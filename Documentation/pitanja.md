@@ -1,33 +1,49 @@
 ## Pitanja u vezi organizacije
 
-- da li postoji ogranicenje koliko takmicara jedan klub moze da prijavi
-    - da li je to ogranicenje na nivou kategorije?
-    - da li postoji neki prioritet? 
-        - da ne moze jedan klub da prijavi 20 takmicara, pa da ostali klubovi uopste ne mogu da ucestvuju? 
++ da li postoji ogranicenje koliko takmicara jedan klub moze da prijavi
+    + da li je to ogranicenje na nivou kategorije?
+    + da li postoji neki prioritet? 
+        + da ne moze jedan klub da prijavi 20 takmicara, pa da ostali klubovi uopste ne mogu da ucestvuju? 
+
++ administrator moze da odjavi nasilno nekog
+    + on ce videti live ko se prijavljuje i onda moze da se doradi
 
 
++ minimalno jedan trener mora da bude prijavljen?
+    + moze cak i da se ne prijavi trener
 
-- minimalno jedan trener mora da bude prijavljen?
++ ako se na klupskom takmicenju prijavi nacionalni tim, da li tada taj tim tretirati kao da je klub
+    + samo u nazivu da pise nacionalni tim bugarske na primer
 
-- ako se na klupskom takmicenju prijavi nacionalni tim, da li tada taj tim tretirati kao da je klub
++ 5 5 3 format ekipa
+    + da li se uzimaju 3 visebojca koji svi moraju biti iz razlictih kategorija
+    + pod najboljim se smatra da imaju najbolji all around score?
+    + 3 najbolja visebojca iz 3 razlicite kategorije(obavezno)
+        - misli se na score u viseboju
 
-- 5 5 3 format ekipa
-    - da li se uzimaju 3 visebojca koji svi moraju biti iz razlictih kategorija
-    - pod najboljim se smatra da imaju najbolji all around score?
++ koje informacije bi se unosile ako bi u pitanju bila drzava
 
-- koje informacije bi se unosile ako bi u pitanju bila drzava
++ zbog cega se unosi godiste ako vec postoji polje za kategorije
+    + da li onda treba omoguciti korigovanje kategorije ako takmicar omasi kategoriju
+        + da
+    + nekad trener moze da zatrazi da se takmicar takmici u visim kategorijama
+        + moze samo na visu kategoriju
 
-- zbog cega se unosi godiste ako vec postoji polje za kategorije
-    - da li onda treba omoguciti korigovanje kategorije ako takmicar omasi kategoriju
++ naznaciti ako klub nije obezbedio sudiju
++ sta ako broj prijavljenih sudija nije dovoljan da se odrzi takmicenje
+    + kako se dobavljaju sudije
+        + sudije se zavrsavaju sa spiskom
+        + onda se rucno dodaju sudije i rasporedjuju po spravama
++ napraviti tako da se podesavaju paramteri, vidi izgleda pa da se opet moze prekonfigurisati i na kraju i rucno preraditi
 
-- sta ako broj prijavljenih sudija nije dovoljan da se odrzi takmicenje
-    - kako se dobavljaju sudije
+
     - da li se onda takmicenje odvija tako sto se takmice prvo 3 sprave pa onda druge 3
         - da li ovo da navedem kao opciju tek nakon imenicne prijave
 
 - POGLEDAJ TACKU IZNAD - format takmicenja 3 pa 3 kada se odlucuje da ce biti koristen
 
-- da li je proglasenje uvek na kraju turnusa ili moze za sve da se odrzi na samom kraju
++ da li je proglasenje uvek na kraju turnusa ili moze za sve da se odrzi na samom kraju
+    - moze i na samom kraju
     - da li treba obezbediti jos prostora za neko finalno proglasenje
 - ako se broj takmicara jedne kategorije prelije u dva turnusa, da li se onda njihovo proglasenje vrsi kada svi takmicari odtakmice
 
@@ -42,7 +58,19 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!
 - U KOM TRENUTKU SE DEFINISE BROJ D I E SUDIJA NA SPRAVAMA
     - tehnicki sastanak ili na samom definisanju formata takmicenja
+        - desava se jos kasnije
+            - odrzava se na opstem zagrevanju(moze i ranije, ali kada se zavrse svi tehnicki problemi)
+            - kako se racuna E ocena zadaje se neposredno pre takmicenja
+                - odbacivanje i racunanje srednje vrednosti
+            - D ocena se jedna upisuje
+                - moze se definisati hoce li biti 1, 2... D sudije i da li ce biti supervizor (on ima zaseban uredjaj)
+                    - zavrsi se izvedba, supervizor posalje svoju D, to vide D ziri i odna se dodje do konsenzusa uo finalnoj D oceni
+                - supervizor vidi sve (i D i E ocene) i ima mogucnost da pregleda i video materijal (nije bitno za sad)
+
+
+- ako dodje do greske ili zalbe trenera, samo supervizor ili administrator da promeni ocenu uz dozvolu!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 - jedino se parter deli, a postoje dva preskoka ako se odrzavaju istovremeno musko i zensko takmicenje
     - kako onda funkcionisu rotacije
@@ -74,7 +102,7 @@
 
 - Budući da u ekipnom finalu učestvuje 8 timova, da li to znači da se finale mora organizovati iz dva turnusa po 4 tima? Kako bi se onda određivalo u kom turnusu se koji tim takmiči? Da li se možda redosled određuje na osnovu plasmana ekipa u kvalifikacijama?
 
-
++ default da bude 6 i 4ali da postoji mogucnost za 3-3 2-2
 ## Predlozi
 
 - na kraju se mogu izabrati dva ili vise takmicenja i na osnovu tih rezultata da se sracuna apsoultni pobednik
