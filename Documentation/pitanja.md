@@ -18,6 +18,10 @@
 
 ## Raspored
 
+- kako za finala po spravama, svih osam ide odjednom?
+    - ne moze u paraleli?
+    - ako se potrefi da nijedan od takmicara ne takmici obe sprave u istom trenutku, da li da paralelizuje ta dva finala
+
 - Ako se rotacija pravi da se deli na dva zagrevanja, da li ce onda tako biti na svakoj spravi ili se za svaku spravu zasebno definise hoce li biti iz delova ili odjednom
 
 - kako se menja raspored ako dodje do neke nezgode za vreme takmičenja?
