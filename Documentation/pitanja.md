@@ -18,18 +18,21 @@
 
 ## Raspored
 
+- Ako se rotacija pravi da se deli na dva zagrevanja, da li ce onda tako biti na svakoj spravi ili se za svaku spravu zasebno definise hoce li biti iz delova ili odjednom
+
 - kako za finala po spravama, svih osam ide odjednom?
     - ne moze u paraleli?
     - ako se potrefi da nijedan od takmicara ne takmici obe sprave u istom trenutku, da li da paralelizuje ta dva finala
+    - da li moze istovremeno vise kategorija odjednom da takmici?
+    - da li sve vazi isto kao i za kvalifikaciono takmicenenje sto se tice proglasenja, zagrevanja, opsteg zagrevanja
 
-- Ako se rotacija pravi da se deli na dva zagrevanja, da li ce onda tako biti na svakoj spravi ili se za svaku spravu zasebno definise hoce li biti iz delova ili odjednom
+- U kom trenutku vise ne mogu da se menjaju informacije o takmicarima? Da li ostaviti da mogu uvek da se menjaju?
+    - Da li nakon tehnickog sastanka moze da se menja starosna kategorija ili sprave na kojima ce se takmicar takmiciti?
 
 - kako se menja raspored ako dodje do neke nezgode za vreme takmičenja?
     - Može se omogućiti naknadno pomeranje rasporeda u slučaju nezgode ili nekog neočekivanog tehničkog problema, kao i ukoliko administrator takmičenja uoči da je ipak potrebno više vremena za jednu rotaciju. Pomeranje bi se vršilo navođenjem vremenskog intervala za koji da se pomeri čitav
     raspored ili definisanjem novog vremena potrebnog za rotaciju, gde bi se na osnovu njega iznova iskalkulisao raspored.
 
-- U kom trenutku vise ne mogu da se menjaju informacije o takmicarima? Da li ostaviti da mogu uvek da se menjaju?
-    - Da li nakon tehnickog sastanka moze da se menja starosna kategorija ili sprave na kojima ce se takmicar takmiciti?
 
 
 
