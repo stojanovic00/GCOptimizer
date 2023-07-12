@@ -1,15 +1,21 @@
 package app
 
 import (
+	grpc_client "api_gateway/api/client"
 	"api_gateway/api/handler"
+	"auth_service/api/middleware"
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	//DEPENDENCIES
-	authHandler := handler.AuthHadler{}
-	scheduleHandelr := handler.ScheduleHandler{}
+	authServiceAddress := fmt.Sprintf("%s:%s", a.Config.AuthServiceHost, a.Config.AuthServicePort)
+	authClient := grpc_client.NewAuthClient(authServiceAddress)
+
+	authHandler := handler.NewAuthHandler(authClient)
+	scheduleHandler := handler.ScheduleHandler{}
 
 	// MIDDLEWARE
 	corsMiddleware := cors.New(cors.Config{
@@ -28,6 +34,7 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	})
 
 	authGroup := publicRouter.Group("/auth")
+	authGroup.POST("/register", authHandler.Register)
 	authGroup.POST("/login", authHandler.Login)
 
 	//PRIVATE
@@ -38,7 +45,7 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 		c.JSON(404, gin.H{"message": "Endpoint doesn't exist"})
 	})
 
-	testGroup := privateRouter.Group("/test")
-	testGroup.GET("", scheduleHandelr.Test)
+	testGroup := privateRouter.Group("/test", middleware.ValidateAndExtractToken())
+	testGroup.GET("", middleware.Authorize("JudgesRead"), scheduleHandler.Test)
 	return publicRouter, privateRouter, nil
 }
