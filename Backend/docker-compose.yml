@@ -67,9 +67,34 @@ services:
     ports:
       - 5001:5432
 
+  application_db:
+    image: application_db
+    container_name: application_db
+    restart: on-failure
+    build:
+      context: ../Database/Application
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${APPLICATION_DB_USER}
+      POSTGRES_PASSWORD: ${APPLICATION_DB_PASS}
+      POSTGRES_DB: ${APPLICATION_DB_NAME}
+    volumes: 
+      - application_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5002:5432
 
 volumes:
   auth_db:
+    driver: local
+  application_db:
     driver: local
 
 networks:
