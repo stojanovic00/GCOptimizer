@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  api_gateway:
+    image: api_gateway
+    container_name: api_gateway
+    build:
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
+    restart: on-failure
+    ports:
+      - ${API_GATEWAY_PUBLIC_PORT}:${API_GATEWAY_PUBLIC_PORT}
+      - ${API_GATEWAY_PRIVATE_PORT}:${API_GATEWAY_PRIVATE_PORT}
+    environment:
+      API_GATEWAY_HOST: ${API_GATEWAY_HOST}
+      API_GATEWAY_PUBLIC_PORT: ${API_GATEWAY_PUBLIC_PORT}
+      API_GATEWAY_PRIVATE_PORT: ${API_GATEWAY_PRIVATE_PORT}
+      
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+    networks:
+      - network
+
+  auth_db:
+    image: auth_db
+    container_name: auth_db
+    restart: on-failure
+    build:
+      context: ../Database/Auth
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+    volumes: 
+      - auth_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5001:5432
+
+
+volumes:
+  auth_db:
+    driver: local
+
+networks:
+  network:
+    driver: bridge
