@@ -5,9 +5,9 @@ import (
 )
 
 type Config struct {
-	Host            string `long:"host" env:"HOST"`
-	PublicPort      string `long:"public-port" env:"PUBLIC_PORT"`
-	PrivatePort     string `long:"private-port" env:"PRIVATE_PORT"`
+	Host            string `long:"host" env:"API_GATEWAY_HOST"`
+	PublicPort      string `long:"public-port" env:"API_GATEWAY_PUBLIC_PORT"`
+	PrivatePort     string `long:"private-port" env:"API_GATEWAY_PRIVATE_PORT"`
 	AuthServiceHost string `long:"AUTH_SERVICE_HOST" env:"AUTH_SERVICE_HOST"`
 	AuthServicePort string `long:"AUTH_SERVICE_PORT" env:"AUTH_SERVICE_PORT"`
 }

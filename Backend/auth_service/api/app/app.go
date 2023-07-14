@@ -21,11 +21,13 @@ type App struct {
 
 func (a *App) Run() error {
 	//DB INIT
+	log.Printf("Connecting to database...")
 	pgClient := a.initPGClient()
 	err := pgClient.AutoMigrate(&domain.Account{}, &domain.Role{}, &domain.Permission{})
 	if err != nil {
 		return err
 	}
+	log.Printf("Connected and updated pg database")
 
 	accountRepo := repo.NewAccountRepositoryPg(pgClient)
 	accountService := service.NewAccountService(accountRepo)

@@ -43,6 +43,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	err := parseBody(ctx, &acc)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
 	}
 
 	response, err := h.client.Create(context.TODO(), &acc)

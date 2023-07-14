@@ -19,7 +19,7 @@ func GenerateToken(account *domain.Account) (string, error) {
 
 	//Standard claims
 	claims.IssuedAt = time.Now().UTC().Unix()
-	claims.ExpiresAt = time.Now().Add(time.Hour).UTC().Unix()
+	claims.ExpiresAt = time.Now().UTC().Add(time.Duration(90) * time.Minute).Unix()
 
 	//Generates not yet signed token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -35,7 +35,6 @@ func GenerateToken(account *domain.Account) (string, error) {
 func VerifyToken(tokenString string) (*domain.JwtClaims, error) {
 	claims := &domain.JwtClaims{}
 	token, err := getTokenFromString(tokenString, claims)
-
 	if err != nil {
 		return claims, err
 	}
