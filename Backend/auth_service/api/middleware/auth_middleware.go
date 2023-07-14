@@ -14,6 +14,10 @@ import (
 	"strings"
 )
 
+//NOTE!!!
+//This middleware should be used in service which uses auth service e.g. api gateway
+//NOTE!!!
+
 var (
 	authServiceHost = os.Getenv("AUTH_SERVICE_HOST")
 	authServicePort = os.Getenv("AUTH_SERVICE_PORT")
@@ -23,7 +27,7 @@ func ValidateAndExtractToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		bearerToken := ctx.Request.Header.Get("Authorization")
 		if bearerToken == "" {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No authentication header provided"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"errors": "No authentication header provided"})
 			ctx.Abort()
 			return
 		}
@@ -32,7 +36,7 @@ func ValidateAndExtractToken() gin.HandlerFunc {
 
 		claims, err := service.VerifyToken(tokenString)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"errors": err.Error()})
 			ctx.Abort()
 			return
 		}
@@ -57,20 +61,20 @@ func Authorize(permission string) gin.HandlerFunc {
 		authClient := grpc_client.NewAuthClient(authServiceAddress)
 		ctxWithInfo, err := GetGrpcContextWithUserInfo(ctx)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
 			ctx.Abort()
 			return
 		}
 
 		hasPermission, err := authClient.HasPermission(ctxWithInfo, &auth_pb.HasPermissionRequest{Permission: permission})
 		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"errors": err.Error()})
 			ctx.Abort()
 			return
 		}
 
 		if !hasPermission.Value {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "You don't have permission for this action"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"errors": "You don't have permission for this action"})
 			ctx.Abort()
 			return
 		}
@@ -90,7 +94,7 @@ func ParseUserInfo(ctx *gin.Context) (*auth_pb.UserInfo, error) {
 func GetGrpcContextWithUserInfo(ctx *gin.Context) (context.Context, error) {
 	userInfo, err := ParseUserInfo(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
 		return nil, err
 	}
 

@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-type AccountRepositoryPg struct {
+type AccountRepoPg struct {
 	dbClient *gorm.DB
 }
 
-func NewAccountRepositoryPg(dbClient *gorm.DB) *AccountRepositoryPg {
-	return &AccountRepositoryPg{dbClient: dbClient}
+func NewAccountRepositoryPg(dbClient *gorm.DB) *AccountRepoPg {
+	return &AccountRepoPg{dbClient: dbClient}
 }
 
-func (r *AccountRepositoryPg) Create(account *domain.Account) (uuid.UUID, error) {
+func (r *AccountRepoPg) Create(account *domain.Account) (uuid.UUID, error) {
 	_, err := r.GetByEmail(account.Email)
 	if err == nil {
 		return uuid.Nil, errors.ErrEmailTaken{}
@@ -42,7 +42,7 @@ func (r *AccountRepositoryPg) Create(account *domain.Account) (uuid.UUID, error)
 	return account.ID, nil
 }
 
-func (r *AccountRepositoryPg) GetByEmail(email string) (domain.Account, error) {
+func (r *AccountRepoPg) GetByEmail(email string) (domain.Account, error) {
 	var account domain.Account
 
 	result := r.dbClient.Where("email = ?", email).Preload("Role").First(&account)
@@ -52,7 +52,7 @@ func (r *AccountRepositoryPg) GetByEmail(email string) (domain.Account, error) {
 	return account, nil
 }
 
-func (r *AccountRepositoryPg) HasPermission(roleName, permissionName string) (bool, error) {
+func (r *AccountRepoPg) HasPermission(roleName, permissionName string) (bool, error) {
 	//Get role
 	var role domain.Role
 	result := r.dbClient.Where("name = ?", strings.ToUpper(roleName)).First(&role)

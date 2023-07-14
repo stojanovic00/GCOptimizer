@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type IAccountRepository interface {
+type AccountRepo interface {
 	Create(account *domain.Account) (uuid.UUID, error)
 	GetByEmail(email string) (domain.Account, error)
 	HasPermission(roleName, permissionName string) (bool, error)

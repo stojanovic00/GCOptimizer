@@ -1,11 +1,18 @@
 package app
 
 import (
+	"application_service/api/handler"
 	"application_service/config"
 	"application_service/core/domain"
+	"application_service/core/service"
 	db_client "application_service/persistence/client"
+	"application_service/persistence/repo"
+	application_pb "common/proto/application/generated"
+	"fmt"
+	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"log"
+	"net"
 )
 
 type App struct {
@@ -16,7 +23,6 @@ func (a *App) Run() error {
 	//DB INIT
 	log.Printf("Connecting to database...")
 	pgClient := a.initPGClient()
-	// POMAZE BOG
 	err := pgClient.AutoMigrate(
 		&domain.Address{},
 		&domain.AgeCategory{},
@@ -29,17 +35,21 @@ func (a *App) Run() error {
 		&domain.DelegationMemberPosition{},
 		&domain.DelegationMemberProposition{},
 		&domain.Judge{},
+		&domain.JudgeApplication{},
 		&domain.SportsOrganisation{},
 		&domain.TeamComposition{},
 	)
 
-	// POMAZE BOG
 	if err != nil {
 		return err
 	}
 	log.Printf("Connected and updated pg database")
 
-	//a.startGrpcServer(accountHandler)
+	soRepo := repo.NewSportsOrganisationRepoPg(pgClient)
+	soService := service.NewSportsOrganisationService(soRepo)
+	rpcHandler := handler.NewHandlerRpc(soService)
+
+	a.startGrpcServer(rpcHandler)
 	return nil
 }
 
@@ -54,17 +64,17 @@ func (a *App) initPGClient() *gorm.DB {
 	return client
 }
 
-//func (a *App) startGrpcServer(accountHandler *handler.AccountHandler) {
-//	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", a.Config.Port))
-//	if err != nil {
-//		log.Fatalf("failed to listen: %v", err)
-//	}
-//
-//	grpcServer := grpc.NewServer()
-//	auth_pb.RegisterAuthServiceServer(grpcServer, accountHandler)
-//	fmt.Printf("Listening on port: %s\n", a.Config.Port)
-//
-//	if err := grpcServer.Serve(listener); err != nil {
-//		log.Fatalf("failed to serve: %s", err)
-//	}
-//}
+func (a *App) startGrpcServer(handlerRpc *handler.HandlerRpc) {
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", a.Config.Port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	application_pb.RegisterApplicationServiceServer(grpcServer, handlerRpc)
+	fmt.Printf("Listening on port: %s\n", a.Config.Port)
+
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %s", err)
+	}
+}

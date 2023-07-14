@@ -1,8 +1,8 @@
 package app
 
 import (
-	grpc_client "api_gateway/api/client"
-	"api_gateway/api/handler"
+	grpc_client "api_gateway/client"
+	handler2 "api_gateway/handler"
 	"auth_service/api/middleware"
 	"fmt"
 	"github.com/gin-contrib/cors"
@@ -13,9 +13,13 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	//DEPENDENCIES
 	authServiceAddress := fmt.Sprintf("%s:%s", a.Config.AuthServiceHost, a.Config.AuthServicePort)
 	authClient := grpc_client.NewAuthClient(authServiceAddress)
+	authHandler := handler2.NewAuthHandler(authClient)
 
-	authHandler := handler.NewAuthHandler(authClient)
-	scheduleHandler := handler.ScheduleHandler{}
+	applicationServiceAddress := fmt.Sprintf("%s:%s", a.Config.ApplicationServiceHost, a.Config.ApplicationServicePort)
+	applicationClient := grpc_client.NewApplicationClient(applicationServiceAddress)
+	applicationHandler := handler2.NewApplicationHandler(applicationClient, authClient)
+
+	scheduleHandler := handler2.ScheduleHandler{}
 
 	// MIDDLEWARE
 	corsMiddleware := cors.New(cors.Config{
@@ -33,9 +37,15 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 		c.JSON(404, gin.H{"message": "Endpoint doesn't exist"})
 	})
 
+	//AUTH
 	authGroup := publicRouter.Group("/auth")
 	authGroup.POST("/register", authHandler.Register)
 	authGroup.POST("/login", authHandler.Login)
+
+	//APPLICATION
+	applicationGroupPublic := publicRouter.Group("application")
+	soGroup := applicationGroupPublic.Group("/sports-organisation")
+	soGroup.POST("", applicationHandler.RegisterSportsOrganisation)
 
 	//PRIVATE
 	privateRouter := gin.Default()

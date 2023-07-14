@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option go_package = "common/application_pb";
+package application_pb;
+
+service ApplicationService{
+  rpc RegisterSportsOrganisation(SportsOrganisation) returns(IdResponse) {}
+}
+
+message IdResponse{
+  string id = 1;
+}
+
+message Address{
+  string id = 1;
+  string country = 2;
+  string city = 3;
+  string street = 4;
+  string streetNumber =5;
+}
+message SportsOrganisation{
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string contactPersonFullName = 5;
+  bool competitionOrganisingPrivilege = 6;
+  Address address = 7;
+}

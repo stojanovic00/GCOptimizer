@@ -3,12 +3,9 @@ package handler
 import (
 	auth_pb "common/proto/auth/generated"
 	"context"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 	"net/http"
 )
 
@@ -20,27 +17,9 @@ func NewAuthHandler(client auth_pb.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{client: client}
 }
 
-func parseBody(ctx *gin.Context, bodyObject proto.Message) error {
-	if ctx.Request.Body == http.NoBody {
-		return errors.New("Empty body")
-	}
-
-	data, err := ctx.GetRawData()
-	if err != nil {
-		return errors.New(err.Error())
-	}
-
-	err = protojson.Unmarshal(data, bodyObject)
-	if err != nil {
-		return errors.New("Unmarshalling failed")
-	}
-
-	return nil
-}
-
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var acc auth_pb.Account
-	err := parseBody(ctx, &acc)
+	err := ctx.ShouldBindJSON(&acc)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -67,7 +46,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 
 func (h *AuthHandler) Login(ctx *gin.Context) {
 	var acc auth_pb.Account
-	err := parseBody(ctx, &acc)
+	err := ctx.ShouldBindJSON(&acc)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 	}

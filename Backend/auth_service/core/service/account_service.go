@@ -9,10 +9,10 @@ import (
 )
 
 type AccountService struct {
-	accountRepository repo.IAccountRepository
+	accountRepository repo.AccountRepo
 }
 
-func NewAccountService(accountRepository repo.IAccountRepository) *AccountService {
+func NewAccountService(accountRepository repo.AccountRepo) *AccountService {
 	return &AccountService{accountRepository: accountRepository}
 }
 
