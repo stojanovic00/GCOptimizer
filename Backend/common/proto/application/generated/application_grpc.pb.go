@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApplicationServiceClient interface {
-	RegisterSportsOrganisation(ctx context.Context, in *SportsOrganisation, opts ...grpc.CallOption) (*IdResponse, error)
+	RegisterSportsOrganisation(ctx context.Context, in *SportsOrganisation, opts ...grpc.CallOption) (*IdMessage, error)
+	GetLoggedSportsOrganisation(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SportsOrganisation, error)
 }
 
 type applicationServiceClient struct {
@@ -33,9 +34,18 @@ func NewApplicationServiceClient(cc grpc.ClientConnInterface) ApplicationService
 	return &applicationServiceClient{cc}
 }
 
-func (c *applicationServiceClient) RegisterSportsOrganisation(ctx context.Context, in *SportsOrganisation, opts ...grpc.CallOption) (*IdResponse, error) {
-	out := new(IdResponse)
+func (c *applicationServiceClient) RegisterSportsOrganisation(ctx context.Context, in *SportsOrganisation, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
 	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/RegisterSportsOrganisation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetLoggedSportsOrganisation(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SportsOrganisation, error) {
+	out := new(SportsOrganisation)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetLoggedSportsOrganisation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +56,8 @@ func (c *applicationServiceClient) RegisterSportsOrganisation(ctx context.Contex
 // All implementations must embed UnimplementedApplicationServiceServer
 // for forward compatibility
 type ApplicationServiceServer interface {
-	RegisterSportsOrganisation(context.Context, *SportsOrganisation) (*IdResponse, error)
+	RegisterSportsOrganisation(context.Context, *SportsOrganisation) (*IdMessage, error)
+	GetLoggedSportsOrganisation(context.Context, *EmptyMessage) (*SportsOrganisation, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -54,8 +65,11 @@ type ApplicationServiceServer interface {
 type UnimplementedApplicationServiceServer struct {
 }
 
-func (UnimplementedApplicationServiceServer) RegisterSportsOrganisation(context.Context, *SportsOrganisation) (*IdResponse, error) {
+func (UnimplementedApplicationServiceServer) RegisterSportsOrganisation(context.Context, *SportsOrganisation) (*IdMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterSportsOrganisation not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetLoggedSportsOrganisation(context.Context, *EmptyMessage) (*SportsOrganisation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLoggedSportsOrganisation not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
 
@@ -88,6 +102,24 @@ func _ApplicationService_RegisterSportsOrganisation_Handler(srv interface{}, ctx
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationService_GetLoggedSportsOrganisation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetLoggedSportsOrganisation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetLoggedSportsOrganisation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetLoggedSportsOrganisation(ctx, req.(*EmptyMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationService_ServiceDesc is the grpc.ServiceDesc for ApplicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterSportsOrganisation",
 			Handler:    _ApplicationService_RegisterSportsOrganisation_Handler,
+		},
+		{
+			MethodName: "GetLoggedSportsOrganisation",
+			Handler:    _ApplicationService_GetLoggedSportsOrganisation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
