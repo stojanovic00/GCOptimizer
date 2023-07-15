@@ -38,6 +38,16 @@ func delegationMemberDomToPb(judgeDom *domain.DelegationMember) *application_pb.
 		SportsOrganisation: sportsOrganizationDomToPb(&judgeDom.SportsOrganization),
 	}
 }
+func delegationMemberPbToDom(judgePb *application_pb.DelegationMember) *domain.DelegationMember {
+	return &domain.DelegationMember{
+		FullName: judgePb.FullName,
+		Email:    judgePb.Email,
+		Gender:   domain.Gender(judgePb.Gender),
+		Position: domain.DelegationMemberPosition{
+			Name: judgePb.Position.Name,
+		},
+	}
+}
 
 func judgeDomToPb(judgeDom *domain.Judge) *application_pb.Judge {
 	return &application_pb.Judge{
@@ -54,4 +64,19 @@ func judgeListDomToPb(judgeDomList []*domain.Judge) []*application_pb.Judge {
 	}
 
 	return judgePbList
+}
+func contestantDomToPb(contestantDom *domain.Contestant) *application_pb.Contestant {
+	return &application_pb.Contestant{
+		DelegationMember: delegationMemberDomToPb(&contestantDom.DelegationMember),
+		DateOfBirth:      contestantDom.DateOfBirth.Unix(),
+	}
+}
+
+func contestantListDomToPb(contestantDomList []*domain.Contestant) []*application_pb.Contestant {
+	var contestantPbList []*application_pb.Contestant
+	for _, contestantDom := range contestantDomList {
+		contestantPbList = append(contestantPbList, contestantDomToPb(contestantDom))
+	}
+
+	return contestantPbList
 }

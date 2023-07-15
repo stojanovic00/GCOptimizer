@@ -35,7 +35,7 @@ func (r *DelegationMemberRepoPg) RegisterJudge(judge *domain.Judge) (uuid.UUID, 
 		return uuid.UUID{}, errors.ErrEmailTaken{}
 	}
 
-	position, err := r.GetPositionByName(judge.Position.Name)
+	position, err := r.GetPositionByName("judge")
 	if err != nil {
 		return uuid.UUID{}, err
 	}
@@ -61,14 +61,6 @@ func (r *DelegationMemberRepoPg) GetSportsOrganisationJudges(soId uuid.UUID) ([]
 
 	return judges, nil
 }
-func (r *DelegationMemberRepoPg) RegisterContestant(contestant *domain.Contestant) (uuid.UUID, error) {
-
-	return uuid.UUID{}, nil
-}
-func (r *DelegationMemberRepoPg) GetSportsOrganisationContestants(soID uuid.UUID) ([]domain.Contestant, error) {
-	return nil, nil
-}
-
 func (r *DelegationMemberRepoPg) GetJudgeByEmail(email string) (*domain.Judge, error) {
 	var judge domain.Judge
 
@@ -81,4 +73,52 @@ func (r *DelegationMemberRepoPg) GetJudgeByEmail(email string) (*domain.Judge, e
 		return &domain.Judge{}, errors.ErrNotFound{Message: "Judge with given email not found"}
 	}
 	return &judge, nil
+}
+
+func (r *DelegationMemberRepoPg) RegisterContestant(contestant *domain.Contestant) (uuid.UUID, error) {
+	_, err := r.GetContestantByEmail(contestant.Email)
+	if err == nil {
+		return uuid.UUID{}, errors.ErrEmailTaken{}
+	}
+
+	position, err := r.GetPositionByName("contestant")
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	contestant.Position = *position
+
+	if contestant.ID == uuid.Nil {
+		contestant.ID, _ = uuid.NewUUID()
+	}
+
+	result := r.dbClient.Create(contestant)
+	if result.Error != nil {
+		return uuid.UUID{}, result.Error
+	}
+
+	return contestant.ID, nil
+}
+
+func (r *DelegationMemberRepoPg) GetSportsOrganisationContestants(soId uuid.UUID) ([]*domain.Contestant, error) {
+	var contestant []*domain.Contestant
+	if err := r.dbClient.Where("sports_organization_id = ?", soId).Preload("Position").Find(&contestant).Error; err != nil {
+		return nil, nil
+	}
+
+	return contestant, nil
+}
+
+func (r *DelegationMemberRepoPg) GetContestantByEmail(email string) (*domain.Contestant, error) {
+	var contestant domain.Contestant
+
+	result := r.dbClient.Where("email = ?", email).First(&contestant)
+	if result.Error != nil {
+		return &domain.Contestant{}, result.Error
+	}
+
+	if &contestant == nil {
+		return &domain.Contestant{}, errors.ErrNotFound{Message: "Contestant with given email not found"}
+	}
+	return &contestant, nil
 }

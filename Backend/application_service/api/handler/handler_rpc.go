@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"time"
 )
 
 type HandlerRpc struct {
@@ -80,16 +81,9 @@ func (h *HandlerRpc) RegisterJudge(ctx context.Context, judge *application_pb.Ju
 	}
 
 	newJudge := &domain.Judge{
-		DelegationMember: domain.DelegationMember{
-			FullName: judge.DelegationMember.FullName,
-			Email:    judge.DelegationMember.Email,
-			Gender:   domain.Gender(judge.DelegationMember.Gender),
-			Position: domain.DelegationMemberPosition{
-				Name: judge.DelegationMember.Position.Name,
-			},
-		},
-		LicenceType: domain.LicenceType(judge.LicenceType),
-		LicenceName: judge.LicenceName,
+		DelegationMember: *delegationMemberPbToDom(judge.DelegationMember),
+		LicenceType:      domain.LicenceType(judge.LicenceType),
+		LicenceName:      judge.LicenceName,
 	}
 	id, err := h.dmService.RegisterJudge(newJudge, userinfo.Email)
 	if err != nil {
@@ -125,8 +119,46 @@ func (h *HandlerRpc) GetSportOrganisationJudges(ctx context.Context, _ *applicat
 	return &application_pb.JudgesList{Judges: judgeListDomToPb(result)}, nil
 }
 func (h *HandlerRpc) RegisterContestant(ctx context.Context, contestant *application_pb.Contestant) (*application_pb.IdMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterContestant not implemented")
+	userinfo, err := ParseUserInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	newContestant := &domain.Contestant{
+		DelegationMember: *delegationMemberPbToDom(contestant.DelegationMember),
+		DateOfBirth:      time.Unix(contestant.DateOfBirth, 0),
+	}
+
+	id, err := h.dmService.RegisterContestant(newContestant, userinfo.Email)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		case errors.ErrEmailTaken:
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+
+	return &application_pb.IdMessage{Id: id.String()}, nil
 }
+
 func (h *HandlerRpc) GetSportOrganisationContestants(ctx context.Context, _ *application_pb.EmptyMessage) (*application_pb.ContestantList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSportOrganisationContestants not implemented")
+	userinfo, err := ParseUserInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := h.dmService.GetSportsOrganisationContestants(userinfo.Email)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+
+	return &application_pb.ContestantList{Contestants: contestantListDomToPb(result)}, nil
 }

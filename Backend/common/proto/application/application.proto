@@ -2,7 +2,6 @@ syntax = "proto3";
 
 option go_package = "common/application_pb";
 package application_pb;
-import "google/protobuf/timestamp.proto";
 
 service ApplicationService{
   //Sports organisation
@@ -75,7 +74,7 @@ message JudgesList{
 
 message Contestant{
   DelegationMember delegationMember = 1;
-  google.protobuf.Timestamp dateOfBirth = 2;
+  int64 dateOfBirth = 2;
 }
 
 message ContestantList{

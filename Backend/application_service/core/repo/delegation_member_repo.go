@@ -9,5 +9,5 @@ type DelegationMemberRepo interface {
 	RegisterJudge(judge *domain.Judge) (uuid.UUID, error)
 	GetSportsOrganisationJudges(soID uuid.UUID) ([]*domain.Judge, error)
 	RegisterContestant(contestant *domain.Contestant) (uuid.UUID, error)
-	GetSportsOrganisationContestants(soID uuid.UUID) ([]domain.Contestant, error)
+	GetSportsOrganisationContestants(soID uuid.UUID) ([]*domain.Contestant, error)
 }

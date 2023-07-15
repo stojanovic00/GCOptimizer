@@ -33,9 +33,20 @@ func (s *DelegationMemberService) GetSportsOrganisationJudges(soEmail string) ([
 
 	return s.dmRepo.GetSportsOrganisationJudges(sportsOrg.ID)
 }
-func (s *DelegationMemberService) RegisterContestant(contestant domain.Contestant) (uuid.UUID, error) {
-	return uuid.UUID{}, nil
+func (s *DelegationMemberService) RegisterContestant(contestant *domain.Contestant, soEmail string) (uuid.UUID, error) {
+	sportsOrg, err := s.soRepo.GetByEmail(soEmail)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	contestant.SportsOrganization = *sportsOrg
+
+	return s.dmRepo.RegisterContestant(contestant)
 }
-func (s *DelegationMemberService) GetSportsOrganisationContestants(soEmail string) ([]domain.Contestant, error) {
-	return nil, nil
+func (s *DelegationMemberService) GetSportsOrganisationContestants(soEmail string) ([]*domain.Contestant, error) {
+	sportsOrg, err := s.soRepo.GetByEmail(soEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.dmRepo.GetSportsOrganisationContestants(sportsOrg.ID)
 }
