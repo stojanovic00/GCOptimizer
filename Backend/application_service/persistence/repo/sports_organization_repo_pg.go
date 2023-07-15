@@ -15,7 +15,7 @@ func NewSportsOrganisationRepoPg(dbClient *gorm.DB) *SportsOrganisationRepoPg {
 	return &SportsOrganisationRepoPg{dbClient: dbClient}
 }
 
-func (r *SportsOrganisationRepoPg) Create(organisation *domain.SportsOrganisation) (uuid.UUID, error) {
+func (r *SportsOrganisationRepoPg) Create(organisation *domain.SportsOrganization) (uuid.UUID, error) {
 	_, err := r.GetByEmail(organisation.Email)
 	if err == nil {
 		return uuid.Nil, errors.ErrEmailTaken{}
@@ -37,16 +37,16 @@ func (r *SportsOrganisationRepoPg) Create(organisation *domain.SportsOrganisatio
 	return organisation.ID, nil
 }
 
-func (r *SportsOrganisationRepoPg) GetByEmail(email string) (*domain.SportsOrganisation, error) {
-	var spOrg domain.SportsOrganisation
+func (r *SportsOrganisationRepoPg) GetByEmail(email string) (*domain.SportsOrganization, error) {
+	var spOrg domain.SportsOrganization
 
 	result := r.dbClient.Where("email = ?", email).Preload("Address").First(&spOrg)
 	if result.Error != nil {
-		return &domain.SportsOrganisation{}, result.Error
+		return &domain.SportsOrganization{}, result.Error
 	}
 
 	if &spOrg == nil {
-		return &domain.SportsOrganisation{}, errors.ErrNotFound{Message: "Sports organisation with given email not found"}
+		return &domain.SportsOrganization{}, errors.ErrNotFound{Message: "Sports organisation with given email not found"}
 	}
 	return &spOrg, nil
 }

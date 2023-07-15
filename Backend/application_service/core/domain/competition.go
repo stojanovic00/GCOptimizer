@@ -16,7 +16,7 @@ type Competition struct {
 	AddressId                     uuid.UUID
 	Address                       Address
 	OrganizerID                   uuid.UUID
-	Organizer                     SportsOrganisation
+	Organizer                     SportsOrganization
 	DelegationMemberPropositionID uuid.UUID
 	DelegationMemberProposition   DelegationMemberProposition
 	TeamCompositionID             uuid.UUID

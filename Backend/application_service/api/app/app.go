@@ -36,7 +36,7 @@ func (a *App) Run() error {
 		&domain.DelegationMemberProposition{},
 		&domain.Judge{},
 		&domain.JudgeApplication{},
-		&domain.SportsOrganisation{},
+		&domain.SportsOrganization{},
 		&domain.TeamComposition{},
 	)
 
@@ -47,7 +47,9 @@ func (a *App) Run() error {
 
 	soRepo := repo.NewSportsOrganisationRepoPg(pgClient)
 	soService := service.NewSportsOrganisationService(soRepo)
-	rpcHandler := handler.NewHandlerRpc(soService)
+	dmRepo := repo.NewDelegationMemberRepoPg(pgClient)
+	dmService := service.NewDelegationMemberService(dmRepo, soRepo)
+	rpcHandler := handler.NewHandlerRpc(soService, dmService)
 
 	a.startGrpcServer(rpcHandler)
 	return nil

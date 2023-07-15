@@ -2,7 +2,7 @@ package domain
 
 import "github.com/google/uuid"
 
-type SportsOrganisation struct {
+type SportsOrganization struct {
 	ID                             uuid.UUID
 	Name                           string
 	Email                          string

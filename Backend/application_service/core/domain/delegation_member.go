@@ -10,6 +10,6 @@ type DelegationMember struct {
 	PositionID           uuid.UUID
 	Position             DelegationMemberPosition
 	Image                string
-	SportsOrganisationID uuid.UUID
-	SportsOrganisation   SportsOrganisation
+	SportsOrganizationID uuid.UUID
+	SportsOrganization   SportsOrganization
 }

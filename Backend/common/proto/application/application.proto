@@ -2,10 +2,17 @@ syntax = "proto3";
 
 option go_package = "common/application_pb";
 package application_pb;
+import "google/protobuf/timestamp.proto";
 
 service ApplicationService{
+  //Sports organisation
   rpc RegisterSportsOrganisation(SportsOrganisation) returns(IdMessage) {}
   rpc GetLoggedSportsOrganisation(EmptyMessage) returns(SportsOrganisation) {}
+  //Delegation members
+  rpc RegisterJudge(Judge) returns(IdMessage);
+  rpc GetSportOrganisationJudges(EmptyMessage) returns(JudgesList);
+  rpc RegisterContestant(Contestant) returns(IdMessage);
+  rpc GetSportOrganisationContestants(EmptyMessage) returns(ContestantList);
 }
 
 message EmptyMessage{}
@@ -29,4 +36,48 @@ message SportsOrganisation{
   string contactPersonFullName = 5;
   bool competitionOrganisingPrivilege = 6;
   Address address = 7;
+}
+
+
+
+enum Gender{
+  Male = 0;
+  Female = 1;
+}
+message DelegationMemberPosition {
+  string id = 1;
+  string name = 2;
+}
+message DelegationMember {
+  string id = 1;
+  string fullName = 2;
+  string email = 3;
+  Gender gender = 4;
+  DelegationMemberPosition position = 5;
+  string image = 6;
+  SportsOrganisation sportsOrganisation = 7;
+}
+
+enum LicenceType{
+  National  = 0;
+  International = 1;
+}
+
+message Judge {
+  DelegationMember delegationMember = 1;
+  LicenceType licenceType = 2;
+  string licenceName = 3;
+}
+
+message JudgesList{
+  repeated Judge judges = 1;
+}
+
+message Contestant{
+  DelegationMember delegationMember = 1;
+  google.protobuf.Timestamp dateOfBirth = 2;
+}
+
+message ContestantList{
+  repeated Contestant contestants = 1;
 }

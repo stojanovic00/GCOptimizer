@@ -22,8 +22,14 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApplicationServiceClient interface {
+	// Sports organisation
 	RegisterSportsOrganisation(ctx context.Context, in *SportsOrganisation, opts ...grpc.CallOption) (*IdMessage, error)
 	GetLoggedSportsOrganisation(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SportsOrganisation, error)
+	// Delegation members
+	RegisterJudge(ctx context.Context, in *Judge, opts ...grpc.CallOption) (*IdMessage, error)
+	GetSportOrganisationJudges(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgesList, error)
+	RegisterContestant(ctx context.Context, in *Contestant, opts ...grpc.CallOption) (*IdMessage, error)
+	GetSportOrganisationContestants(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ContestantList, error)
 }
 
 type applicationServiceClient struct {
@@ -52,12 +58,54 @@ func (c *applicationServiceClient) GetLoggedSportsOrganisation(ctx context.Conte
 	return out, nil
 }
 
+func (c *applicationServiceClient) RegisterJudge(ctx context.Context, in *Judge, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/RegisterJudge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetSportOrganisationJudges(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgesList, error) {
+	out := new(JudgesList)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetSportOrganisationJudges", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) RegisterContestant(ctx context.Context, in *Contestant, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/RegisterContestant", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetSportOrganisationContestants(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ContestantList, error) {
+	out := new(ContestantList)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetSportOrganisationContestants", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationServiceServer is the server API for ApplicationService service.
 // All implementations must embed UnimplementedApplicationServiceServer
 // for forward compatibility
 type ApplicationServiceServer interface {
+	// Sports organisation
 	RegisterSportsOrganisation(context.Context, *SportsOrganisation) (*IdMessage, error)
 	GetLoggedSportsOrganisation(context.Context, *EmptyMessage) (*SportsOrganisation, error)
+	// Delegation members
+	RegisterJudge(context.Context, *Judge) (*IdMessage, error)
+	GetSportOrganisationJudges(context.Context, *EmptyMessage) (*JudgesList, error)
+	RegisterContestant(context.Context, *Contestant) (*IdMessage, error)
+	GetSportOrganisationContestants(context.Context, *EmptyMessage) (*ContestantList, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -70,6 +118,18 @@ func (UnimplementedApplicationServiceServer) RegisterSportsOrganisation(context.
 }
 func (UnimplementedApplicationServiceServer) GetLoggedSportsOrganisation(context.Context, *EmptyMessage) (*SportsOrganisation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLoggedSportsOrganisation not implemented")
+}
+func (UnimplementedApplicationServiceServer) RegisterJudge(context.Context, *Judge) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterJudge not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetSportOrganisationJudges(context.Context, *EmptyMessage) (*JudgesList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSportOrganisationJudges not implemented")
+}
+func (UnimplementedApplicationServiceServer) RegisterContestant(context.Context, *Contestant) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterContestant not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetSportOrganisationContestants(context.Context, *EmptyMessage) (*ContestantList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSportOrganisationContestants not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
 
@@ -120,6 +180,78 @@ func _ApplicationService_GetLoggedSportsOrganisation_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationService_RegisterJudge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Judge)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).RegisterJudge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/RegisterJudge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).RegisterJudge(ctx, req.(*Judge))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetSportOrganisationJudges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetSportOrganisationJudges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetSportOrganisationJudges",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetSportOrganisationJudges(ctx, req.(*EmptyMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_RegisterContestant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Contestant)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).RegisterContestant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/RegisterContestant",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).RegisterContestant(ctx, req.(*Contestant))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetSportOrganisationContestants_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetSportOrganisationContestants(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetSportOrganisationContestants",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetSportOrganisationContestants(ctx, req.(*EmptyMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationService_ServiceDesc is the grpc.ServiceDesc for ApplicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +266,22 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLoggedSportsOrganisation",
 			Handler:    _ApplicationService_GetLoggedSportsOrganisation_Handler,
+		},
+		{
+			MethodName: "RegisterJudge",
+			Handler:    _ApplicationService_RegisterJudge_Handler,
+		},
+		{
+			MethodName: "GetSportOrganisationJudges",
+			Handler:    _ApplicationService_GetSportOrganisationJudges_Handler,
+		},
+		{
+			MethodName: "RegisterContestant",
+			Handler:    _ApplicationService_RegisterContestant_Handler,
+		},
+		{
+			MethodName: "GetSportOrganisationContestants",
+			Handler:    _ApplicationService_GetSportOrganisationContestants_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

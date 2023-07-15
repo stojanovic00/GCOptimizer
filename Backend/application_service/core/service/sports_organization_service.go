@@ -14,9 +14,9 @@ func NewSportsOrganisationService(soRepo repo.SportsOrganisationRepo) *SportsOrg
 	return &SportsOrganisationService{soRepo: soRepo}
 }
 
-func (s *SportsOrganisationService) Create(organisation *domain.SportsOrganisation) (uuid.UUID, error) {
+func (s *SportsOrganisationService) Create(organisation *domain.SportsOrganization) (uuid.UUID, error) {
 	return s.soRepo.Create(organisation)
 }
-func (s *SportsOrganisationService) GetByEmail(email string) (*domain.SportsOrganisation, error) {
+func (s *SportsOrganisationService) GetByEmail(email string) (*domain.SportsOrganization, error) {
 	return s.soRepo.GetByEmail(email)
 }

@@ -93,3 +93,61 @@ func (h *ApplicationHandler) GetLoggedSportsOrganisation(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, sportsOrg)
 }
+
+func (h *ApplicationHandler) RegisterJudge(ctx *gin.Context) {
+	var newJudge application_pb.Judge
+
+	err := ctx.ShouldBindJSON(&newJudge)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctxWithUserInfo, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	id, err := h.appClient.RegisterJudge(ctxWithUserInfo, &newJudge)
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			case codes.AlreadyExists:
+				ctx.JSON(http.StatusConflict, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, id)
+}
+func (h *ApplicationHandler) GetSportOrganisationJudges(ctx *gin.Context) {
+	ctxWithUserInfo, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
+		ctx.Abort()
+		return
+	}
+
+	judges, err := h.appClient.GetSportOrganisationJudges(ctxWithUserInfo, &application_pb.EmptyMessage{})
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, judges.Judges)
+}
+func (h *ApplicationHandler) RegisterContestant(ctx *gin.Context)              {}
+func (h *ApplicationHandler) GetSportOrganisationContestants(ctx *gin.Context) {}
