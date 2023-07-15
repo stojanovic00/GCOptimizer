@@ -55,6 +55,14 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	soGroup.GET("contestant", middleware.Authorize("Contestant_crud"), applicationHandler.GetSportOrganisationContestants)
 	soGroup.POST("contestant", middleware.Authorize("Contestant_crud"), applicationHandler.RegisterContestant)
 
+	compGroup := applicationGroupPublic.Group("/competition")
+	//Unauth
+	compGroup.GET("", applicationHandler.GetAllCompetitions)
+	compGroup.GET("/:id", applicationHandler.GetCompetitionById)
+	//Auth
+	compGroup.Use(middleware.ValidateAndExtractToken())
+	compGroup.POST("", middleware.Authorize("Competition_cud"), applicationHandler.CreateCompetition)
+
 	//PRIVATE
 	privateRouter := gin.Default()
 

@@ -12,6 +12,10 @@ service ApplicationService{
   rpc GetSportOrganisationJudges(EmptyMessage) returns(JudgesList);
   rpc RegisterContestant(Contestant) returns(IdMessage);
   rpc GetSportOrganisationContestants(EmptyMessage) returns(ContestantList);
+  //Competition
+  rpc CreateCompetition(Competition) returns(IdMessage);
+  rpc GetAllCompetitions(EmptyMessage) returns(CompetitionList);
+  rpc GetCompetitionById(IdMessage) returns(Competition);
 }
 
 message EmptyMessage{}
@@ -79,4 +83,52 @@ message Contestant{
 
 message ContestantList{
   repeated Contestant contestants = 1;
+}
+
+enum CompetitionType{
+  TeamFinals = 0;
+  AllAroundFinals = 1;
+  ApparatusFinals = 2;
+  Qualifications = 3;
+}
+
+message DelegationMemberProposition{
+  string id = 1;
+  DelegationMemberPosition position = 2;
+  int32 minNumber = 3;
+  int32 maxNumber = 4;
+}
+
+message TeamComposition{
+  string id = 1;
+  int32 baseContestantNumber = 2;
+  int32 bonusContestantNumber = 3;
+  bool multiCategoryTeam = 4;
+}
+
+message AgeCategory{
+  string id = 1;
+  string name = 2;
+  int32 minAge = 3;
+  int32 maxAge = 4;
+  Competition competition = 6;
+}
+
+message Competition{
+  string id = 1;
+  string name = 2;
+  int64 startDate = 3;
+  int64 endDate = 4;
+  Gender gender = 5;
+  CompetitionType type = 6;
+  bool tiebreak = 7;
+  Address address = 8;
+  SportsOrganisation organizer = 9;
+  repeated DelegationMemberProposition delegationMemberPropositions = 10;
+  TeamComposition teamComposition = 11;
+  repeated AgeCategory ageCategories = 12;
+}
+
+message CompetitionList{
+ repeated Competition competitions = 1;
 }

@@ -14,30 +14,18 @@ import (
 
 type HandlerRpc struct {
 	application_pb.UnimplementedApplicationServiceServer
-	soService *service.SportsOrganisationService
-	dmService *service.DelegationMemberService
+	soService   *service.SportsOrganisationService
+	dmService   *service.DelegationMemberService
+	compService *service.CompetitionService
 }
 
-func NewHandlerRpc(soService *service.SportsOrganisationService, dmService *service.DelegationMemberService) *HandlerRpc {
-	return &HandlerRpc{soService: soService, dmService: dmService}
+func NewHandlerRpc(soService *service.SportsOrganisationService, dmService *service.DelegationMemberService, compService *service.CompetitionService) *HandlerRpc {
+	return &HandlerRpc{soService: soService, dmService: dmService, compService: compService}
 }
 
 func (h *HandlerRpc) RegisterSportsOrganisation(ctx context.Context, sOrganisation *application_pb.SportsOrganisation) (*application_pb.IdMessage, error) {
 	id, _ := uuid.NewUUID()
-	newSOrg := &domain.SportsOrganization{
-		ID:                             id,
-		Name:                           sOrganisation.Name,
-		Email:                          sOrganisation.Email,
-		PhoneNumber:                    sOrganisation.PhoneNumber,
-		ContactPersonFullName:          sOrganisation.ContactPersonFullName,
-		CompetitionOrganisingPrivilege: false,
-		Address: domain.Address{
-			Country:      sOrganisation.Address.Country,
-			City:         sOrganisation.Address.City,
-			Street:       sOrganisation.Address.Street,
-			StreetNumber: sOrganisation.Address.StreetNumber,
-		},
-	}
+	newSOrg := sportsOrganizationPbToDom(sOrganisation)
 
 	id, err := h.soService.Create(newSOrg)
 
@@ -161,4 +149,50 @@ func (h *HandlerRpc) GetSportOrganisationContestants(ctx context.Context, _ *app
 	}
 
 	return &application_pb.ContestantList{Contestants: contestantListDomToPb(result)}, nil
+}
+
+func (h *HandlerRpc) CreateCompetition(ctx context.Context, competition *application_pb.Competition) (*application_pb.IdMessage, error) {
+	userinfo, err := ParseUserInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	newComp := competitionPbToDom(competition)
+
+	id, err := h.compService.Create(newComp, userinfo.Email)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+
+	return &application_pb.IdMessage{Id: id.String()}, nil
+}
+func (h *HandlerRpc) GetAllCompetitions(ctx context.Context, _ *application_pb.EmptyMessage) (*application_pb.CompetitionList, error) {
+	comps, err := h.compService.GetAll()
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.CompetitionList{Competitions: competitionListDomToPb(comps)}, nil
+}
+func (h *HandlerRpc) GetCompetitionById(ctx context.Context, compId *application_pb.IdMessage) (*application_pb.Competition, error) {
+	id, _ := uuid.Parse(compId.Id)
+	comp, err := h.compService.GetById(id)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return competitionDomToPb(comp), nil
 }

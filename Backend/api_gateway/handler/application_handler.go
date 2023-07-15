@@ -204,3 +204,57 @@ func (h *ApplicationHandler) GetSportOrganisationContestants(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, contestants.Contestants)
 }
+func (h *ApplicationHandler) CreateCompetition(ctx *gin.Context) {
+	var newCompetition application_pb.Competition
+
+	err := ctx.ShouldBindJSON(&newCompetition)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctxWithUserInfo, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	id, err := h.appClient.CreateCompetition(ctxWithUserInfo, &newCompetition)
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, id)
+}
+func (h *ApplicationHandler) GetAllCompetitions(ctx *gin.Context) {
+	comps, err := h.appClient.GetAllCompetitions(context.Background(), &application_pb.EmptyMessage{})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, comps.Competitions)
+}
+func (h *ApplicationHandler) GetCompetitionById(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	comp, err := h.appClient.GetCompetitionById(context.Background(), &application_pb.IdMessage{Id: id})
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, comp)
+}

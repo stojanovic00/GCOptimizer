@@ -49,7 +49,9 @@ func (a *App) Run() error {
 	soService := service.NewSportsOrganisationService(soRepo)
 	dmRepo := repo.NewDelegationMemberRepoPg(pgClient)
 	dmService := service.NewDelegationMemberService(dmRepo, soRepo)
-	rpcHandler := handler.NewHandlerRpc(soService, dmService)
+	compRepo := repo.NewCompetitionRepoPg(pgClient)
+	compService := service.NewCompetitionService(compRepo, soRepo)
+	rpcHandler := handler.NewHandlerRpc(soService, dmService, compService)
 
 	a.startGrpcServer(rpcHandler)
 	return nil

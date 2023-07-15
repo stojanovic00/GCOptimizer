@@ -30,6 +30,10 @@ type ApplicationServiceClient interface {
 	GetSportOrganisationJudges(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgesList, error)
 	RegisterContestant(ctx context.Context, in *Contestant, opts ...grpc.CallOption) (*IdMessage, error)
 	GetSportOrganisationContestants(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ContestantList, error)
+	// Competition
+	CreateCompetition(ctx context.Context, in *Competition, opts ...grpc.CallOption) (*IdMessage, error)
+	GetAllCompetitions(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*CompetitionList, error)
+	GetCompetitionById(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*Competition, error)
 }
 
 type applicationServiceClient struct {
@@ -94,6 +98,33 @@ func (c *applicationServiceClient) GetSportOrganisationContestants(ctx context.C
 	return out, nil
 }
 
+func (c *applicationServiceClient) CreateCompetition(ctx context.Context, in *Competition, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/CreateCompetition", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetAllCompetitions(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*CompetitionList, error) {
+	out := new(CompetitionList)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetAllCompetitions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetCompetitionById(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*Competition, error) {
+	out := new(Competition)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetCompetitionById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationServiceServer is the server API for ApplicationService service.
 // All implementations must embed UnimplementedApplicationServiceServer
 // for forward compatibility
@@ -106,6 +137,10 @@ type ApplicationServiceServer interface {
 	GetSportOrganisationJudges(context.Context, *EmptyMessage) (*JudgesList, error)
 	RegisterContestant(context.Context, *Contestant) (*IdMessage, error)
 	GetSportOrganisationContestants(context.Context, *EmptyMessage) (*ContestantList, error)
+	// Competition
+	CreateCompetition(context.Context, *Competition) (*IdMessage, error)
+	GetAllCompetitions(context.Context, *EmptyMessage) (*CompetitionList, error)
+	GetCompetitionById(context.Context, *IdMessage) (*Competition, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -130,6 +165,15 @@ func (UnimplementedApplicationServiceServer) RegisterContestant(context.Context,
 }
 func (UnimplementedApplicationServiceServer) GetSportOrganisationContestants(context.Context, *EmptyMessage) (*ContestantList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSportOrganisationContestants not implemented")
+}
+func (UnimplementedApplicationServiceServer) CreateCompetition(context.Context, *Competition) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCompetition not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetAllCompetitions(context.Context, *EmptyMessage) (*CompetitionList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllCompetitions not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetCompetitionById(context.Context, *IdMessage) (*Competition, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCompetitionById not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
 
@@ -252,6 +296,60 @@ func _ApplicationService_GetSportOrganisationContestants_Handler(srv interface{}
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationService_CreateCompetition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Competition)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).CreateCompetition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/CreateCompetition",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).CreateCompetition(ctx, req.(*Competition))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetAllCompetitions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetAllCompetitions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetAllCompetitions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetAllCompetitions(ctx, req.(*EmptyMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetCompetitionById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetCompetitionById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetCompetitionById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetCompetitionById(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationService_ServiceDesc is the grpc.ServiceDesc for ApplicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -282,6 +380,18 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSportOrganisationContestants",
 			Handler:    _ApplicationService_GetSportOrganisationContestants_Handler,
+		},
+		{
+			MethodName: "CreateCompetition",
+			Handler:    _ApplicationService_CreateCompetition_Handler,
+		},
+		{
+			MethodName: "GetAllCompetitions",
+			Handler:    _ApplicationService_GetAllCompetitions_Handler,
+		},
+		{
+			MethodName: "GetCompetitionById",
+			Handler:    _ApplicationService_GetCompetitionById_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
