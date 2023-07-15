@@ -2,7 +2,7 @@ package app
 
 import (
 	grpc_client "api_gateway/client"
-	handler2 "api_gateway/handler"
+	handler "api_gateway/handler"
 	"auth_service/api/middleware"
 	"fmt"
 	"github.com/gin-contrib/cors"
@@ -13,13 +13,11 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	//DEPENDENCIES
 	authServiceAddress := fmt.Sprintf("%s:%s", a.Config.AuthServiceHost, a.Config.AuthServicePort)
 	authClient := grpc_client.NewAuthClient(authServiceAddress)
-	authHandler := handler2.NewAuthHandler(authClient)
+	authHandler := handler.NewAuthHandler(authClient)
 
 	applicationServiceAddress := fmt.Sprintf("%s:%s", a.Config.ApplicationServiceHost, a.Config.ApplicationServicePort)
 	applicationClient := grpc_client.NewApplicationClient(applicationServiceAddress)
-	applicationHandler := handler2.NewApplicationHandler(applicationClient, authClient)
-
-	scheduleHandler := handler2.ScheduleHandler{}
+	applicationHandler := handler.NewApplicationHandler(applicationClient, authClient)
 
 	// MIDDLEWARE
 	corsMiddleware := cors.New(cors.Config{
@@ -44,8 +42,14 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 
 	//APPLICATION
 	applicationGroupPublic := publicRouter.Group("application")
+
+	//Unauth
 	soGroup := applicationGroupPublic.Group("/sports-organisation")
 	soGroup.POST("", applicationHandler.RegisterSportsOrganisation)
+
+	//Auth
+	soGroup.Use(middleware.ValidateAndExtractToken())
+	soGroup.GET("", middleware.Authorize("LoggedInSO_ru"), applicationHandler.GetLoggedSportsOrganisation)
 
 	//PRIVATE
 	privateRouter := gin.Default()
@@ -55,7 +59,5 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 		c.JSON(404, gin.H{"message": "Endpoint doesn't exist"})
 	})
 
-	testGroup := privateRouter.Group("/test", middleware.ValidateAndExtractToken())
-	testGroup.GET("", middleware.Authorize("JudgesRead"), scheduleHandler.Test)
 	return publicRouter, privateRouter, nil
 }

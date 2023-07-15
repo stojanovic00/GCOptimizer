@@ -4,10 +4,13 @@ option go_package = "common/application_pb";
 package application_pb;
 
 service ApplicationService{
-  rpc RegisterSportsOrganisation(SportsOrganisation) returns(IdResponse) {}
+  rpc RegisterSportsOrganisation(SportsOrganisation) returns(IdMessage) {}
+  rpc GetLoggedSportsOrganisation(EmptyMessage) returns(SportsOrganisation) {}
 }
 
-message IdResponse{
+message EmptyMessage{}
+
+message IdMessage{
   string id = 1;
 }
 

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"api_gateway/dto"
+	"auth_service/api/middleware"
 	application_pb "common/proto/application/generated"
 	auth_pb "common/proto/auth/generated"
 	"context"
@@ -66,4 +67,29 @@ func (h *ApplicationHandler) RegisterSportsOrganisation(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.SportsOrganisationRegistrationResponse{AccountID: accId.Id, SportsOrganisationID: soId.Id})
+}
+
+func (h *ApplicationHandler) GetLoggedSportsOrganisation(ctx *gin.Context) {
+	ctxWithUserInfo, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
+		ctx.Abort()
+		return
+	}
+
+	sportsOrg, err := h.appClient.GetLoggedSportsOrganisation(ctxWithUserInfo, &application_pb.EmptyMessage{})
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, sportsOrg)
 }
