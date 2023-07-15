@@ -258,3 +258,66 @@ func (h *ApplicationHandler) GetCompetitionById(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, comp)
 }
+func (h *ApplicationHandler) AddAgeCategory(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	var newCat application_pb.AgeCategory
+
+	err := ctx.ShouldBindJSON(&newCat)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := h.appClient.AddAgeCategory(context.Background(), &application_pb.AddAgeCategoryRequest{
+		AgeCategory:   &newCat,
+		CompetitionId: compId,
+	})
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, id)
+
+}
+func (h *ApplicationHandler) AddDelegationMemberProposition(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	var newProp application_pb.DelegationMemberProposition
+
+	err := ctx.ShouldBindJSON(&newProp)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := h.appClient.AddDelegationMemberProposition(context.Background(), &application_pb.AddDelegationMemberPropositionRequest{
+		DelegationMemberProposition: &newProp,
+		CompetitionId:               compId,
+	})
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, id)
+}

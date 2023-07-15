@@ -16,6 +16,8 @@ service ApplicationService{
   rpc CreateCompetition(Competition) returns(IdMessage);
   rpc GetAllCompetitions(EmptyMessage) returns(CompetitionList);
   rpc GetCompetitionById(IdMessage) returns(Competition);
+  rpc AddAgeCategory(AddAgeCategoryRequest) returns(IdMessage);
+  rpc AddDelegationMemberProposition(AddDelegationMemberPropositionRequest) returns(IdMessage);
 }
 
 message EmptyMessage{}
@@ -114,6 +116,7 @@ message AgeCategory{
   Competition competition = 6;
 }
 
+
 message Competition{
   string id = 1;
   string name = 2;
@@ -131,4 +134,13 @@ message Competition{
 
 message CompetitionList{
  repeated Competition competitions = 1;
+}
+message  AddAgeCategoryRequest{
+  AgeCategory ageCategory = 1;
+  string competitionId = 2;
+}
+
+message  AddDelegationMemberPropositionRequest{
+  DelegationMemberProposition delegationMemberProposition = 1;
+  string competitionId = 2;
 }

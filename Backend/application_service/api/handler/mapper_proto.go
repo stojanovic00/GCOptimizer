@@ -147,6 +147,26 @@ func delegationMemberPositionDomToPb(pos *domain.DelegationMemberPosition) *appl
 	}
 }
 
+func delegationMemberPositionPbToDom(pos *application_pb.DelegationMemberPosition) *domain.DelegationMemberPosition {
+	id, _ := uuid.Parse(pos.Id)
+	return &domain.DelegationMemberPosition{
+		ID:   id,
+		Name: pos.Name,
+	}
+}
+
+func delegationMemberPropositionPbToDom(proposition *application_pb.DelegationMemberProposition) *domain.DelegationMemberProposition {
+	id, _ := uuid.Parse(proposition.Id)
+	return &domain.DelegationMemberProposition{
+		ID:            id,
+		Position:      *delegationMemberPositionPbToDom(proposition.Position),
+		MinNumber:     int(proposition.MinNumber),
+		MaxNumber:     int(proposition.MaxNumber),
+		CompetitionID: uuid.UUID{},
+		Competition:   domain.Competition{},
+	}
+}
+
 func delegationMemberPropositionDomToPb(prop *domain.DelegationMemberProposition) *application_pb.DelegationMemberProposition {
 	return &application_pb.DelegationMemberProposition{
 		Id:        prop.ID.String(),
@@ -171,6 +191,18 @@ func teamCompositionDomToPb(comp *domain.TeamComposition) *application_pb.TeamCo
 		BaseContestantNumber:  int32(comp.BaseContestantNumber),
 		BonusContestantNumber: int32(comp.BonusContestantNumber),
 		MultiCategoryTeam:     comp.MultiCategoryTeam,
+	}
+}
+
+func ageCategoryPbToDom(cat *application_pb.AgeCategory) *domain.AgeCategory {
+	id, _ := uuid.Parse(cat.Id)
+	return &domain.AgeCategory{
+		ID:            id,
+		Name:          cat.Name,
+		MinAge:        int(cat.MinAge),
+		MaxAge:        int(cat.MaxAge),
+		CompetitionID: uuid.UUID{},
+		Competition:   domain.Competition{},
 	}
 }
 

@@ -34,6 +34,8 @@ type ApplicationServiceClient interface {
 	CreateCompetition(ctx context.Context, in *Competition, opts ...grpc.CallOption) (*IdMessage, error)
 	GetAllCompetitions(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*CompetitionList, error)
 	GetCompetitionById(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*Competition, error)
+	AddAgeCategory(ctx context.Context, in *AddAgeCategoryRequest, opts ...grpc.CallOption) (*IdMessage, error)
+	AddDelegationMemberProposition(ctx context.Context, in *AddDelegationMemberPropositionRequest, opts ...grpc.CallOption) (*IdMessage, error)
 }
 
 type applicationServiceClient struct {
@@ -125,6 +127,24 @@ func (c *applicationServiceClient) GetCompetitionById(ctx context.Context, in *I
 	return out, nil
 }
 
+func (c *applicationServiceClient) AddAgeCategory(ctx context.Context, in *AddAgeCategoryRequest, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/AddAgeCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) AddDelegationMemberProposition(ctx context.Context, in *AddDelegationMemberPropositionRequest, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/AddDelegationMemberProposition", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationServiceServer is the server API for ApplicationService service.
 // All implementations must embed UnimplementedApplicationServiceServer
 // for forward compatibility
@@ -141,6 +161,8 @@ type ApplicationServiceServer interface {
 	CreateCompetition(context.Context, *Competition) (*IdMessage, error)
 	GetAllCompetitions(context.Context, *EmptyMessage) (*CompetitionList, error)
 	GetCompetitionById(context.Context, *IdMessage) (*Competition, error)
+	AddAgeCategory(context.Context, *AddAgeCategoryRequest) (*IdMessage, error)
+	AddDelegationMemberProposition(context.Context, *AddDelegationMemberPropositionRequest) (*IdMessage, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -174,6 +196,12 @@ func (UnimplementedApplicationServiceServer) GetAllCompetitions(context.Context,
 }
 func (UnimplementedApplicationServiceServer) GetCompetitionById(context.Context, *IdMessage) (*Competition, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCompetitionById not implemented")
+}
+func (UnimplementedApplicationServiceServer) AddAgeCategory(context.Context, *AddAgeCategoryRequest) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAgeCategory not implemented")
+}
+func (UnimplementedApplicationServiceServer) AddDelegationMemberProposition(context.Context, *AddDelegationMemberPropositionRequest) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddDelegationMemberProposition not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
 
@@ -350,6 +378,42 @@ func _ApplicationService_GetCompetitionById_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationService_AddAgeCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddAgeCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).AddAgeCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/AddAgeCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).AddAgeCategory(ctx, req.(*AddAgeCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_AddDelegationMemberProposition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddDelegationMemberPropositionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).AddDelegationMemberProposition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/AddDelegationMemberProposition",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).AddDelegationMemberProposition(ctx, req.(*AddDelegationMemberPropositionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationService_ServiceDesc is the grpc.ServiceDesc for ApplicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -392,6 +456,14 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCompetitionById",
 			Handler:    _ApplicationService_GetCompetitionById_Handler,
+		},
+		{
+			MethodName: "AddAgeCategory",
+			Handler:    _ApplicationService_AddAgeCategory_Handler,
+		},
+		{
+			MethodName: "AddDelegationMemberProposition",
+			Handler:    _ApplicationService_AddDelegationMemberProposition_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

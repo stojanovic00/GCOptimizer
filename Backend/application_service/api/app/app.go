@@ -50,7 +50,7 @@ func (a *App) Run() error {
 	dmRepo := repo.NewDelegationMemberRepoPg(pgClient)
 	dmService := service.NewDelegationMemberService(dmRepo, soRepo)
 	compRepo := repo.NewCompetitionRepoPg(pgClient)
-	compService := service.NewCompetitionService(compRepo, soRepo)
+	compService := service.NewCompetitionService(compRepo, soRepo, dmRepo)
 	rpcHandler := handler.NewHandlerRpc(soService, dmService, compService)
 
 	a.startGrpcServer(rpcHandler)

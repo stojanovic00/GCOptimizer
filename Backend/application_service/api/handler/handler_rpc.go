@@ -196,3 +196,31 @@ func (h *HandlerRpc) GetCompetitionById(ctx context.Context, compId *application
 	}
 	return competitionDomToPb(comp), nil
 }
+func (h *HandlerRpc) AddAgeCategory(ctx context.Context, request *application_pb.AddAgeCategoryRequest) (*application_pb.IdMessage, error) {
+	compId, _ := uuid.Parse(request.CompetitionId)
+
+	id, err := h.compService.AddAgeCategory(ageCategoryPbToDom(request.AgeCategory), compId)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.IdMessage{Id: id.String()}, nil
+}
+func (h *HandlerRpc) AddDelegationMemberProposition(ctx context.Context, request *application_pb.AddDelegationMemberPropositionRequest) (*application_pb.IdMessage, error) {
+	compId, _ := uuid.Parse(request.CompetitionId)
+
+	id, err := h.compService.AddDelegationMemberProposition(delegationMemberPropositionPbToDom(request.DelegationMemberProposition), compId)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.IdMessage{Id: id.String()}, nil
+}

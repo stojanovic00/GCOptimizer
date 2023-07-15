@@ -62,6 +62,8 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	//Auth
 	compGroup.Use(middleware.ValidateAndExtractToken())
 	compGroup.POST("", middleware.Authorize("Competition_cud"), applicationHandler.CreateCompetition)
+	compGroup.POST("/:id/age-category", middleware.Authorize("Competition_cud"), applicationHandler.AddAgeCategory)
+	compGroup.POST("/:id/delegation-member-prop", middleware.Authorize("Competition_cud"), applicationHandler.AddDelegationMemberProposition)
 
 	//PRIVATE
 	privateRouter := gin.Default()
