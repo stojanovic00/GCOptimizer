@@ -32,7 +32,7 @@ export class LoginPageComponent implements OnInit {
   login = () => {
     let loginDto : LoginDto = {
       email: this.Loginform.email.value ?? "",
-      password: this.Loginform.email.value ?? "",
+      password: this.Loginform.password.value ?? "",
     };
 
     this.loginService.login(loginDto);
