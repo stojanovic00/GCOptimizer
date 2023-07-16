@@ -5,11 +5,13 @@ import (
 )
 
 type Config struct {
-	Host            string `long:"host" env:"API_GATEWAY_HOST"`
-	PublicPort      string `long:"public-port" env:"API_GATEWAY_PUBLIC_PORT"`
-	PrivatePort     string `long:"private-port" env:"API_GATEWAY_PRIVATE_PORT"`
-	AuthServiceHost string `long:"AUTH_SERVICE_HOST" env:"AUTH_SERVICE_HOST"`
-	AuthServicePort string `long:"AUTH_SERVICE_PORT" env:"AUTH_SERVICE_PORT"`
+	Host                   string `long:"host" env:"API_GATEWAY_HOST"`
+	PublicPort             string `long:"public-port" env:"API_GATEWAY_PUBLIC_PORT"`
+	PrivatePort            string `long:"private-port" env:"API_GATEWAY_PRIVATE_PORT"`
+	AuthServiceHost        string `long:"auth_service_host" env:"AUTH_SERVICE_HOST"`
+	AuthServicePort        string `long:"auth_service_port" env:"AUTH_SERVICE_PORT"`
+	ApplicationServiceHost string `long:"application_service_host" env:"APPLICATION_SERVICE_HOST"`
+	ApplicationServicePort string `long:"application_service_port" env:"APPLICATION_SERVICE_PORT"`
 }
 
 func LoadConfig() (Config, error) {

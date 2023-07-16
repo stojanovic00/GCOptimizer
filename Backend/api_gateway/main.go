@@ -1,7 +1,7 @@
 package main
 
 import (
-	app "api_gateway/api/app"
+	"api_gateway/app"
 	"api_gateway/config"
 	"context"
 	"fmt"

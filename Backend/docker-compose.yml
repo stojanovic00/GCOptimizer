@@ -18,6 +18,8 @@ services:
       
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     networks:
       - network
@@ -68,8 +70,55 @@ services:
       - 5001:5432
 
 
+  application_service:
+    image: application_service
+    container_name: application_service
+    build:
+      context: .
+      dockerfile: ./application_service/Dockerfile
+    restart: on-failure
+    ports:
+      - 8002:${APPLICATION_SERVICE_PORT}
+    environment:
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+      APPLICATION_DB_NAME: ${APPLICATION_DB_NAME}
+      APPLICATION_DB_HOST: ${APPLICATION_DB_HOST}
+      APPLICATION_DB_PORT: ${APPLICATION_DB_PORT}
+      APPLICATION_DB_USER: ${APPLICATION_DB_USER}
+      APPLICATION_DB_PASS: ${APPLICATION_DB_PASS}
+    networks:
+      - network
+
+
+  application_db:
+    image: application_db
+    container_name: application_db
+    restart: on-failure
+    build:
+      context: ../Database/Application
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${APPLICATION_DB_USER}
+      POSTGRES_PASSWORD: ${APPLICATION_DB_PASS}
+      POSTGRES_DB: ${APPLICATION_DB_NAME}
+    volumes: 
+      - application_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5002:5432
+
 volumes:
   auth_db:
+    driver: local
+  application_db:
     driver: local
 
 networks:
