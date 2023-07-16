@@ -4,19 +4,25 @@ import { LoginPageComponent } from 'src/app/pages/login/login-page.component';
 import { RegisterPageComponent } from '../pages/register-page/register-page.component';
 import { SportsOrgPageComponent } from '../pages/sports-org-page/sports-org-page.component';
 import { SportsOrgRoutingModule } from './sports-org-routing.module';
+import { RoleGuardService as RoleGuard } from '../auth/guards/role-guard.service';
+import { IncognitoGuardService as IncognitoGuard } from '../auth/guards/incognito-guard.service';
 
 const routes: Routes = [
   {
     path: 'login',
+    canActivate: [IncognitoGuard],
     component: LoginPageComponent
   },
   {
     path: 'register',
+    canActivate: [IncognitoGuard],
     component: RegisterPageComponent
   },
   {
     path: 'sports-org',
     component: SportsOrgPageComponent,
+    canActivate: [RoleGuard],
+    data: { expectedRole: 'SPORTS_ORG' },
     loadChildren: () =>  
       import('./sports-org-routing.module').then(
         (m) => SportsOrgRoutingModule

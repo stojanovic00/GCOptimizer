@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   applicationPath: "http://localhost:8081/application",
+  authPath: "http://localhost:8081/auth",
 };
 
 /*
