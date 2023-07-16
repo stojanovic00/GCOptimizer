@@ -11,4 +11,5 @@ type CompetitionRepo interface {
 	GetAll() ([]*domain.Competition, error)
 	AddAgeCategory(ageCat *domain.AgeCategory) (uuid.UUID, error)
 	AddDelegationMemberProposition(prop *domain.DelegationMemberProposition) (uuid.UUID, error)
+	GetAgeCategoryById(id uuid.UUID) (*domain.AgeCategory, error)
 }

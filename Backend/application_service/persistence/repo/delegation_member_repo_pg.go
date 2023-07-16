@@ -122,3 +122,30 @@ func (r *DelegationMemberRepoPg) GetContestantByEmail(email string) (*domain.Con
 	}
 	return &contestant, nil
 }
+func (r *DelegationMemberRepoPg) GetJudgeById(id uuid.UUID) (*domain.Judge, error) {
+	var judge domain.Judge
+
+	result := r.dbClient.Where("id = ?", id).First(&judge)
+	if result.Error != nil {
+		return &domain.Judge{}, result.Error
+	}
+
+	if &judge == nil {
+		return &domain.Judge{}, errors.ErrNotFound{Message: "Judge with given id not found"}
+	}
+	return &judge, nil
+}
+
+func (r *DelegationMemberRepoPg) GetContestantById(id uuid.UUID) (*domain.Contestant, error) {
+	var contestant domain.Contestant
+
+	result := r.dbClient.Where("id = ?", id).First(&contestant)
+	if result.Error != nil {
+		return &domain.Contestant{}, result.Error
+	}
+
+	if &contestant == nil {
+		return &domain.Contestant{}, errors.ErrNotFound{Message: "Contestant with given id not found"}
+	}
+	return &contestant, nil
+}

@@ -43,6 +43,7 @@ func (s *CompetitionService) AddAgeCategory(ageCat *domain.AgeCategory, compId u
 	ageCat.Competition = *comp
 	return s.compRepo.AddAgeCategory(ageCat)
 }
+
 func (s *CompetitionService) AddDelegationMemberProposition(prop *domain.DelegationMemberProposition, compId uuid.UUID) (uuid.UUID, error) {
 	comp, err := s.compRepo.GetById(compId)
 	if err != nil {

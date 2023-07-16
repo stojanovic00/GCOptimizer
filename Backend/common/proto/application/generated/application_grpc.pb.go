@@ -36,6 +36,10 @@ type ApplicationServiceClient interface {
 	GetCompetitionById(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*Competition, error)
 	AddAgeCategory(ctx context.Context, in *AddAgeCategoryRequest, opts ...grpc.CallOption) (*IdMessage, error)
 	AddDelegationMemberProposition(ctx context.Context, in *AddDelegationMemberPropositionRequest, opts ...grpc.CallOption) (*IdMessage, error)
+	CreateJudgeApplication(ctx context.Context, in *CreateJudgeApplicationRequest, opts ...grpc.CallOption) (*IdMessage, error)
+	GetAllJudgeApplications(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*JudgeApplicationList, error)
+	CreateContestantApplication(ctx context.Context, in *CreateContestantApplicationRequest, opts ...grpc.CallOption) (*IdMessage, error)
+	GetAllContestantApplications(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*ContestantApplicationList, error)
 }
 
 type applicationServiceClient struct {
@@ -145,6 +149,42 @@ func (c *applicationServiceClient) AddDelegationMemberProposition(ctx context.Co
 	return out, nil
 }
 
+func (c *applicationServiceClient) CreateJudgeApplication(ctx context.Context, in *CreateJudgeApplicationRequest, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/CreateJudgeApplication", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetAllJudgeApplications(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*JudgeApplicationList, error) {
+	out := new(JudgeApplicationList)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetAllJudgeApplications", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) CreateContestantApplication(ctx context.Context, in *CreateContestantApplicationRequest, opts ...grpc.CallOption) (*IdMessage, error) {
+	out := new(IdMessage)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/CreateContestantApplication", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetAllContestantApplications(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*ContestantApplicationList, error) {
+	out := new(ContestantApplicationList)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetAllContestantApplications", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationServiceServer is the server API for ApplicationService service.
 // All implementations must embed UnimplementedApplicationServiceServer
 // for forward compatibility
@@ -163,6 +203,10 @@ type ApplicationServiceServer interface {
 	GetCompetitionById(context.Context, *IdMessage) (*Competition, error)
 	AddAgeCategory(context.Context, *AddAgeCategoryRequest) (*IdMessage, error)
 	AddDelegationMemberProposition(context.Context, *AddDelegationMemberPropositionRequest) (*IdMessage, error)
+	CreateJudgeApplication(context.Context, *CreateJudgeApplicationRequest) (*IdMessage, error)
+	GetAllJudgeApplications(context.Context, *IdMessage) (*JudgeApplicationList, error)
+	CreateContestantApplication(context.Context, *CreateContestantApplicationRequest) (*IdMessage, error)
+	GetAllContestantApplications(context.Context, *IdMessage) (*ContestantApplicationList, error)
 	mustEmbedUnimplementedApplicationServiceServer()
 }
 
@@ -202,6 +246,18 @@ func (UnimplementedApplicationServiceServer) AddAgeCategory(context.Context, *Ad
 }
 func (UnimplementedApplicationServiceServer) AddDelegationMemberProposition(context.Context, *AddDelegationMemberPropositionRequest) (*IdMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddDelegationMemberProposition not implemented")
+}
+func (UnimplementedApplicationServiceServer) CreateJudgeApplication(context.Context, *CreateJudgeApplicationRequest) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateJudgeApplication not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetAllJudgeApplications(context.Context, *IdMessage) (*JudgeApplicationList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllJudgeApplications not implemented")
+}
+func (UnimplementedApplicationServiceServer) CreateContestantApplication(context.Context, *CreateContestantApplicationRequest) (*IdMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateContestantApplication not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetAllContestantApplications(context.Context, *IdMessage) (*ContestantApplicationList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllContestantApplications not implemented")
 }
 func (UnimplementedApplicationServiceServer) mustEmbedUnimplementedApplicationServiceServer() {}
 
@@ -414,6 +470,78 @@ func _ApplicationService_AddDelegationMemberProposition_Handler(srv interface{},
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationService_CreateJudgeApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateJudgeApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).CreateJudgeApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/CreateJudgeApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).CreateJudgeApplication(ctx, req.(*CreateJudgeApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetAllJudgeApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetAllJudgeApplications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetAllJudgeApplications",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetAllJudgeApplications(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_CreateContestantApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateContestantApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).CreateContestantApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/CreateContestantApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).CreateContestantApplication(ctx, req.(*CreateContestantApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetAllContestantApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetAllContestantApplications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetAllContestantApplications",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetAllContestantApplications(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationService_ServiceDesc is the grpc.ServiceDesc for ApplicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -464,6 +592,22 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddDelegationMemberProposition",
 			Handler:    _ApplicationService_AddDelegationMemberProposition_Handler,
+		},
+		{
+			MethodName: "CreateJudgeApplication",
+			Handler:    _ApplicationService_CreateJudgeApplication_Handler,
+		},
+		{
+			MethodName: "GetAllJudgeApplications",
+			Handler:    _ApplicationService_GetAllJudgeApplications_Handler,
+		},
+		{
+			MethodName: "CreateContestantApplication",
+			Handler:    _ApplicationService_CreateContestantApplication_Handler,
+		},
+		{
+			MethodName: "GetAllContestantApplications",
+			Handler:    _ApplicationService_GetAllContestantApplications_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

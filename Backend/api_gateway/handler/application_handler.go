@@ -321,3 +321,101 @@ func (h *ApplicationHandler) AddDelegationMemberProposition(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, id)
 }
+func (h *ApplicationHandler) CreateJudgeApplication(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	var newAppReq application_pb.CreateJudgeApplicationRequest
+	newAppReq.CompetitionId = compId
+
+	err := ctx.ShouldBindJSON(&newAppReq)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := h.appClient.CreateJudgeApplication(context.Background(), &newAppReq)
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, id)
+}
+
+func (h *ApplicationHandler) GetAllJudgeApplications(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	applications, err := h.appClient.GetAllJudgeApplications(context.Background(), &application_pb.IdMessage{Id: compId})
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, applications.JudgeApplications)
+}
+func (h *ApplicationHandler) CreateContestantApplication(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	var newAppReq application_pb.CreateContestantApplicationRequest
+	newAppReq.CompetitionId = compId
+
+	err := ctx.ShouldBindJSON(&newAppReq)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := h.appClient.CreateContestantApplication(context.Background(), &newAppReq)
+
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, id)
+
+}
+func (h *ApplicationHandler) GetAllContestantApplications(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	applications, err := h.appClient.GetAllContestantApplications(context.Background(), &application_pb.IdMessage{Id: compId})
+	if err != nil {
+		grpcError, ok := status.FromError(err)
+		if ok {
+			switch grpcError.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, grpcError.Message())
+				return
+			}
+		}
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, applications.ContestantApplications)
+}

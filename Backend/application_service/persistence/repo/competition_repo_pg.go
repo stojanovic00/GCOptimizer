@@ -39,7 +39,6 @@ func (r *CompetitionRepoPg) Create(competition *domain.Competition) (uuid.UUID, 
 func (r *CompetitionRepoPg) GetById(id uuid.UUID) (*domain.Competition, error) {
 	var comp domain.Competition
 
-	//TODO add more preloads
 	result := r.dbClient.
 		Where("id = ?", id).
 		Preload("Address").
@@ -81,6 +80,19 @@ func (r *CompetitionRepoPg) AddAgeCategory(ageCat *domain.AgeCategory) (uuid.UUI
 	return ageCat.ID, nil
 }
 
+func (r *CompetitionRepoPg) GetAgeCategoryById(id uuid.UUID) (*domain.AgeCategory, error) {
+	var cat domain.AgeCategory
+
+	result := r.dbClient.Where("id = ?", id).First(&cat)
+	if result.Error != nil {
+		return &domain.AgeCategory{}, result.Error
+	}
+
+	if &cat == nil {
+		return &domain.AgeCategory{}, errors.ErrNotFound{Message: "Age category with given id not found"}
+	}
+	return &cat, nil
+}
 func (r *CompetitionRepoPg) DelegationMemberPropositionPositionWithSameName(name string) (bool, error) {
 	var count int64
 

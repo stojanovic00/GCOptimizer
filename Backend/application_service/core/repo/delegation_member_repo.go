@@ -11,4 +11,7 @@ type DelegationMemberRepo interface {
 	RegisterContestant(contestant *domain.Contestant) (uuid.UUID, error)
 	GetSportsOrganisationContestants(soID uuid.UUID) ([]*domain.Contestant, error)
 	GetPositionByName(name string) (*domain.DelegationMemberPosition, error)
+	GetJudgeByEmail(email string) (*domain.Judge, error)
+	GetJudgeById(id uuid.UUID) (*domain.Judge, error)
+	GetContestantById(id uuid.UUID) (*domain.Contestant, error)
 }

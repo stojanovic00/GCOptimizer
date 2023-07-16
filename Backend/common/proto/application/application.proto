@@ -18,6 +18,11 @@ service ApplicationService{
   rpc GetCompetitionById(IdMessage) returns(Competition);
   rpc AddAgeCategory(AddAgeCategoryRequest) returns(IdMessage);
   rpc AddDelegationMemberProposition(AddDelegationMemberPropositionRequest) returns(IdMessage);
+
+  rpc CreateJudgeApplication(CreateJudgeApplicationRequest) returns(IdMessage);
+  rpc GetAllJudgeApplications(IdMessage) returns(JudgeApplicationList);
+  rpc CreateContestantApplication(CreateContestantApplicationRequest) returns(IdMessage);
+  rpc GetAllContestantApplications(IdMessage) returns(ContestantApplicationList);
 }
 
 message EmptyMessage{}
@@ -135,12 +140,68 @@ message Competition{
 message CompetitionList{
  repeated Competition competitions = 1;
 }
+
+message JudgeApplication{
+  string id = 1;
+  Competition competition = 2;
+  Judge judge = 3;
+}
+
+
+message JudgeApplicationList{
+  repeated JudgeApplication judgeApplications = 1;
+}
+
+enum Apparatus{
+    Floor = 0;
+    PommelHorse = 1;
+    StillRings = 2;
+    Vault = 3;
+    ParallelBars = 4;
+    HorizontalBar = 5;
+    BalanceBeam = 6;
+    UnevenBars = 7;
+}
+
+message ApparatusAnnouncement{
+  string id = 1;
+  Apparatus apparatus = 2;
+  ContestantApplication contestantApplication = 3;
+}
+
+message ContestantApplication{
+  string id = 1;
+  int32 teamNumber = 2;
+  Competition competition = 3;
+  Contestant contestant = 4;
+  AgeCategory ageCategory = 5;
+  repeated ApparatusAnnouncement apparatusAnnouncements = 6;
+}
+
+message ContestantApplicationList{
+  repeated ContestantApplication contestantApplications = 1;
+}
+
+// Requests
 message  AddAgeCategoryRequest{
-  AgeCategory ageCategory = 1;
-  string competitionId = 2;
+AgeCategory ageCategory = 1;
+string competitionId = 2;
 }
 
 message  AddDelegationMemberPropositionRequest{
   DelegationMemberProposition delegationMemberProposition = 1;
   string competitionId = 2;
+}
+
+message CreateJudgeApplicationRequest{
+  string judgeId = 1;
+  string competitionId = 2;
+}
+
+message CreateContestantApplicationRequest{
+  int32 teamNumber = 2;
+  string competitionId = 3;
+  string contestantId = 4;
+  string ageCategoryId = 5;
+  repeated ApparatusAnnouncement apparatusAnnouncements = 6;
 }

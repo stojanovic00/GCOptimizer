@@ -250,3 +250,103 @@ func competitionListDomToPb(compList []*domain.Competition) []*application_pb.Co
 
 	return compPbList
 }
+
+func judgeApplicationRequestPbToDom(app *application_pb.CreateJudgeApplicationRequest) *domain.JudgeApplication {
+	compId, _ := uuid.Parse(app.CompetitionId)
+	judgeId, _ := uuid.Parse(app.JudgeId)
+	return &domain.JudgeApplication{
+		ID:            uuid.UUID{},
+		CompetitionID: compId,
+		Competition:   domain.Competition{},
+		JudgeID:       judgeId,
+		Judge:         domain.Judge{},
+	}
+}
+
+func judgeApplicationDomToPb(app *domain.JudgeApplication) *application_pb.JudgeApplication {
+	return &application_pb.JudgeApplication{
+		Id:          app.ID.String(),
+		Competition: competitionDomToPb(&app.Competition),
+		Judge:       judgeDomToPb(&app.Judge),
+	}
+}
+func judgeApplicationListDomToPb(appList []*domain.JudgeApplication) []*application_pb.JudgeApplication {
+	var appPbList []*application_pb.JudgeApplication
+	for _, appDom := range appList {
+		appPbList = append(appPbList, judgeApplicationDomToPb(appDom))
+	}
+
+	return appPbList
+}
+
+func contestantApplicationRequestPbToDom(req *application_pb.CreateContestantApplicationRequest) *domain.ContestantApplication {
+	contestantId, _ := uuid.Parse(req.ContestantId)
+	ageCatId, _ := uuid.Parse(req.AgeCategoryId)
+	return &domain.ContestantApplication{
+		ID:                     uuid.UUID{},
+		TeamNumber:             int(req.TeamNumber),
+		CompetitionID:          uuid.UUID{},
+		Competition:            domain.Competition{},
+		ContestantID:           contestantId,
+		Contestant:             domain.Contestant{},
+		AgeCategoryID:          ageCatId,
+		AgeCategory:            domain.AgeCategory{},
+		ApparatusAnnouncements: apparatusAnnouncementListPbToDom(req.ApparatusAnnouncements),
+	}
+}
+
+func contestantApplicationDomToPb(app *domain.ContestantApplication) *application_pb.ContestantApplication {
+	return &application_pb.ContestantApplication{
+		Id:                     app.ID.String(),
+		TeamNumber:             int32(app.TeamNumber),
+		Competition:            competitionDomToPb(&app.Competition),
+		Contestant:             contestantDomToPb(&app.Contestant),
+		AgeCategory:            ageCategoryDomToPb(&app.AgeCategory),
+		ApparatusAnnouncements: apparatusAnnouncementListDomToPb(app.ApparatusAnnouncements),
+	}
+}
+
+func contestantApplicationListDomToPb(applications []*domain.ContestantApplication) []*application_pb.ContestantApplication {
+	var pbList []*application_pb.ContestantApplication
+	for _, applicationDom := range applications {
+		pbList = append(pbList, contestantApplicationDomToPb(applicationDom))
+	}
+
+	return pbList
+}
+
+func apparatusAnnouncementPbToDom(ann *application_pb.ApparatusAnnouncement) *domain.ApparatusAnnouncement {
+	id, _ := uuid.Parse(ann.Id)
+
+	return &domain.ApparatusAnnouncement{
+		ID:                      id,
+		Apparatus:               domain.Apparatus(ann.Apparatus),
+		ContestantApplicationID: uuid.UUID{},
+		ContestantApplication:   domain.ContestantApplication{},
+	}
+}
+
+func apparatusAnnouncementListPbToDom(announcements []*application_pb.ApparatusAnnouncement) []domain.ApparatusAnnouncement {
+	var domList []domain.ApparatusAnnouncement
+	for _, announcementPb := range announcements {
+		domList = append(domList, *apparatusAnnouncementPbToDom(announcementPb))
+	}
+
+	return domList
+}
+
+func apparatusAnnouncementDomToPb(ann *domain.ApparatusAnnouncement) *application_pb.ApparatusAnnouncement {
+	return &application_pb.ApparatusAnnouncement{
+		Id:                    ann.ID.String(),
+		Apparatus:             application_pb.Apparatus(ann.Apparatus),
+		ContestantApplication: nil,
+	}
+}
+func apparatusAnnouncementListDomToPb(announcements []domain.ApparatusAnnouncement) []*application_pb.ApparatusAnnouncement {
+	var pbList []*application_pb.ApparatusAnnouncement
+	for _, announcementDom := range announcements {
+		pbList = append(pbList, apparatusAnnouncementDomToPb(&announcementDom))
+	}
+
+	return pbList
+}

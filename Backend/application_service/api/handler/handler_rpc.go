@@ -17,10 +17,11 @@ type HandlerRpc struct {
 	soService   *service.SportsOrganisationService
 	dmService   *service.DelegationMemberService
 	compService *service.CompetitionService
+	appService  *service.ApplicationService
 }
 
-func NewHandlerRpc(soService *service.SportsOrganisationService, dmService *service.DelegationMemberService, compService *service.CompetitionService) *HandlerRpc {
-	return &HandlerRpc{soService: soService, dmService: dmService, compService: compService}
+func NewHandlerRpc(soService *service.SportsOrganisationService, dmService *service.DelegationMemberService, compService *service.CompetitionService, appService *service.ApplicationService) *HandlerRpc {
+	return &HandlerRpc{soService: soService, dmService: dmService, compService: compService, appService: appService}
 }
 
 func (h *HandlerRpc) RegisterSportsOrganisation(ctx context.Context, sOrganisation *application_pb.SportsOrganisation) (*application_pb.IdMessage, error) {
@@ -223,4 +224,65 @@ func (h *HandlerRpc) AddDelegationMemberProposition(ctx context.Context, request
 		}
 	}
 	return &application_pb.IdMessage{Id: id.String()}, nil
+}
+func (h *HandlerRpc) CreateJudgeApplication(ctx context.Context, request *application_pb.CreateJudgeApplicationRequest) (*application_pb.IdMessage, error) {
+	compId, _ := uuid.Parse(request.CompetitionId)
+	newApp := judgeApplicationRequestPbToDom(request)
+
+	id, err := h.appService.CreateJudgeApplication(newApp, compId)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.IdMessage{Id: id.String()}, nil
+}
+
+func (h *HandlerRpc) GetAllJudgeApplications(ctx context.Context, compId *application_pb.IdMessage) (*application_pb.JudgeApplicationList, error) {
+	cmpId, _ := uuid.Parse(compId.Id)
+
+	applications, err := h.appService.GetAllJudgeApplications(cmpId)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.JudgeApplicationList{JudgeApplications: judgeApplicationListDomToPb(applications)}, nil
+}
+
+func (h *HandlerRpc) CreateContestantApplication(ctx context.Context, request *application_pb.CreateContestantApplicationRequest) (*application_pb.IdMessage, error) {
+	compId, _ := uuid.Parse(request.CompetitionId)
+	newApp := contestantApplicationRequestPbToDom(request)
+	newApp.CompetitionID = compId
+
+	id, err := h.appService.CreateContestantApplication(newApp)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.IdMessage{Id: id.String()}, nil
+}
+func (h *HandlerRpc) GetAllContestantApplications(ctx context.Context, compId *application_pb.IdMessage) (*application_pb.ContestantApplicationList, error) {
+	cmpId, _ := uuid.Parse(compId.Id)
+
+	applications, err := h.appService.GetAllContestantApplications(cmpId)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return &application_pb.ContestantApplicationList{ContestantApplications: contestantApplicationListDomToPb(applications)}, nil
 }
