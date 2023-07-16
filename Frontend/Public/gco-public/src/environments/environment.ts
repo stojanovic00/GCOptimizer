@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  prublicApiHost: "http://localhost:8081",
+  applicationPath: "http://localhost:8081/application",
 };
 
 /*

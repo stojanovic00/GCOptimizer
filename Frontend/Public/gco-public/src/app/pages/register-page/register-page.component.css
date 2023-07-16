@@ -1,0 +1,18 @@
+.heading{
+    margin: 100px auto 0px auto;
+    width: 100%;
+    text-align: center;
+    font-size: 50px;
+}
+.custom-form{
+    width: 600px;
+    margin: 100px auto 0px auto;
+}
+
+.form-item{
+    width: 80%;
+}
+
+.separator{
+    height: 10px;
+}

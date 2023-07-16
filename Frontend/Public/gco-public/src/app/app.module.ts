@@ -6,7 +6,8 @@ import { AppRoutingModule } from './routing/app-routing.module';
 import { LoginPageModule } from './pages/login/login-page.module';
 import { RegisterPageModule } from './pages/register-page/register-page.module';
 import { SportsOrgPageModule } from './pages/sports-org-page/sports-org-page.module';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 @NgModule({
   declarations: [
     AppComponent,
@@ -18,7 +19,10 @@ import { SportsOrgPageModule } from './pages/sports-org-page/sports-org-page.mod
 
 
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    HttpClientModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]
