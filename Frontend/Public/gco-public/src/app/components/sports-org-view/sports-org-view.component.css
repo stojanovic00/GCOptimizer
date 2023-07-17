@@ -1,0 +1,17 @@
+@import '../../styles/forms-and-headings.css';
+
+.info{
+    background-color: #c2abe9;
+    width: 60%;
+    margin: 50px auto;
+    padding: 40px;
+    border-radius: 30px;
+}
+
+h2{
+    font-size: 40px;
+}
+
+h3{
+    font-size: 30px;
+}

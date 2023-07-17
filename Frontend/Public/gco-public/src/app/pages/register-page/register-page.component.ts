@@ -63,15 +63,15 @@ export class RegisterPageComponent implements OnInit {
     }
    } 
 
-    this.sportsOrgService.register(dto).subscribe(
-      res => {
-        console.log(res);
+    this.sportsOrgService.register(dto).subscribe({
+      next: (response) => {
         this.router.navigate(["login"])
       },
-      (err : HttpErrorResponse) => {
-        window.alert(err.error)
-      }
-    )
+      error:
+        (err: HttpErrorResponse) => {
+          alert(err.error)
+        }
+    })
 
   }
 backToLogin = () => {
