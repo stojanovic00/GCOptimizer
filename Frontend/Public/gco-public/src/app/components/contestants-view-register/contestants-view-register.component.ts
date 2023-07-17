@@ -3,7 +3,7 @@ import { Gender, getGenderName } from 'src/app/model/core/gender';
 import { SprotsOrgService } from 'src/app/services/sprots-org.service';
 import { Contestant, ContestantTable } from '../../model/core/contestant';
 import { HttpErrorResponse } from '@angular/common/http';
-import { dateToUnixTimeStamp, formatDate, unixTimeStampToDate } from '../../utils/date-utils'
+import { dateToUnixTimeStamp, formatDate, unixDateToString, unixTimeStampToDate } from '../../utils/date-utils'
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
@@ -20,10 +20,7 @@ export class ContestantsViewRegisterComponent implements OnInit {
     selectedRow : null
   }
   getGenderName = getGenderName
-
-  unixDateToString = (unixDate: number) : string =>{
-    return formatDate(unixTimeStampToDate(unixDate));
-  }
+  unixDateToString = unixDateToString
 
 
   //Register

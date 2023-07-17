@@ -61,6 +61,7 @@ func (r *CompetitionRepoPg) GetAll() ([]*domain.Competition, error) {
 	var competitions []*domain.Competition
 	err := r.dbClient.
 		Preload("Address").
+		Preload("Organizer").
 		Find(&competitions).Error
 	if err != nil {
 		return nil, nil

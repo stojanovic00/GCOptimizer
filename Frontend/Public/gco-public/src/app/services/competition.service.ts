@@ -32,4 +32,13 @@ export class CompetitionService {
     let path = this.path + "/"+  competitionId + "/age-category";
     return this.http.post<string>(path, cat);
   }
+
+  getAll = (): Observable<Competition[]> => {
+    return this.http.get<Competition[]>(this.path);
+  }
+
+  getById = (competitionId: string): Observable<Competition> => {
+    let path = this.path + "/"+  competitionId;
+    return this.http.get<Competition>(path);
+  }
 }

@@ -4,6 +4,7 @@ import { SportsOrgViewComponent } from '../components/sports-org-view/sports-org
 import { JudgesViewRegisterComponent } from '../components/judges-view-register/judges-view-register.component';
 import { ContestantsViewRegisterComponent } from '../components/contestants-view-register/contestants-view-register.component';
 import { CompetitionCreateComponent } from '../components/competition-create/competition-create.component';
+import { CompetitionViewComponent } from '../components/competition-view/competition-view.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'competition',
     component: CompetitionCreateComponent
+  },
+  {
+    path: 'competition/view',
+    component: CompetitionViewComponent
   },
   {
     path: '',

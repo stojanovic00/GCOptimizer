@@ -1,5 +1,5 @@
 <p class="heading-main">Sports organisation info</p>
-<div class="info">
+<div *ngIf="sportsOrg" class="info">
     <h2>{{sportsOrg.name}}</h2>
     <h3>Email: {{sportsOrg.email}}</h3>
     <h3>Contact: {{sportsOrg.phoneNumber}}</h3>
@@ -7,13 +7,4 @@
     <h3>Address: {{address}}</h3>
     <h3 *ngIf="sportsOrg.competitionOrganisingPrivilege">This organization can organize competitions</h3>
     <h3 *ngIf="!sportsOrg.competitionOrganisingPrivilege">This organization cannot organize competitions</h3>
-    <div class="button-wrap">
-        <button
-            id ="organize-button"
-            mat-raised-button
-            color="primary"
-            [disabled]="!sportsOrg.competitionOrganisingPrivilege"
-            (click)="goToCreateCompetition()"
-        >Organize competition</button>
-    </div>
 </div>

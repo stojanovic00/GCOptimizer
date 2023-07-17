@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { formatAddress } from 'src/app/model/core/address';
 import { SportsOrg } from 'src/app/model/core/sports-org';
 import { SprotsOrgService } from 'src/app/services/sprots-org.service';
 
@@ -15,7 +16,7 @@ export class SportsOrgViewComponent implements OnInit {
   sportsOrg! : SportsOrg;
 
   get address () :string {
-    return this.sportsOrg!.address.country! + " " + this.sportsOrg!.address.city! + ", " + this.sportsOrg!.address.street! + " " + this.sportsOrg!.address.streetNumber!;
+    return formatAddress(this.sportsOrg.address!);
   }
 
   constructor(
@@ -32,9 +33,5 @@ export class SportsOrgViewComponent implements OnInit {
         alert(err.error);
       }
     })
-  }
-
-  goToCreateCompetition = () => {
-    this.router.navigate(['sports-org/competition']);
   }
 }

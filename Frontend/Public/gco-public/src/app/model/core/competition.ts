@@ -23,3 +23,11 @@ export interface Competition{
 }
 
 
+export interface CompetitionTable {
+    displayedColumns: string[];
+    dataSource: Competition[];
+    selectedRow: Competition | null;
+}
+
+
+
