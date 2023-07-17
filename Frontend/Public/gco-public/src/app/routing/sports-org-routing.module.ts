@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SportsOrgViewComponent } from '../components/sports-org-view/sports-org-view.component';
 import { JudgesViewRegisterComponent } from '../components/judges-view-register/judges-view-register.component';
 import { ContestantsViewRegisterComponent } from '../components/contestants-view-register/contestants-view-register.component';
+import { CompetitionCreateComponent } from '../components/competition-create/competition-create.component';
 
 const routes: Routes = [
   {
@@ -16,6 +17,10 @@ const routes: Routes = [
   {
     path: 'contestant',
     component: ContestantsViewRegisterComponent
+  },
+  {
+    path: 'competition',
+    component: CompetitionCreateComponent
   },
   {
     path: '',

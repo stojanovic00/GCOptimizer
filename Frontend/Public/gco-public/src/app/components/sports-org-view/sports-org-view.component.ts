@@ -20,6 +20,7 @@ export class SportsOrgViewComponent implements OnInit {
 
   constructor(
     private readonly soService: SprotsOrgService,
+    private readonly router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -33,4 +34,7 @@ export class SportsOrgViewComponent implements OnInit {
     })
   }
 
+  goToCreateCompetition = () => {
+    this.router.navigate(['sports-org/competition']);
+  }
 }

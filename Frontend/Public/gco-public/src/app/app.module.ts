@@ -10,8 +10,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { AuthInterceptor } from './auth/auth.interceptor';
-import { JudgesViewRegisterComponent } from './components/judges-view-register/judges-view-register.component';
-import { ContestantsViewRegisterComponent } from './components/contestants-view-register/contestants-view-register.component';
 @NgModule({
   declarations: [
     AppComponent

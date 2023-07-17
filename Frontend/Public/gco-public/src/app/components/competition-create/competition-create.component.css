@@ -1,0 +1,30 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+@import '../../styles/dialogs.css';
+
+.heading-main{
+    margin-bottom: 10px;
+}
+mat-checkbox{
+    font-size: 20px;
+}
+
+.added-wrapper{
+	width: 480px;
+	margin: auto;
+	margin-top: 20px;
+}
+
+.added-wrapper h3{
+    font-weight: 400;
+    font-size: 20px;
+}
+
+.added-wrapper li{
+    font-size: 20px;
+}
+
+/* Disables manual stepping on stepper */
+::ng-deep .mat-horizontal-stepper-header{
+    pointer-events: none !important;
+}

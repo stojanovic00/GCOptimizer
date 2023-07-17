@@ -7,6 +7,7 @@ import { SportsOrgViewComponent } from 'src/app/components/sports-org-view/sport
 import { MaterialModule } from 'src/app/material/material/material.module';
 import { JudgesViewRegisterComponent } from 'src/app/components/judges-view-register/judges-view-register.component';
 import { ContestantsViewRegisterComponent } from 'src/app/components/contestants-view-register/contestants-view-register.component';
+import { CompetitionCreateComponent } from 'src/app/components/competition-create/competition-create.component'
 
 
 
@@ -15,7 +16,8 @@ import { ContestantsViewRegisterComponent } from 'src/app/components/contestants
     SportsOrgPageComponent,
     SportsOrgViewComponent,
     JudgesViewRegisterComponent,
-    ContestantsViewRegisterComponent
+    ContestantsViewRegisterComponent,
+    CompetitionCreateComponent
   ],
   imports: [
     CommonModule,

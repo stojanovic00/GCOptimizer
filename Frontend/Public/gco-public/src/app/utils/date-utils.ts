@@ -4,7 +4,7 @@ export function unixTimeStampToDate(unixTimeStamp: number): Date {
 }
 
 export function dateToUnixTimeStamp(date: Date): number {
-    return date.getTime() / 1000;
+    return Math.floor(date.getTime() / 1000);
 }
 
 export function formatDate(date: Date): string {

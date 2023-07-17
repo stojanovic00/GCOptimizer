@@ -15,10 +15,12 @@ export class SprotsOrgService {
   path: string = environment.applicationPath + "/sports-organisation";
 
 
-  constructor(private readonly http: HttpClient) { }
+  constructor(
+    private readonly http: HttpClient
+    ) { }
 
-  register = (dto: RegistrationDto) => {
-    return this.http.post(this.path, dto);
+  register = (dto: RegistrationDto): Observable<string> => {
+    return this.http.post<string>(this.path, dto);
   }
 
   getLoggedIn = (): Observable<SportsOrg> => {
