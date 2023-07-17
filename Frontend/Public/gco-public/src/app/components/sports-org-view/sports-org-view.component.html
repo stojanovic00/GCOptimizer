@@ -5,4 +5,6 @@
     <h3>Contact: {{sportsOrg.phoneNumber}}</h3>
     <h3>Contact person: {{sportsOrg.contactPersonFullName}}</h3>
     <h3>Address: {{address}}</h3>
+    <h3 *ngIf="sportsOrg.competitionOrganisingPrivilege">This organization can organize competitions</h3>
+    <h3 *ngIf="!sportsOrg.competitionOrganisingPrivilege">This organization cannot organize competitions</h3>
 </div>

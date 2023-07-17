@@ -6,4 +6,5 @@ export interface SportsOrg{
     phoneNumber: string;
     contactPersonFullName: string;
     address: Address;
+    competitionOrganisingPrivilege: boolean;
 }

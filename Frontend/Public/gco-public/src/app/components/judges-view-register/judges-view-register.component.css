@@ -1,5 +1,6 @@
 @import '../../styles/forms-and-headings.css';
 @import '../../styles/tables.css';
+@import '../../styles/dialogs.css';
 
 .table-wrap{
     width: 70%;
@@ -7,24 +8,8 @@
     text-align: right;
 }
 
-
-button{
+#register-button{
     margin-bottom: 20px;
-}
-
-.hidden{
-    display: none;
-}
-
-
-.register-dialog{
-    top:0px;
-    left:0px;
-    position: absolute;
-    margin: auto;
-    width: 100%;
-    height: 100%;
-    background: rgba(130, 132, 136, 0.7);
 }
 
 .form-wrapper{
@@ -36,4 +21,8 @@ button{
 
 .custom-form{
     padding-top: 30px;
+}
+
+.custom-form:last-child{
+    padding-bottom: 30px;
 }

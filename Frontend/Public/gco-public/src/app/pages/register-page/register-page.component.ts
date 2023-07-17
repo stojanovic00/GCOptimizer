@@ -54,6 +54,7 @@ export class RegisterPageComponent implements OnInit {
         phoneNumber: this.regform.phoneNumber.value ?? "",
         contactPersonFullName: this.regform.contactPersonFullName.value ?? "",
         email: this.regform.email.value ?? "",
+        competitionOrganisingPrivilege : false,
         address: {
           country: this.regform.country.value ?? "",
           city: this.regform.city.value ?? "",

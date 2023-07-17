@@ -1,6 +1,7 @@
 <p class="heading-main">Judges</p>
 <div class="table-wrap">
     <button
+        id ="register-button"
         mat-raised-button
         color="primary"
         (click)="openRegisterDialog()"
@@ -36,7 +37,7 @@
     </table>
 </div>
 
-<div class="register-dialog" [class.hidden]="!regDialogOpened">
+<div class="dialog" [class.hidden]="!regDialogOpened">
     <div class="form-wrapper">
         <form [formGroup]="registrationForm" class="custom-form">
             <mat-form-field appearance="fill" class="form-item">

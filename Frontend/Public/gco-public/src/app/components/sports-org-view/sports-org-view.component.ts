@@ -19,7 +19,6 @@ export class SportsOrgViewComponent implements OnInit {
   }
 
   constructor(
-    private readonly router: Router,
     private readonly soService: SprotsOrgService,
   ) { }
 

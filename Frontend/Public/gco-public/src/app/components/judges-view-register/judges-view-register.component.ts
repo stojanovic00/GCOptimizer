@@ -56,6 +56,17 @@ export class JudgesViewRegisterComponent implements OnInit {
     this.loadTable();
   }
 
+  loadTable = () => {
+    this.soService.getJudges().subscribe({
+      next: (response: Judge[]) => {
+        this.table.dataSource = response;
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.error);
+      }
+    });
+  }
+
   //View
   selectRow = (row: Judge) => {
     this.table.selectedRow = row;
@@ -103,14 +114,4 @@ export class JudgesViewRegisterComponent implements OnInit {
 
   }
 
-  loadTable = () => {
-    this.soService.getJudges().subscribe({
-      next: (response: Judge[]) => {
-        this.table.dataSource = response;
-      },
-      error: (err: HttpErrorResponse) => {
-        alert(err.error);
-      }
-    });
-  }
 }
