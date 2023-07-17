@@ -16,15 +16,19 @@ export class SprotsOrgService {
 
   constructor(private readonly http: HttpClient) { }
 
-  register= (dto: RegistrationDto) => {
+  register = (dto: RegistrationDto) => {
     return this.http.post(this.path, dto);
   }
 
-  getLoggedIn= (): Observable<SportsOrg> => {
+  getLoggedIn = (): Observable<SportsOrg> => {
     return this.http.get<SportsOrg>(this.path);
   }
 
-  getJudges= (): Observable<Judge[]> => {
+  getJudges = (): Observable<Judge[]> => {
     return this.http.get<Judge[]>(this.path + "/judge");
+  }
+
+  registerJudge = (judge: Judge): Observable<string> => {
+    return this.http.post<string>(this.path + "/judge", judge);
   }
 }

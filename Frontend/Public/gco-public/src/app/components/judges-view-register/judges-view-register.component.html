@@ -1,5 +1,10 @@
 <p class="heading-main">Judges</p>
 <div class="table-wrap">
+    <button
+        mat-raised-button
+        color="primary"
+        (click)="openRegisterDialog()"
+    > Register new judge</button>
     <table mat-table [dataSource]="table.dataSource" class="mat-elevation-z8 tablee">
         <ng-container matColumnDef="fullName">
             <th mat-header-cell *matHeaderCellDef>Full name</th>
@@ -21,9 +26,64 @@
             <td mat-cell *matCellDef="let judge">{{judge.licenceName}}</td>
         </ng-container>
 
+        <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let judge">{{getGenderName(judge.delegationMember.gender)}}</td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: table.displayedColumns;" (click)="selectRow(row)" [class.selected-row]="row === table.selectedRow"></tr>
     </table>
 </div>
 
+<div class="register-dialog" [class.hidden]="!regDialogOpened">
+    <div class="form-wrapper">
+        <form [formGroup]="registrationForm" class="custom-form">
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Fullname</mat-label>
+                <input matInput placeholder="fullname" formControlName="fullName">
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Email</mat-label>
+                <input matInput placeholder="email" formControlName="email">
+            </mat-form-field>
 
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender">
+                  <mat-option *ngFor="let option of genderOptions" [value]="option.value">
+                    {{option.label}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Licence type</mat-label>
+                <mat-select formControlName="licenceType">
+                  <mat-option *ngFor="let option of licenceTypeOptions" [value]="option.value">
+                    {{option.label}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Licence name</mat-label>
+                <input matInput placeholder="licence name" formControlName="licenceName">
+            </mat-form-field>
+            <button
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="registrationForm.invalid"
+             (click)="register()"
+             >Register</button>
+            <div class="separator"></div>
+            <button
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             (click)="closeRegisterDialog()"
+             >Cancel</button>
+        </form>
+    </div>
+</div>
