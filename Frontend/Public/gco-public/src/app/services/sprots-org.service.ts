@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RegistrationDto } from '../model/dto/registration-dto';
-import { SportsOrg } from '../model/core/SportsOrg';
+import { Judge } from '../model/core/judge'
+import { SportsOrg } from '../model/core/sports-org';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -21,5 +22,9 @@ export class SprotsOrgService {
 
   getLoggedIn= (): Observable<SportsOrg> => {
     return this.http.get<SportsOrg>(this.path);
+  }
+
+  getJudges= (): Observable<Judge[]> => {
+    return this.http.get<Judge[]>(this.path + "/judge");
   }
 }

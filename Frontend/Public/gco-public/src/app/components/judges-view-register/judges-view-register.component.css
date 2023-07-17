@@ -1,0 +1,7 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+.table-wrap{
+    width: 70%;
+    margin: 100px auto ;
+}

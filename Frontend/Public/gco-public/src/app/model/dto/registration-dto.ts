@@ -1,4 +1,4 @@
-import { SportsOrg } from "../core/SportsOrg";
+import { SportsOrg } from "../core/sports-org";
 import { Account } from "../core/account";
 
 export interface RegistrationDto{

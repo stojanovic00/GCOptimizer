@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SportsOrg } from 'src/app/model/core/SportsOrg';
+import { SportsOrg } from 'src/app/model/core/sports-org';
 import { SprotsOrgService } from 'src/app/services/sprots-org.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { SprotsOrgService } from 'src/app/services/sprots-org.service';
 export class SportsOrgViewComponent implements OnInit {
 
 
-  sportsOrg : SportsOrg | null = null
+  sportsOrg! : SportsOrg;
 
   get address () :string {
     return this.sportsOrg!.address.country! + " " + this.sportsOrg!.address.city! + ", " + this.sportsOrg!.address.street! + " " + this.sportsOrg!.address.streetNumber!;
