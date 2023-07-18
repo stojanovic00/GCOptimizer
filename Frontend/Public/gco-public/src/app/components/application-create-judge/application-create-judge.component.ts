@@ -71,7 +71,7 @@ addApplication = () =>{
     this.compService.addJudgeApplication(request, this.competitionId).subscribe({
       next: (response: string) => {
         this.addedJudges.push(this.table.selectedRow!)
-        this.addedTable.dataSource = this.addedJudges;
+        this.addedTable.dataSource = this.addedJudges.slice();
       },
       error: (err: HttpErrorResponse) => {
         alert(err.error);
