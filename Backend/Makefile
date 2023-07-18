@@ -10,4 +10,10 @@ proto-application:
 	--go-grpc_out ./common/proto/application/generated --go-grpc_opt paths=source_relative \
 	./common/proto/application/application.proto
 
-proto-all: proto-auth proto-application
+proto-scheduling:
+	protoc -I ./common/proto/scheduling -I ./common/proto \
+	--go_out ./common/proto/scheduling/generated --go_opt paths=source_relative \
+	--go-grpc_out ./common/proto/scheduling/generated --go-grpc_opt paths=source_relative \
+	./common/proto/scheduling/scheduling.proto
+
+proto-all: proto-auth proto-application proto-scheduling
