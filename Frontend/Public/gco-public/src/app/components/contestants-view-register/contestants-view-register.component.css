@@ -1,0 +1,28 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+@import '../../styles/dialogs.css';
+
+.table-wrap{
+    width: 70%;
+    margin: 100px auto 0px auto ;
+    text-align: right;
+}
+
+#register-button{
+    margin-bottom: 20px;
+}
+
+.form-wrapper{
+    background-color: white;
+    width: 35%;
+    margin: auto;
+    border-radius: 25px;
+}
+
+.custom-form{
+    padding-top: 30px;
+}
+
+.custom-form:last-child{
+    padding-bottom: 30px;
+}

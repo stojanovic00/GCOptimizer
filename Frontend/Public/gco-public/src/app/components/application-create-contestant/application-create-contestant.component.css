@@ -1,0 +1,61 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+@import '../../styles/dialogs.css';
+
+.table-wrap{
+    width: 70%;
+    margin: 100px auto 0px auto ;
+    text-align: right;
+}
+
+.form-wrapper{
+    background-color: white;
+    width: 35%;
+    margin: auto;
+    border-radius: 25px;
+}
+
+.flex-container{
+    display: flex;
+}
+
+.flex-item{
+    flex: 1;
+    padding: 10px;
+}
+
+.contestants-wrap .table-wrap{
+    margin-top: 30px;
+}
+
+.info-wrap{
+    margin-top: 15px;
+}
+
+.info-wrap .form-wrapper{
+    width: 70%;
+}
+
+.info-wrap .heading-hier-2 {
+	margin: 50px auto -50px auto;
+}
+
+.button-wrap{
+    width: 70%;
+	margin: 20px auto 0px auto;
+    text-align: center;
+}
+
+.info-wrap button{
+    width: 100%;
+}
+
+.created-wrap .table-wrap{
+    margin-top:40px ;
+}
+
+
+.created-wrap button{
+    width: 50%;
+    margin: 40px auto;
+}

@@ -1,0 +1,29 @@
+
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+@import '../../styles/dialogs.css';
+
+.table-wrap{
+    width: 70%;
+    margin: 100px auto 0px auto ;
+    text-align: right;
+}
+
+#add-button{
+    margin-bottom: 20px;
+}
+
+#added-judges{
+    margin-top: 20px;
+}
+
+
+.button-wrap{
+    width: 100%;
+    text-align: center;
+}
+
+.button-wrap button{
+    width: 30%;
+    margin: 40px auto;
+}

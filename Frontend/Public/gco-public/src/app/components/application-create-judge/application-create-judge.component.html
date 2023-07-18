@@ -1,0 +1,78 @@
+<p class="heading-main">Create judge applications</p>
+<div class="table-wrap">
+    <button
+        id ="add-button"
+        mat-raised-button
+        color="primary"
+        [disabled]="table.selectedRow === null"
+        (click)="addApplication()"
+    >Create</button>
+    <table mat-table [dataSource]="table.dataSource" class="mat-elevation-z8 tablee">
+        <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Full name</th>
+            <td mat-cell *matCellDef="let judge">{{judge.delegationMember.fullName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let judge">{{judge.delegationMember.email}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="licenceType">
+            <th mat-header-cell *matHeaderCellDef>Licence type</th>
+            <td mat-cell *matCellDef="let judge">{{getLicenceTypeName(judge.licenceType)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="licenceName">
+            <th mat-header-cell *matHeaderCellDef>Licence name</th>
+            <td mat-cell *matCellDef="let judge">{{judge.licenceName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let judge">{{getGenderName(judge.delegationMember.gender)}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: table.displayedColumns;" (click)="selectRow(row)" [class.selected-row]="row === table.selectedRow"></tr>
+    </table>
+</div>
+<p class="heading-hier-1">Judges applied</p>
+<div class="table-wrap" id="added-judges">
+    <table mat-table [dataSource]="addedTable.dataSource" class="mat-elevation-z8 tablee">
+        <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Full name</th>
+            <td mat-cell *matCellDef="let judge">{{judge.delegationMember.fullName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let judge">{{judge.delegationMember.email}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="licenceType">
+            <th mat-header-cell *matHeaderCellDef>Licence type</th>
+            <td mat-cell *matCellDef="let judge">{{getLicenceTypeName(judge.licenceType)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="licenceName">
+            <th mat-header-cell *matHeaderCellDef>Licence name</th>
+            <td mat-cell *matCellDef="let judge">{{judge.licenceName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let judge">{{getGenderName(judge.delegationMember.gender)}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: table.displayedColumns;"></tr>
+    </table>
+</div>
+    <div class="button-wrap">
+        <button
+                mat-raised-button
+                color="primary"
+                (click)="finishCreation()"
+                >Finish creating applications</button>
+    </div>

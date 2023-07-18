@@ -1,0 +1,26 @@
+<p class="heading-main">Login<p>
+    <form [formGroup]="loginForm" class="custom-form">
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Email</mat-label>
+            <input matInput placeholder="email" formControlName="email">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" placeholder="password" formControlName="password">
+        </mat-form-field>
+        <button
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         [disabled]="loginForm.invalid"
+         (click)="login()"
+         >Login</button>
+        <div class="separator"></div>
+        <button
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         (click)="goToRegister()"
+            > Register</button>
+    </form>
+
