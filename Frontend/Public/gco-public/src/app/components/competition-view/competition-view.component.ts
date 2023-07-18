@@ -92,4 +92,17 @@ export class CompetitionViewComponent implements OnInit {
   goToCreateCompetition = () => {
     this.router.navigate(['sports-org/competition']);
   }
+
+  viewApplications = () => {
+    let compId = this.table.selectedRow?.id;
+    this.router.navigate(['sports-org/competition/' + compId + '/application/view']);
+  }
+  createJudgeApplication = () => {
+    let compId = this.table.selectedRow?.id;
+    this.router.navigate(['sports-org/competition/' + compId + '/application/create-judge']);
+  }
+  createContestantApplication = () => {
+    let compId = this.table.selectedRow?.id;
+    this.router.navigate(['sports-org/competition/' + compId + '/application/create-contestant']);
+  }
 }

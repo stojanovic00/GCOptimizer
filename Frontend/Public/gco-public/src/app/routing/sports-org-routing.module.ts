@@ -5,6 +5,9 @@ import { JudgesViewRegisterComponent } from '../components/judges-view-register/
 import { ContestantsViewRegisterComponent } from '../components/contestants-view-register/contestants-view-register.component';
 import { CompetitionCreateComponent } from '../components/competition-create/competition-create.component';
 import { CompetitionViewComponent } from '../components/competition-view/competition-view.component';
+import { ApplicationViewComponent } from '../components/application-view/application-view.component';
+import { ApplicationCreateJudgeComponent } from '../components/application-create-judge/application-create-judge.component';
+import { ApplicationCreateContestantComponent } from '../components/application-create-contestant/application-create-contestant.component';
 
 const routes: Routes = [
   {
@@ -26,6 +29,18 @@ const routes: Routes = [
   {
     path: 'competition/view',
     component: CompetitionViewComponent
+  },
+  {
+    path: 'competition/:id/application/view',
+    component: ApplicationViewComponent
+  },
+  {
+    path: 'competition/:id/application/create-judge',
+    component: ApplicationCreateJudgeComponent
+  },
+  {
+    path: 'competition/:id/application/create-contestant',
+    component: ApplicationCreateContestantComponent
   },
   {
     path: '',

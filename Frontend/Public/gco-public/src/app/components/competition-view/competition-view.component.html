@@ -76,8 +76,9 @@
                 {{ proposition.position.name }} : min number: {{ proposition.minNumber }}, max number: {{ proposition.maxNumber }}
             </li>
         </ul>
-        <button mat-raised-button color="primary">View applications</button>
-        <button mat-raised-button color="primary">Create application</button>
+        <button mat-raised-button color="primary" (click)="viewApplications()">View applications</button>
+        <button mat-raised-button color="primary" (click)="createJudgeApplication()">Create judge application</button>
+        <button mat-raised-button color="primary" (click)="createContestantApplication()">Create contestant application</button>
         <button mat-raised-button color="primary" (click)="closeDetailsDialog()">Close</button>
     </div>
 </div>

@@ -193,7 +193,7 @@ message  AddDelegationMemberPropositionRequest{
   string competitionId = 2;
 }
 
-message CreateJudgeApplicationRequest{
+m    });essage CreateJudgeApplicationRequest{
   string judgeId = 1;
   string competitionId = 2;
 }
