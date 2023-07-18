@@ -1,1 +1,66 @@
-<p>application-view works!</p>
+<p class="heading-main">Contestant applications</p>
+<div class="table-wrap">
+    <table mat-table [dataSource]="tableApplicationsContestant.dataSource" class="mat-elevation-z8 tablee">
+
+        <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Full name</th>
+            <td mat-cell *matCellDef="let application">{{application.contestant.delegationMember.fullName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="teamNumber">
+            <th mat-header-cell *matHeaderCellDef>Team</th>
+            <td mat-cell *matCellDef="let application">{{application.teamNumber}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="ageCategory">
+            <th mat-header-cell *matHeaderCellDef>Age category</th>
+            <td mat-cell *matCellDef="let application">{{formatAgeCategory(application.ageCategory)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="apparatuses">
+            <th mat-header-cell *matHeaderCellDef>Competing</th>
+            <td mat-cell *matCellDef="let application">{{formatApparatusAnnouncements(application.apparatusAnnouncements)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="organisation">
+            <th mat-header-cell *matHeaderCellDef>Organisation</th>
+            <td mat-cell *matCellDef="let application">{{application.contestant.delegationMember.sportsOrganisation.name}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tableApplicationsContestant.displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableApplicationsContestant.displayedColumns;"></tr>
+    </table>
+</div>
+
+<p class="heading-main">Judge applications</p>
+<div class="table-wrap">
+    <table mat-table [dataSource]="tableApplicationsJudge.dataSource" class="mat-elevation-z8 tablee">
+        <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Full name</th>
+            <td mat-cell *matCellDef="let application">{{application.judge.delegationMember.fullName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let application">{{application.judge.delegationMember.email}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="licenceType">
+            <th mat-header-cell *matHeaderCellDef>Licence type</th>
+            <td mat-cell *matCellDef="let application">{{getLicenceTypeName(application.judge.licenceType)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="licenceName">
+            <th mat-header-cell *matHeaderCellDef>Licence name</th>
+            <td mat-cell *matCellDef="let application">{{application.judge.licenceName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let application">{{getGenderName(application.judge.delegationMember.gender)}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tableApplicationsJudge.displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableApplicationsJudge.displayedColumns;"></tr>
+    </table>
+</div>

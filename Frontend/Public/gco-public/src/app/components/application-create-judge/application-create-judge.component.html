@@ -69,3 +69,10 @@
         <tr mat-row *matRowDef="let row; columns: table.displayedColumns;"></tr>
     </table>
 </div>
+    <div class="button-wrap">
+        <button
+                mat-raised-button
+                color="primary"
+                (click)="finishCreation()"
+                >Finish creating applications</button>
+    </div>

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { getGenderName } from 'src/app/model/core/gender';
 import { JudgeTable, Judge } from 'src/app/model/core/judge';
 import { getLicenceTypeName } from 'src/app/model/core/licence-type';
@@ -35,6 +35,7 @@ export class ApplicationCreateJudgeComponent implements OnInit {
 
   constructor(
     private readonly route : ActivatedRoute,
+    private readonly router : Router,
     private readonly soService : SprotsOrgService,
     private readonly compService : CompetitionService
   ) { }
@@ -77,4 +78,11 @@ addApplication = () =>{
       }
     });
 }
+
+finishCreation = () =>
+{
+    this.router.navigate(['sports-org/competition/view']);
+}
+
+
 }

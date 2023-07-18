@@ -16,3 +16,14 @@
 #added-judges{
     margin-top: 20px;
 }
+
+
+.button-wrap{
+    width: 100%;
+    text-align: center;
+}
+
+.button-wrap button{
+    width: 30%;
+    margin: 40px auto;
+}

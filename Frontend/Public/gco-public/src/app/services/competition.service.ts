@@ -8,6 +8,8 @@ import { AgeCategory } from '../model/core/age-category';
 import { IdResponse } from '../model/dto/id-response';
 import { CreateJudgeApplicationDto } from '../model/dto/create-judge-application-dto';
 import { CreateContestantApplicationRequest } from '../model/dto/create-contestant-application-request';
+import { ContestantApplication } from '../model/core/contestant-application';
+import { JudgeApplication } from '../model/core/judge-application';
 
 @Injectable({
   providedIn: 'root'
@@ -52,5 +54,15 @@ export class CompetitionService {
   addContestantApplication = (app: CreateContestantApplicationRequest, competitionId: string): Observable<string> => {
     let path = this.path + "/"+  competitionId + "/app/contestant";
     return this.http.post<string>(path, app);
+  }
+
+  getContestantApplications = (competitionId: string): Observable<ContestantApplication[]> => {
+    let path = this.path + "/"+  competitionId + "/app/contestant";
+    return this.http.get<ContestantApplication[]>(path);
+  }
+
+  getJudgeApplications = (competitionId: string): Observable<JudgeApplication[]> => {
+    let path = this.path + "/"+  competitionId + "/app/judge";
+    return this.http.get<JudgeApplication[]>(path);
   }
 }

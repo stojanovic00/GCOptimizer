@@ -65,7 +65,7 @@ func (r *ApplicationRepoPg) CreateContestantApplication(app *domain.ContestantAp
 func (r *ApplicationRepoPg) GetAllContestantApplications(compId uuid.UUID) ([]*domain.ContestantApplication, error) {
 	var applications []*domain.ContestantApplication
 	err := r.dbClient.Where("competition_id = ?", compId).
-		Preload("Contestant").
+		Preload("Contestant.SportsOrganization").
 		Preload("AgeCategory").
 		Preload("ApparatusAnnouncements").
 		Find(&applications).Error
