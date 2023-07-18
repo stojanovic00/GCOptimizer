@@ -7,6 +7,7 @@ import { DelegationMemberProposition } from '../model/core/delegation-member-pro
 import { AgeCategory } from '../model/core/age-category';
 import { IdResponse } from '../model/dto/id-response';
 import { CreateJudgeApplicationDto } from '../model/dto/create-judge-application-dto';
+import { CreateContestantApplicationRequest } from '../model/dto/create-contestant-application-request';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +46,11 @@ export class CompetitionService {
 
   addJudgeApplication = (app: CreateJudgeApplicationDto, competitionId: string): Observable<string> => {
     let path = this.path + "/"+  competitionId + "/app/judge";
+    return this.http.post<string>(path, app);
+  }
+
+  addContestantApplication = (app: CreateContestantApplicationRequest, competitionId: string): Observable<string> => {
+    let path = this.path + "/"+  competitionId + "/app/contestant";
     return this.http.post<string>(path, app);
   }
 }

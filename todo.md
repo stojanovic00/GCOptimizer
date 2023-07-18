@@ -15,8 +15,8 @@
 
 - view competitions +
 
-- apply contestant
-- apply judge
+- apply contestant +
+- apply judge +
 
 - view contestant applications
 - view judge applications
