@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"auth_service/api/middleware"
 	scheduling_pb "common/proto/scheduling/generated"
-	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,7 +24,12 @@ func (h *SchedulingHandler) Test(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.client.Test(context.Background(), &scheduling_pb.TestMessage{Message: message.Message})
+	userInfoContext, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No user info provided"})
+		return
+	}
+	resp, err := h.client.Test(userInfoContext, &scheduling_pb.TestMessage{Message: message.Message})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return

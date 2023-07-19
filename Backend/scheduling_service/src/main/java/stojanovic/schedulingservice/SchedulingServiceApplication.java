@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"api.handler"})
+@ComponentScan(basePackages = {"api.handler", "api.middleware"})
 public class SchedulingServiceApplication {
 	private static String grpcServerPort;
 

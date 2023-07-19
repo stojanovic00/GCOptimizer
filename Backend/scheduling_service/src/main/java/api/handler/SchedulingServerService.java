@@ -1,6 +1,8 @@
 package api.handler;
 
 
+import api.middleware.UserInfoInterceptor;
+import auth_pb.Auth;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import scheduling_pb.Scheduling;
@@ -10,10 +12,15 @@ import scheduling_pb.SchedulingServiceGrpc;
 public class SchedulingServerService extends SchedulingServiceGrpc.SchedulingServiceImplBase {
     @Override
     public void test(Scheduling.TestMessage request, StreamObserver<Scheduling.TestResponse> responseObserver) {
-        String uppercase = request.getMessage().toUpperCase();
+        Auth.UserInfo userInfo = UserInfoInterceptor.USER_INFO.get();
+
+        String message = "email: " + userInfo.getEmail() + ", role: " + userInfo.getRole() + ", message: " + request.getMessage();
+
         Scheduling.TestResponse resp = Scheduling.TestResponse.newBuilder()
-                .setResponse(uppercase)
+                .setResponse(message)
                 .build();
+
+
 
         responseObserver.onNext(resp);
         responseObserver.onCompleted();
