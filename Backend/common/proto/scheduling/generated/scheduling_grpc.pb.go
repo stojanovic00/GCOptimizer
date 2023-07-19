@@ -35,7 +35,7 @@ func NewSchedulingServiceClient(cc grpc.ClientConnInterface) SchedulingServiceCl
 
 func (c *schedulingServiceClient) Test(ctx context.Context, in *TestMessage, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
-	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/test", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/Test", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _SchedulingService_Test_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/scheduling_pb.SchedulingService/test",
+		FullMethod: "/scheduling_pb.SchedulingService/Test",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SchedulingServiceServer).Test(ctx, req.(*TestMessage))
@@ -96,7 +96,7 @@ var SchedulingService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SchedulingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "test",
+			MethodName: "Test",
 			Handler:    _SchedulingService_Test_Handler,
 		},
 	},

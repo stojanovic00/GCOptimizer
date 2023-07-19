@@ -5,7 +5,7 @@ package scheduling_pb;
 
 
 service SchedulingService{
-  rpc test(TestMessage) returns(TestResponse) {}
+  rpc Test(TestMessage) returns(TestResponse) {}
 }
 
 

@@ -61,6 +61,12 @@
 			<version>2.9.0.RELEASE</version>
 		</dependency>
 
+<!--		for @GrpcClient for making client-->
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-client-spring-boot-starter</artifactId>
+			<version>2.9.0.RELEASE</version>
+		</dependency>
 
 	</dependencies>
 

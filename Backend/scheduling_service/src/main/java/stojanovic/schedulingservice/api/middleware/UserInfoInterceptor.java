@@ -1,4 +1,4 @@
-package api.middleware;
+package stojanovic.schedulingservice.api.middleware;
 
 import auth_pb.Auth;
 import io.grpc.*;

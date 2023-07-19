@@ -1,4 +1,4 @@
-package core.domain;
+package stojanovic.schedulingservice.domain;
 
 import lombok.*;
 
