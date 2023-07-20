@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  api_gateway:
-    image: api_gateway
-    container_name: api_gateway
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
     build:
       context: .
       dockerfile: ./api_gateway/Dockerfile
@@ -18,15 +18,20 @@ services:
       
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+
       APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
       APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+
+      SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
+      SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
+
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     networks:
       - network
 
-  auth_service:
-    image: auth_service
-    container_name: auth_service
+  auth-service:
+    image: auth-service
+    container_name: auth-service
     build:
       context: .
       dockerfile: ./auth_service/Dockerfile
@@ -45,11 +50,11 @@ services:
     networks:
       - network
     depends_on:
-      - auth_db
+      - auth-db
 
-  auth_db:
-    image: auth_db
-    container_name: auth_db
+  auth-db:
+    image: auth-db
+    container_name: auth-db
     restart: on-failure
     build:
       context: ../Database/Auth
@@ -72,9 +77,9 @@ services:
       - 5001:5432
 
 
-  application_service:
-    image: application_service
-    container_name: application_service
+  application-service:
+    image: application-service
+    container_name: application-service
     build:
       context: .
       dockerfile: ./application_service/Dockerfile
@@ -92,12 +97,12 @@ services:
     networks:
       - network
     depends_on:
-      - application_db
+      - application-db
 
 
-  application_db:
-    image: application_db
-    container_name: application_db
+  application-db:
+    image: application-db
+    container_name: application-db
     restart: on-failure
     build:
       context: ../Database/Application
@@ -119,10 +124,36 @@ services:
     ports:
       - 5002:5432
 
+  scheduling_service:
+    image: scheduling-service
+    container_name: scheduling-service
+    build:
+      context: ./scheduling_service
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - 8003:${SCHEDULING_SERVICE_PORT}
+    environment:
+      SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
+      SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
+      SCHEDULING_DB_NAME: ${SCHEDULING_DB_NAME}
+      SCHEDULING_DB_HOST: ${SCHEDULING_DB_HOST}
+      SCHEDULING_DB_PORT: ${SCHEDULING_DB_PORT}
+      SCHEDULING_DB_USER: ${SCHEDULING_DB_USER}
+      SCHEDULING_DB_PASS: ${SCHEDULING_DB_PASS}
 
-  scheduling_db:
-    image: scheduling_db
-    container_name: scheduling_db
+
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+    networks:
+      - network
+    depends_on:
+      - scheduling-db
+
+
+  scheduling-db:
+    image: scheduling-db
+    container_name: scheduling-db
     restart: on-failure
     build:
       context: ../Database/Scheduling

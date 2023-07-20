@@ -10,4 +10,4 @@ COPY --from=builder extracted/spring-boot-loader/ ./
 COPY --from=builder extracted/snapshot-dependencies/ ./
 COPY --from=builder extracted/application/ ./
 EXPOSE 8000
-ENTRYPOINT ["java", "-Dspring.config.location=./BOOT-INF/classes/application-docker.properties", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
