@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SchedulingServiceClient interface {
-	Test(ctx context.Context, in *TestMessage, opts ...grpc.CallOption) (*TestResponse, error)
+	GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*Schedule, error)
 }
 
 type schedulingServiceClient struct {
@@ -33,9 +33,9 @@ func NewSchedulingServiceClient(cc grpc.ClientConnInterface) SchedulingServiceCl
 	return &schedulingServiceClient{cc}
 }
 
-func (c *schedulingServiceClient) Test(ctx context.Context, in *TestMessage, opts ...grpc.CallOption) (*TestResponse, error) {
-	out := new(TestResponse)
-	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/Test", in, out, opts...)
+func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*Schedule, error) {
+	out := new(Schedule)
+	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/GenerateSchedule", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *schedulingServiceClient) Test(ctx context.Context, in *TestMessage, opt
 // All implementations must embed UnimplementedSchedulingServiceServer
 // for forward compatibility
 type SchedulingServiceServer interface {
-	Test(context.Context, *TestMessage) (*TestResponse, error)
+	GenerateSchedule(context.Context, *SchedulingParameters) (*Schedule, error)
 	mustEmbedUnimplementedSchedulingServiceServer()
 }
 
@@ -54,8 +54,8 @@ type SchedulingServiceServer interface {
 type UnimplementedSchedulingServiceServer struct {
 }
 
-func (UnimplementedSchedulingServiceServer) Test(context.Context, *TestMessage) (*TestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
+func (UnimplementedSchedulingServiceServer) GenerateSchedule(context.Context, *SchedulingParameters) (*Schedule, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateSchedule not implemented")
 }
 func (UnimplementedSchedulingServiceServer) mustEmbedUnimplementedSchedulingServiceServer() {}
 
@@ -70,20 +70,20 @@ func RegisterSchedulingServiceServer(s grpc.ServiceRegistrar, srv SchedulingServ
 	s.RegisterService(&SchedulingService_ServiceDesc, srv)
 }
 
-func _SchedulingService_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TestMessage)
+func _SchedulingService_GenerateSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SchedulingParameters)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SchedulingServiceServer).Test(ctx, in)
+		return srv.(SchedulingServiceServer).GenerateSchedule(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/scheduling_pb.SchedulingService/Test",
+		FullMethod: "/scheduling_pb.SchedulingService/GenerateSchedule",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulingServiceServer).Test(ctx, req.(*TestMessage))
+		return srv.(SchedulingServiceServer).GenerateSchedule(ctx, req.(*SchedulingParameters))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +96,8 @@ var SchedulingService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SchedulingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Test",
-			Handler:    _SchedulingService_Test_Handler,
+			MethodName: "GenerateSchedule",
+			Handler:    _SchedulingService_GenerateSchedule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

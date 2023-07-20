@@ -84,7 +84,7 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 
 	schGroup := privateRouter.Group("scheduling")
 	schGroup.Use(middleware.ValidateAndExtractToken())
-	schGroup.POST("test", middleware.Authorize("Application_crud"), schedulingHandler.Test)
+	schGroup.POST("schedule", middleware.Authorize("Schedule_crud"), schedulingHandler.GenerateSchedule)
 
 	return publicRouter, privateRouter, nil
 }

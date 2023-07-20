@@ -17,9 +17,8 @@ public class UserInfoInterceptor implements ServerInterceptor {
         String userInfoStr = headers.get(Metadata.Key.of("user-info", Metadata.ASCII_STRING_MARSHALLER));
         // Reject the request if userInfo is empty
         if (userInfoStr == null || userInfoStr.isEmpty()) {
-            call.close(Status.INVALID_ARGUMENT.withDescription("Missing user-info"), headers);
-            return new ServerCall.Listener() {
-            };
+            Context context = Context.current().withValue(USER_INFO, null);
+            return Contexts.interceptCall(context, call, headers, next);
         }
 
         //Parsing

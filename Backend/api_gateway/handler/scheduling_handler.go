@@ -15,10 +15,10 @@ func NewSchedulingHandler(client scheduling_pb.SchedulingServiceClient) *Schedul
 	return &SchedulingHandler{client: client}
 }
 
-func (h *SchedulingHandler) Test(ctx *gin.Context) {
-	var message scheduling_pb.TestMessage
+func (h *SchedulingHandler) GenerateSchedule(ctx *gin.Context) {
+	var params scheduling_pb.SchedulingParameters
 
-	err := ctx.ShouldBindJSON(&message)
+	err := ctx.ShouldBindJSON(&params)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
 		return
@@ -29,11 +29,11 @@ func (h *SchedulingHandler) Test(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No user info provided"})
 		return
 	}
-	resp, err := h.client.Test(userInfoContext, &scheduling_pb.TestMessage{Message: message.Message})
+	resp, err := h.client.GenerateSchedule(userInfoContext, &params)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp.Response)
+	ctx.JSON(http.StatusOK, resp.GetSlots())
 }

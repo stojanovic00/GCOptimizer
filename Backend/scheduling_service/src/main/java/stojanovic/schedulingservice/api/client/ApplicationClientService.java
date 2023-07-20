@@ -12,20 +12,27 @@ import io.grpc.stub.MetadataUtils;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 
 @Service
 public class ApplicationClientService {
     @GrpcClient("grpc-application-service")
     ApplicationServiceGrpc.ApplicationServiceBlockingStub client; //synchronous client
 
-    public Application.SportsOrganisation getCurrentSportsOrg() throws StatusRuntimeException{
-        Application.EmptyMessage emptyMessage =  Application.EmptyMessage.newBuilder().build();
+    public Application.ContestantApplicationList getCompetitionApplications(UUID competitionId) throws StatusRuntimeException{
+        Application.IdMessage idMessage =  Application.IdMessage.newBuilder()
+                .setId(competitionId.toString())
+                .build();
 
+        //TODO: used for checking if this sports organization can get applications for this competition
         ApplicationServiceGrpc.ApplicationServiceBlockingStub modifiedClient = getClientWithAttachedUserInfoMetadata();
-        return modifiedClient.getLoggedSportsOrganisation(emptyMessage);
+
+        return modifiedClient.getAllContestantApplications(idMessage);
     }
 
     private ApplicationServiceGrpc.ApplicationServiceBlockingStub getClientWithAttachedUserInfoMetadata() {
+        // TODO null exception handling
         Auth.UserInfo userInfo = UserInfoInterceptor.USER_INFO.get();
 
         // Create metadata with the user information

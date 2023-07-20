@@ -124,7 +124,7 @@ services:
     ports:
       - 5002:5432
 
-  scheduling_service:
+  scheduling-service:
     image: scheduling-service
     container_name: scheduling-service
     build:

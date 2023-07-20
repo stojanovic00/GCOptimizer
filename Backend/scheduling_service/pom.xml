@@ -19,6 +19,20 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
+<!--	OPTA-->
+<!--	<dependencyManagement>-->
+<!--		<dependencies>-->
+<!--			<dependency>-->
+<!--				<groupId>org.optaplanner</groupId>-->
+<!--				<artifactId>optaplanner-bom</artifactId>-->
+<!--				<version>${version.org.optaplanner}</version>-->
+<!--				<type>pom</type>-->
+<!--				<scope>import</scope>-->
+<!--			</dependency>-->
+<!--		</dependencies>-->
+<!--	</dependencyManagement>-->
+
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -66,6 +80,24 @@
 			<groupId>net.devh</groupId>
 			<artifactId>grpc-client-spring-boot-starter</artifactId>
 			<version>2.9.0.RELEASE</version>
+		</dependency>
+
+
+<!--		OPTA-->
+<!--		 https://mvnrepository.com/artifact/org.optaplanner/optaplanner-spring-boot-starter-->
+		<dependency>
+			<groupId>org.optaplanner</groupId>
+			<artifactId>optaplanner-spring-boot-starter</artifactId>
+			<version>9.38.0.Final</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/org.optaplanner/optaplanner-test -->
+		<dependency>
+			<groupId>org.optaplanner</groupId>
+			<artifactId>optaplanner-test</artifactId>
+			<version>9.38.0.Final</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

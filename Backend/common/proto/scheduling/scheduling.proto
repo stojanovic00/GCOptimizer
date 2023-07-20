@@ -5,14 +5,71 @@ package scheduling_pb;
 
 
 service SchedulingService{
-  rpc Test(TestMessage) returns(TestResponse) {}
+  rpc GenerateSchedule(SchedulingParameters) returns(Schedule) {}
 }
 
 
-message TestMessage{
-  string message = 1;
+enum ApparatusType{
+  Floor = 0;
+  PommelHorse = 1;
+  StillRings = 2;
+  Vault = 3;
+  ParallelBars = 4;
+  HorizontalBar = 5;
+  BalanceBeam = 6;
+  UnevenBars = 7;
 }
 
-message TestResponse{
-  string response = 1;
+
+message AgeCategory{
+  string id = 1;
+  string name = 2;
+  int32 minAge = 3;
+  int32 maxAge = 4;
+}
+
+
+message SlotContestantInfo{
+  string contestantId = 1;
+  int32 contestantCompId = 2;
+  int32 teamNumber = 3;
+  string organization = 4;
+  AgeCategory ageCategory = 5;
+  string Country = 6;
+  string City = 7;
+  repeated Apparatus competingApparatuses = 8;
+}
+
+
+message ScheduleSlot{
+  int32 sessionNumber = 1;
+  ApparatusType startingApparatus = 2;
+  SlotContestantInfo contestantInfo = 3;
+}
+
+message Schedule{
+  repeated ScheduleSlot slots = 1;
+}
+
+message Apparatus{
+  string id = 1;
+  ApparatusType type = 2;
+}
+
+message SchedulingParameters{
+    string  id = 1;
+    string  competitionId = 2;
+    int64  startTime = 3;
+    int64  endTime = 4;
+    bool  warmupRoomAvailable = 5;
+    int32  generalWarmupTime = 6;
+    int32  warmupTime = 7;
+    int32  warmupsPerApparatus = 8;
+    int32  contestantNumPerApparatus = 9;
+    int32  executionTime = 10;
+    int32  apparatusRotationTime = 11;
+    int32  medalCeremonyAfterOneSessionTime = 12;
+    int32  finalMedalCeremonyTime = 13;
+    bool halfApparatusPerSessionMode = 14;
+    repeated  Apparatus apparatusOrder = 15;
 }
