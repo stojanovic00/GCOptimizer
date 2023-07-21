@@ -31,10 +31,11 @@ message AgeCategory{
 
 message ContestantInfo{
   int32 contestantCompId = 1;
-  int32 teamNumber = 2;
-  string organization = 3;
-  string ageCategory = 4;
-  string location = 5;
+  string name = 2;
+  int32 teamNumber = 3;
+  string organization = 4;
+  string ageCategory = 5;
+  string location = 6;
 }
 
 

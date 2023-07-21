@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +24,15 @@ public class ScheduleService {
     private final ApplicationClientService applicationClientService;
     private final SolverManager<Schedule, UUID> solverManager;
     public Schedule generateSchedule(SchedulingParameters parameters) throws StatusRuntimeException {
-        //Get applications from application service
+        //Get competition and applications from application service
         Application.ContestantApplicationList applications = applicationClientService.getCompetitionApplications(parameters.getCompetitionId());
+
+        List<ApparatusType> apparatusOrder = parameters.getApparatusOrder().stream()
+                .map(Apparatus::getType).collect(Collectors.toList());
 
         //Prepare data for optaplanner
         List<Contestant> contestants = generateContestants(applications);
-        List<ScheduleSlot> slots = generateScheduleSlots(parameters);
+        List<ScheduleSlot> slots = generateScheduleSlots(parameters, contestants.size(), apparatusOrder);
 
         //Initialize planning solution
         Schedule schedule = new Schedule(contestants, slots);
@@ -58,7 +62,7 @@ public class ScheduleService {
         return contestants;
     }
 
-    private List<ScheduleSlot> generateScheduleSlots(SchedulingParameters parameters){
+    private List<ScheduleSlot> generateScheduleSlots(SchedulingParameters parameters, int allContestantsNum, List<ApparatusType> apparatusOrder){
        double maxSessionNum = calculateMaxSessionNum(parameters);
 
        List<ScheduleSlot> slots = new ArrayList<ScheduleSlot>();
@@ -69,7 +73,7 @@ public class ScheduleService {
           for(Apparatus apparatus : parameters.getApparatusOrder()){
               for(int i = 0; i < parameters.getContestantNumPerApparatus(); i++){
                   slotCounter ++;
-                  ScheduleSlot slot = new ScheduleSlot(slotCounter, sessionNum, apparatus.getType());
+                  ScheduleSlot slot = new ScheduleSlot(slotCounter, sessionNum, apparatus.getType(), allContestantsNum, apparatusOrder);
                   slots.add(slot);
               }
           }

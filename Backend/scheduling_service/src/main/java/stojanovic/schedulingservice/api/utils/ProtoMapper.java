@@ -96,6 +96,7 @@ public class ProtoMapper {
             return null;
        return Scheduling.ContestantInfo.newBuilder()
                .setContestantCompId(contestant.getContestantCompId())
+               .setName(contestant.getName())
                .setTeamNumber(contestant.getTeamNumber())
                .setOrganization(contestant.getOrganization())
                .setAgeCategory(contestant.getAgeCategory().getName())

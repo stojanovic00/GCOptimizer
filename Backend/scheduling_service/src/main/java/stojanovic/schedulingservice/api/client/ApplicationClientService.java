@@ -31,6 +31,17 @@ public class ApplicationClientService {
         return modifiedClient.getAllContestantApplications(idMessage);
     }
 
+    public Application.Competition getCompetitionById(UUID id){
+        Application.IdMessage idMessage =  Application.IdMessage.newBuilder()
+                .setId(id.toString())
+                .build();
+
+        //TODO: used for checking if this sports organization can get this competition
+        ApplicationServiceGrpc.ApplicationServiceBlockingStub modifiedClient = getClientWithAttachedUserInfoMetadata();
+
+        return modifiedClient.getCompetitionById(idMessage);
+    }
+
     private ApplicationServiceGrpc.ApplicationServiceBlockingStub getClientWithAttachedUserInfoMetadata() {
         // TODO null exception handling
         Auth.UserInfo userInfo = UserInfoInterceptor.USER_INFO.get();

@@ -10,6 +10,8 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+import java.util.List;
 
 @Entity
 @Data
@@ -27,10 +29,18 @@ public class ScheduleSlot {
     @PlanningVariable(nullable = true) // If not enough contestants some slots will be empty
     Contestant contestant;
 
+    //Helping fields
+    @Transient
+    int allContestantsNum;
+    @Transient
+    List<ApparatusType> apparatusOrder;
 
-    public ScheduleSlot(long id, int session, ApparatusType apparatus){
+    public ScheduleSlot(long id, int session, ApparatusType apparatus, int allContestantsNum, List<ApparatusType> apparatusOrder){
         this.id = id;
         this.session = session;
         this.startingApparatus = apparatus;
+        this.allContestantsNum = allContestantsNum;
+        this.apparatusOrder = apparatusOrder;
     }
+
 }
