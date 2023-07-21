@@ -2,10 +2,7 @@ package stojanovic.schedulingservice.api.utils;
 
 import application_pb.Application;
 import scheduling_pb.Scheduling;
-import stojanovic.schedulingservice.core.domain.model.AgeCategory;
-import stojanovic.schedulingservice.core.domain.model.Apparatus;
-import stojanovic.schedulingservice.core.domain.model.ApparatusType;
-import stojanovic.schedulingservice.core.domain.model.SchedulingParameters;
+import stojanovic.schedulingservice.core.domain.model.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -74,4 +71,37 @@ public class ProtoMapper {
                 .map(ProtoMapper::apparatusApplicationDom)
                 .collect(Collectors.toList());
     }
+
+   public static Scheduling.ScheduleSlot scheduleSlotPb(ScheduleSlot slot){
+        Scheduling.ScheduleSlot.Builder  builder =  Scheduling.ScheduleSlot.newBuilder()
+                .setSession(slot.getSession())
+                .setStartingApparatus(Scheduling.ApparatusType.values()[slot.getStartingApparatus().ordinal()]);
+
+        //Some slots will remain unassigned
+        if(slot.getContestant() != null){
+            builder.setContestantInfo(contestantToContestantInfo(slot.getContestant()));
+        }
+
+        return builder.build();
+    }
+
+    public static List<Scheduling.ScheduleSlot> scheduleSlotListPb(List<ScheduleSlot> slots){
+       return slots.stream()
+               .map(ProtoMapper::scheduleSlotPb)
+               .collect(Collectors.toList());
+    }
+
+    public static Scheduling.ContestantInfo contestantToContestantInfo(Contestant contestant){
+        if(contestant == null)
+            return null;
+       return Scheduling.ContestantInfo.newBuilder()
+               .setContestantCompId(contestant.getContestantCompId())
+               .setTeamNumber(contestant.getTeamNumber())
+               .setOrganization(contestant.getOrganization())
+               .setAgeCategory(contestant.getAgeCategory().getName())
+               .setLocation(contestant.getCountry() + ", " + contestant.getCity())
+               .build();
+    }
+
+
 }

@@ -20,6 +20,7 @@ public class Contestant {
     //Assigned after retrieving info from application service
     int contestantCompId;
     int teamNumber;
+    String name;
     String organization;
     @Embedded
     @AttributeOverrides({

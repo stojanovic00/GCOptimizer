@@ -29,22 +29,19 @@ message AgeCategory{
 }
 
 
-message SlotContestantInfo{
-  string contestantId = 1;
-  int32 contestantCompId = 2;
-  int32 teamNumber = 3;
-  string organization = 4;
-  AgeCategory ageCategory = 5;
-  string Country = 6;
-  string City = 7;
-  repeated Apparatus competingApparatuses = 8;
+message ContestantInfo{
+  int32 contestantCompId = 1;
+  int32 teamNumber = 2;
+  string organization = 3;
+  string ageCategory = 4;
+  string location = 5;
 }
 
 
 message ScheduleSlot{
-  int32 sessionNumber = 1;
+  int32 session = 1;
   ApparatusType startingApparatus = 2;
-  SlotContestantInfo contestantInfo = 3;
+  ContestantInfo contestantInfo = 3;
 }
 
 message Schedule{

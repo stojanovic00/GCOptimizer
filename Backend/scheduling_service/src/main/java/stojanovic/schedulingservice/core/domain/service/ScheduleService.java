@@ -3,6 +3,8 @@ package stojanovic.schedulingservice.core.domain.service;
 import application_pb.Application;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
+import org.optaplanner.core.api.solver.SolverJob;
+import org.optaplanner.core.api.solver.SolverManager;
 import org.springframework.stereotype.Service;
 import stojanovic.schedulingservice.api.client.ApplicationClientService;
 import stojanovic.schedulingservice.api.utils.ProtoMapper;
@@ -12,13 +14,15 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
 
     private final ApplicationClientService applicationClientService;
-    public void generateSchedule(SchedulingParameters parameters) throws StatusRuntimeException {
+    private final SolverManager<Schedule, UUID> solverManager;
+    public Schedule generateSchedule(SchedulingParameters parameters) throws StatusRuntimeException {
         //Get applications from application service
         Application.ContestantApplicationList applications = applicationClientService.getCompetitionApplications(parameters.getCompetitionId());
 
@@ -26,8 +30,22 @@ public class ScheduleService {
         List<Contestant> contestants = generateContestants(applications);
         List<ScheduleSlot> slots = generateScheduleSlots(parameters);
 
+        //Initialize planning solution
         Schedule schedule = new Schedule(contestants, slots);
 
+
+        UUID problemId = UUID.randomUUID();
+        // Submit the problem to start solving
+        SolverJob<Schedule, UUID> solverJob = solverManager.solve(problemId, schedule);
+        Schedule solution;
+        try {
+            // Wait until the solving ends
+            solution = solverJob.getFinalBestSolution();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IllegalStateException("Solving failed.", e);
+        }
+
+        return solution;
     }
 
     private List<Contestant> generateContestants(Application.ContestantApplicationList applications){
@@ -65,6 +83,7 @@ public class ScheduleService {
                 .id(UUID.fromString(application.getContestant().getDelegationMember().getId()))
                 .contestantCompId(compId)
                 .teamNumber(application.getTeamNumber())
+                .name(application.getContestant().getDelegationMember().getFullName())
                 .organization(application.getContestant().getDelegationMember().getSportsOrganisation().getName())
                 .ageCategory(ProtoMapper.ageCategoryDom(application.getAgeCategory()))
                 .Country(application.getContestant().getDelegationMember().getSportsOrganisation().getAddress().getCountry())
