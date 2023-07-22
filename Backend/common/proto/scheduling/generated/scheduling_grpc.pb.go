@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SchedulingServiceClient interface {
-	GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*Schedule, error)
+	GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*ScheduleDto, error)
 }
 
 type schedulingServiceClient struct {
@@ -33,8 +33,8 @@ func NewSchedulingServiceClient(cc grpc.ClientConnInterface) SchedulingServiceCl
 	return &schedulingServiceClient{cc}
 }
 
-func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*Schedule, error) {
-	out := new(Schedule)
+func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*ScheduleDto, error) {
+	out := new(ScheduleDto)
 	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/GenerateSchedule", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *Sche
 // All implementations must embed UnimplementedSchedulingServiceServer
 // for forward compatibility
 type SchedulingServiceServer interface {
-	GenerateSchedule(context.Context, *SchedulingParameters) (*Schedule, error)
+	GenerateSchedule(context.Context, *SchedulingParameters) (*ScheduleDto, error)
 	mustEmbedUnimplementedSchedulingServiceServer()
 }
 
@@ -54,7 +54,7 @@ type SchedulingServiceServer interface {
 type UnimplementedSchedulingServiceServer struct {
 }
 
-func (UnimplementedSchedulingServiceServer) GenerateSchedule(context.Context, *SchedulingParameters) (*Schedule, error) {
+func (UnimplementedSchedulingServiceServer) GenerateSchedule(context.Context, *SchedulingParameters) (*ScheduleDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateSchedule not implemented")
 }
 func (UnimplementedSchedulingServiceServer) mustEmbedUnimplementedSchedulingServiceServer() {}

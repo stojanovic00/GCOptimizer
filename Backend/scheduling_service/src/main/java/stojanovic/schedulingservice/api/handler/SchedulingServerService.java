@@ -22,28 +22,20 @@ public class SchedulingServerService extends SchedulingServiceGrpc.SchedulingSer
     private final ScheduleService scheduleService;
 
     @Override
-    public void generateSchedule(Scheduling.SchedulingParameters request, StreamObserver<Scheduling.Schedule> responseObserver) {
+    public void generateSchedule(Scheduling.SchedulingParameters request, StreamObserver<Scheduling.ScheduleDto> responseObserver) {
         SchedulingParameters parameters = ProtoMapper.schedulingParametersDom(request);
 
-        Schedule schedule;
         try{
-            schedule = scheduleService.generateSchedule(parameters);
+            Scheduling.ScheduleDto dto = scheduleService.generateSchedule(parameters);
 
-            List<Scheduling.ScheduleSlot> slots = ProtoMapper.scheduleSlotListPb(schedule.getSlots());
-
-            Scheduling.Schedule response = Scheduling.Schedule.newBuilder()
-                    .addAllSlots(slots)
-                    .build();
-
-            responseObserver.onNext(response);
+            responseObserver.onNext(dto);
             responseObserver.onCompleted();
-    }
+        }
         catch (StatusRuntimeException e){
-        String errorMessage=e.getStatus().getDescription();
-        Status status= Status.NOT_FOUND.withDescription(errorMessage);
-        responseObserver.onError(status.asRuntimeException());
-    }
-
+            String errorMessage=e.getStatus().getDescription();
+            Status status= Status.NOT_FOUND.withDescription(errorMessage);
+            responseObserver.onError(status.asRuntimeException());
+        }
     }
 }
 

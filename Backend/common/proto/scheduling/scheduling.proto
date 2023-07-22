@@ -5,7 +5,7 @@ package scheduling_pb;
 
 
 service SchedulingService{
-  rpc GenerateSchedule(SchedulingParameters) returns(Schedule) {}
+  rpc GenerateSchedule(SchedulingParameters) returns(ScheduleDto) {}
 }
 
 
@@ -47,6 +47,12 @@ message ScheduleSlot{
 
 message Schedule{
   repeated ScheduleSlot slots = 1;
+}
+
+//Used just for frontend preview
+message ScheduleDto{
+  Schedule schedule = 1;
+  repeated int64 startingTimes = 2;
 }
 
 message Apparatus{

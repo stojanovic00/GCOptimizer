@@ -76,6 +76,7 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 
 	//PRIVATE
 	privateRouter := gin.Default()
+	privateRouter.Use(corsMiddleware)
 
 	// ROUTES
 	privateRouter.NoRoute(func(c *gin.Context) {
