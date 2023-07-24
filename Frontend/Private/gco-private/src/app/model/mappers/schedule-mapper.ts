@@ -1,7 +1,7 @@
 import { ScheduleSlot } from "../core/schedule-slot";
 import { ScheduleSessionView} from "../dto/schedule-session-view";
 import { ScheduleDto } from "../dto/schedule-dto";
-import { unixTimeStampToDate } from "src/app/utils/date-utils";
+import { unixTimeStampToDate } from "../../utils/date-utils";
 import { Apparatus, getApparatusName } from "../core/apparatus";
 import { ApparatusContestantList} from '../dto/apparatus-contestant-list';
 
@@ -44,6 +44,20 @@ export function ScheduleDtoToScheduleView(dto: ScheduleDto):ScheduleSessionView[
     return scheduleSessionViews;
 }
 
+function groupBySession(slots: ScheduleSlot[]) {
+    let groupedSlots: { [session: number]: ScheduleSlot[]; } = slots.reduce((acc, slot) => {
+        if (!acc[slot.session]) {
+            acc[slot.session] = [];
+        }
+        acc[slot.session].push(slot);
+        return acc;
+    }, {} as { [session: number]: ScheduleSlot[]; }); // Explicitly define the type here
+
+
+    // Convert the groupedSlots object into an array of arrays
+    let slotsBySession: ScheduleSlot[][] = Object.values(groupedSlots);
+    return slotsBySession;
+}
 
 
 function groupByStartingApparatus(sessionSlots: ScheduleSlot[]) {
@@ -61,17 +75,3 @@ function groupByStartingApparatus(sessionSlots: ScheduleSlot[]) {
     return slotsByStartingApparatus;
 }
 
-function groupBySession(slots: ScheduleSlot[]) {
-    let groupedSlots: { [session: number]: ScheduleSlot[]; } = slots.reduce((acc, slot) => {
-        if (!acc[slot.session]) {
-            acc[slot.session] = [];
-        }
-        acc[slot.session].push(slot);
-        return acc;
-    }, {} as { [session: number]: ScheduleSlot[]; }); // Explicitly define the type here
-
-
-    // Convert the groupedSlots object into an array of arrays
-    let slotsBySession: ScheduleSlot[][] = Object.values(groupedSlots);
-    return slotsBySession;
-}

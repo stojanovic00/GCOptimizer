@@ -123,7 +123,7 @@ export class ScheduleCreateComponent implements OnInit {
                   generalWarmupTime: 60,
                   warmupTime: 3,
                   warmupsPerApparatus: 1,
-                  contestantNumPerApparatus: 6,
+                  contestantNumPerApparatus: 4,
                   executionTime: 3,
                   apparatusRotationTime: 1,
                   medalCeremonyAfterOneSessionTime: 10,
