@@ -1,19 +1,18 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Apparatus, ApparatusTable, getApparatusName } from 'src/app/model/core/apparatus';
 import { ApparatusTypeFoScheduling } from 'src/app/model/core/apparatus-type-for-scheduling';
 import { Competition } from 'src/app/model/core/competition';
 import { Gender } from 'src/app/model/core/gender';
-import { Schedule } from 'src/app/model/core/schedule';
 import { SchedulingParameters } from 'src/app/model/core/scheduling-paramters';
-import { ScheduleDto } from 'src/app/model/dto/schedule-dto';
 import { CompetitionService } from 'src/app/services/competition.service';
 import { ScheduleService } from 'src/app/services/schedule.service';
 import { dateToUnixTimeStamp, timeStringToDate } from 'src/app/utils/date-utils';
 import {ScheduleDtoToScheduleView} from '../../model/mappers/schedule-mapper'
 import { ScheduleSessionView } from 'src/app/model/dto/schedule-session-view';
+import { Schedule } from 'src/app/model/core/schedule';
 
 @Component({
   selector: 'app-schedule-create',
@@ -78,6 +77,7 @@ export class ScheduleCreateComponent implements OnInit {
 
   constructor(
     private readonly route : ActivatedRoute,
+    private readonly router : Router,
     private readonly schService : ScheduleService,
     private readonly compService : CompetitionService
   ){}
@@ -106,47 +106,6 @@ export class ScheduleCreateComponent implements OnInit {
 
                 this.availableApparatusesTable.dataSource = this.availableApparatuses.slice(); 
                 this.compGender = response.gender;
-
-                //DEV ONLY
-
-                let apparatusOrder : ApparatusTypeFoScheduling[] = []
-                this.chosenApparatusesTable.dataSource = this.maleApparatuses;
-                apparatusOrder = this.chosenApparatusesTable.dataSource.map( apparatus =>{
-                  return { type : apparatus}
-                })
-
-                let params : SchedulingParameters = {
-                  competitionId: "235bc45c-288c-11ee-b6f8-040e3c52dc2b",
-                  startTime: 978332400,
-                  endTime: 978375600,
-                  warmupRoomAvailable: false,
-                  generalWarmupTime: 60,
-                  warmupTime: 3,
-                  warmupsPerApparatus: 1,
-                  contestantNumPerApparatus: 4,
-                  executionTime: 3,
-                  apparatusRotationTime: 1,
-                  medalCeremonyAfterOneSessionTime: 10,
-                  finalMedalCeremonyTime: 0,
-                  halfApparatusPerSessionMode: false,
-                  apparatusOrder: apparatusOrder
-                }
-
-
-                  this.schService.generateSchedule(params).subscribe({
-                  next: (response: ScheduleDto) => {
-                      this.sessionViews = ScheduleDtoToScheduleView(response);
-                  },
-                  error: (err: HttpErrorResponse) => {
-                    alert(err.error);
-                  }
-                }); 
-                alert("Schedule is generating...")
-
-
-
-
-                //DEV ONLY
               },
               error: (err: HttpErrorResponse) => {
                 alert(err.error);
@@ -203,11 +162,14 @@ clearSelectedApparatuses = () =>{
 }
 
   generateSchedule = () => {
-    let apparatusOrder : ApparatusTypeFoScheduling[] = []
 
-    apparatusOrder = this.chosenApparatusesTable.dataSource.map( apparatus =>{
-      return { type : apparatus}
-    })
+      let apparatusOrder : ApparatusTypeFoScheduling[] = []
+      this.chosenApparatusesTable.dataSource = this.maleApparatuses;
+      apparatusOrder = this.chosenApparatusesTable.dataSource.map(app => {
+          return {
+            type : app
+          }
+      })
 
     let params : SchedulingParameters = {
         competitionId : this.competitionId,
@@ -228,7 +190,7 @@ clearSelectedApparatuses = () =>{
 
 
       this.schService.generateSchedule(params).subscribe({
-      next: (response: ScheduleDto) => {
+      next: (response: Schedule) => {
           this.sessionViews = ScheduleDtoToScheduleView(response);
       },
       error: (err: HttpErrorResponse) => {
@@ -239,7 +201,7 @@ clearSelectedApparatuses = () =>{
   }
 
 saveSchedule = () => {
-  alert("SRBIJA")
+    this.router.navigate(['sports-org/competition/'  + this.competitionId + '/schedule/view']);
 }
   
 }

@@ -1,7 +1,6 @@
 import { ApparatusTypeFoScheduling } from './apparatus-type-for-scheduling'
 
 export interface SchedulingParameters{
-    id?: string;
     competitionId: string;
     startTime: number;
     endTime: number;

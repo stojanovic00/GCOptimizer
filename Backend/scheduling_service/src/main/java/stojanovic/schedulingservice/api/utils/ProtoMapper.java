@@ -31,9 +31,6 @@ public class ProtoMapper {
 
     public static SchedulingParameters schedulingParametersDom(Scheduling.SchedulingParameters params){
         SchedulingParameters domParams = new SchedulingParameters();
-        if(!params.getId().isEmpty()){
-            domParams.setId(UUID.fromString(params.getId()));
-        }
         domParams.setCompetitionId(UUID.fromString(params.getCompetitionId()));
         domParams.setStartTime(unixTimestampToLocalDateTime(params.getStartTime()).toLocalTime());
         domParams.setEndTime(unixTimestampToLocalDateTime(params.getEndTime()).toLocalTime());
@@ -104,5 +101,13 @@ public class ProtoMapper {
                .build();
     }
 
+    public static Scheduling.Schedule schedulePb(Schedule schedule) {
+        List<Scheduling.ScheduleSlot> slotsPb = ProtoMapper.scheduleSlotListPb(schedule.getSlots());
+        return Scheduling.Schedule.newBuilder()
+                .setId(schedule.getId().toString())
+                .addAllSlots(slotsPb)
+                .addAllStartingTimes(schedule.getStartingTimes())
+                .build();
+    }
 
 }

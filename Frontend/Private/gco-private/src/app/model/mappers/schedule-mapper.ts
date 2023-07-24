@@ -1,13 +1,13 @@
 import { ScheduleSlot } from "../core/schedule-slot";
 import { ScheduleSessionView} from "../dto/schedule-session-view";
-import { ScheduleDto } from "../dto/schedule-dto";
 import { unixTimeStampToDate } from "../../utils/date-utils";
 import { Apparatus, getApparatusName } from "../core/apparatus";
 import { ApparatusContestantList} from '../dto/apparatus-contestant-list';
+import { Schedule } from "../core/schedule";
 
-export function ScheduleDtoToScheduleView(dto: ScheduleDto):ScheduleSessionView[] {
-    let slots : ScheduleSlot[] = dto.schedule.slots;
-    let startingTimes = dto.startingTimes;
+export function ScheduleDtoToScheduleView(schedule: Schedule):ScheduleSessionView[] {
+    let slots : ScheduleSlot[] = schedule.slots;
+    let startingTimes = schedule.startingTimes;
 
     let scheduleSessionViews : ScheduleSessionView[] = [];
 

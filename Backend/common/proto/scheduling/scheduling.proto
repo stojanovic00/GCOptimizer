@@ -5,9 +5,13 @@ package scheduling_pb;
 
 
 service SchedulingService{
-  rpc GenerateSchedule(SchedulingParameters) returns(ScheduleDto) {}
+  rpc GenerateSchedule(SchedulingParameters) returns(Schedule) {}
+  rpc GetByCompetitionId(IdMessage) returns(Schedule) {}
 }
 
+message IdMessage{
+  string id = 1;
+}
 
 enum ApparatusType{
   Floor = 0;
@@ -46,14 +50,11 @@ message ScheduleSlot{
 }
 
 message Schedule{
-  repeated ScheduleSlot slots = 1;
+  string id = 1;
+  repeated ScheduleSlot slots = 2;
+  repeated int64 startingTimes = 3;
 }
 
-//Used just for frontend preview
-message ScheduleDto{
-  Schedule schedule = 1;
-  repeated int64 startingTimes = 2;
-}
 
 message Apparatus{
   string id = 1;
@@ -61,19 +62,18 @@ message Apparatus{
 }
 
 message SchedulingParameters{
-    string  id = 1;
-    string  competitionId = 2;
-    int64  startTime = 3;
-    int64  endTime = 4;
-    bool  warmupRoomAvailable = 5;
-    int32  generalWarmupTime = 6;
-    int32  warmupTime = 7;
-    int32  warmupsPerApparatus = 8;
-    int32  contestantNumPerApparatus = 9;
-    int32  executionTime = 10;
-    int32  apparatusRotationTime = 11;
-    int32  medalCeremonyAfterOneSessionTime = 12;
-    int32  finalMedalCeremonyTime = 13;
-    bool halfApparatusPerSessionMode = 14;
-    repeated  Apparatus apparatusOrder = 15;
+    string  competitionId = 1;
+    int64  startTime = 2;
+    int64  endTime = 3;
+    bool  warmupRoomAvailable = 4;
+    int32  generalWarmupTime = 5;
+    int32  warmupTime = 6;
+    int32  warmupsPerApparatus = 7;
+    int32  contestantNumPerApparatus = 8;
+    int32  executionTime = 9;
+    int32  apparatusRotationTime = 10;
+    int32  medalCeremonyAfterOneSessionTime = 11;
+    int32  finalMedalCeremonyTime = 12;
+    bool halfApparatusPerSessionMode = 13;
+    repeated  Apparatus apparatusOrder = 14;
 }

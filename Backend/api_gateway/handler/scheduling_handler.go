@@ -29,11 +29,28 @@ func (h *SchedulingHandler) GenerateSchedule(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No user info provided"})
 		return
 	}
-	scheduleDto, err := h.client.GenerateSchedule(userInfoContext, &params)
+	schedule, err := h.client.GenerateSchedule(userInfoContext, &params)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, scheduleDto)
+	ctx.JSON(http.StatusOK, schedule)
+}
+func (h *SchedulingHandler) GetByCompetitionId(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	userInfoContext, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No user info provided"})
+		return
+	}
+
+	schedule, err := h.client.GetByCompetitionId(userInfoContext, &scheduling_pb.IdMessage{Id: id})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, schedule)
 }

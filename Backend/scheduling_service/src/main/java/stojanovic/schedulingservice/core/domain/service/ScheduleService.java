@@ -3,7 +3,6 @@ package stojanovic.schedulingservice.core.domain.service;
 import application_pb.Application;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import org.optaplanner.core.api.solver.SolverJob;
 import org.optaplanner.core.api.solver.SolverManager;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import scheduling_pb.Scheduling;
 import stojanovic.schedulingservice.api.client.ApplicationClientService;
 import stojanovic.schedulingservice.api.utils.ProtoMapper;
 import stojanovic.schedulingservice.core.domain.model.*;
+import stojanovic.schedulingservice.core.domain.repo.ScheduleRepo;
 
 import java.time.*;
 import java.util.*;
@@ -23,10 +23,13 @@ public class ScheduleService {
 
     private final ApplicationClientService applicationClientService;
     private final SolverManager<Schedule, UUID> solverManager;
-    public Scheduling.ScheduleDto generateSchedule(SchedulingParameters parameters) throws StatusRuntimeException {
+    private final ScheduleRepo scheduleRepo;
+    public Schedule generateSchedule(SchedulingParameters parameters) throws StatusRuntimeException {
+        // Delete existing schedule for this competition
+       scheduleRepo.deleteByCompetitionId(parameters.getCompetitionId());
+
         //Get competition and applications from application service
         Application.ContestantApplicationList applications = applicationClientService.getCompetitionApplications(parameters.getCompetitionId());
-
         List<ApparatusType> apparatusOrder = parameters.getApparatusOrder().stream()
                 .map(Apparatus::getType).collect(Collectors.toList());
 
@@ -57,20 +60,15 @@ public class ScheduleService {
         List<ApparatusType> appOrder = parameters.getApparatusOrder().stream().map(Apparatus::getType).collect(Collectors.toList());
         List<ScheduleSlot> processedSlots = processSlots(solution.getSlots(), appOrder);
 
-        // Prepare response
         List<Long> startingTimes = generateStartingTimes(parameters);
+        //Save
+        solution.setSlots(processedSlots);
+        solution.setStartingTimes(startingTimes);
+        solution.setId(UUID.randomUUID());
+        solution.setCompetitionId(parameters.getCompetitionId());
 
-        List<Scheduling.ScheduleSlot> slotsPb = ProtoMapper.scheduleSlotListPb(processedSlots);
-        Scheduling.Schedule schedulePb = Scheduling.Schedule.newBuilder()
-                .addAllSlots(slotsPb)
-                .build();
-
-        Scheduling.ScheduleDto dto = Scheduling.ScheduleDto.newBuilder()
-               .setSchedule(schedulePb)
-               .addAllStartingTimes(startingTimes)
-               .build();
-
-        return dto;
+        scheduleRepo.save(solution);
+        return solution;
     }
 
     private List<Long> generateStartingTimes(SchedulingParameters parameters) {
@@ -299,5 +297,9 @@ public class ScheduleService {
         }
 
         return new ArrayList<>(groupedByCountry.values());
+    }
+
+    public Schedule getByCompetitionId(UUID id){
+       return scheduleRepo.findFirstByCompetitionId(id);
     }
 }

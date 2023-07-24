@@ -152,36 +152,32 @@ services:
 
 
   scheduling-db:
-    image: scheduling-db
+    image: mongo
     container_name: scheduling-db
     restart: on-failure
-    build:
-      context: ../Database/Scheduling
-      dockerfile: Dockerfile
-    environment:
-      PGUSER: ${SCHEDULING_DB_USER}
-      POSTGRES_PASSWORD: ${SCHEDULING_DB_PASS}
-      POSTGRES_DB: ${SCHEDULING_DB_NAME}
     volumes: 
-      - scheduling_db:/var/lib/postgresql/data
+      - scheduling-db:/data/db
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
-      interval: 10s
+      test: echo 'db.runCommand("ping").ok'
+      interval: 20s
       timeout: 10s
-      retries: 10
+      retries: 20
       start_period: 10s 
     networks:
       - network
     ports:
-      - 5003:5432
-
+      - 5003:27017
+    environment:
+      MONGO_INITDB_DATABASE: ${SCHEDULING_DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${SCHEDULING_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${SCHEDULING_DB_PASS}
 
 volumes:
   auth_db:
     driver: local
   application_db:
     driver: local
-  scheduling_db:
+  scheduling-db:
     driver: local
 
 networks:

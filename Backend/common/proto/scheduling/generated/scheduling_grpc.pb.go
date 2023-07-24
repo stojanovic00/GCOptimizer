@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SchedulingServiceClient interface {
-	GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*ScheduleDto, error)
+	GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*Schedule, error)
+	GetByCompetitionId(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*Schedule, error)
 }
 
 type schedulingServiceClient struct {
@@ -33,9 +34,18 @@ func NewSchedulingServiceClient(cc grpc.ClientConnInterface) SchedulingServiceCl
 	return &schedulingServiceClient{cc}
 }
 
-func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*ScheduleDto, error) {
-	out := new(ScheduleDto)
+func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *SchedulingParameters, opts ...grpc.CallOption) (*Schedule, error) {
+	out := new(Schedule)
 	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/GenerateSchedule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *schedulingServiceClient) GetByCompetitionId(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*Schedule, error) {
+	out := new(Schedule)
+	err := c.cc.Invoke(ctx, "/scheduling_pb.SchedulingService/GetByCompetitionId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +56,8 @@ func (c *schedulingServiceClient) GenerateSchedule(ctx context.Context, in *Sche
 // All implementations must embed UnimplementedSchedulingServiceServer
 // for forward compatibility
 type SchedulingServiceServer interface {
-	GenerateSchedule(context.Context, *SchedulingParameters) (*ScheduleDto, error)
+	GenerateSchedule(context.Context, *SchedulingParameters) (*Schedule, error)
+	GetByCompetitionId(context.Context, *IdMessage) (*Schedule, error)
 	mustEmbedUnimplementedSchedulingServiceServer()
 }
 
@@ -54,8 +65,11 @@ type SchedulingServiceServer interface {
 type UnimplementedSchedulingServiceServer struct {
 }
 
-func (UnimplementedSchedulingServiceServer) GenerateSchedule(context.Context, *SchedulingParameters) (*ScheduleDto, error) {
+func (UnimplementedSchedulingServiceServer) GenerateSchedule(context.Context, *SchedulingParameters) (*Schedule, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateSchedule not implemented")
+}
+func (UnimplementedSchedulingServiceServer) GetByCompetitionId(context.Context, *IdMessage) (*Schedule, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByCompetitionId not implemented")
 }
 func (UnimplementedSchedulingServiceServer) mustEmbedUnimplementedSchedulingServiceServer() {}
 
@@ -88,6 +102,24 @@ func _SchedulingService_GenerateSchedule_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SchedulingService_GetByCompetitionId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SchedulingServiceServer).GetByCompetitionId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scheduling_pb.SchedulingService/GetByCompetitionId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SchedulingServiceServer).GetByCompetitionId(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SchedulingService_ServiceDesc is the grpc.ServiceDesc for SchedulingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var SchedulingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateSchedule",
 			Handler:    _SchedulingService_GenerateSchedule_Handler,
+		},
+		{
+			MethodName: "GetByCompetitionId",
+			Handler:    _SchedulingService_GetByCompetitionId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
