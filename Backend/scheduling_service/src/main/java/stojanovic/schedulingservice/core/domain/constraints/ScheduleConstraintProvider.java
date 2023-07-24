@@ -228,7 +228,7 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
                             List<ApparatusType> apparatusOrder = slot.getApparatusOrder();
                             int numOfApparatuses = apparatusOrder.size();
                             int startingAppIndex = apparatusOrder.indexOf(slot.getStartingApparatus());
-                            
+
                             int waiting = 0;
 
                             List<ApparatusType> contestantsApparatuses = slot.getContestant().getCompetingApparatuses().stream()
