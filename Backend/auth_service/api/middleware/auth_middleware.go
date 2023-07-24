@@ -97,6 +97,5 @@ func GetGrpcContextWithUserInfo(ctx *gin.Context) (context.Context, error) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
 		return nil, err
 	}
-
 	return metadata.NewOutgoingContext(context.Background(), metadata.Pairs("user-info", userInfo.String())), nil
 }

@@ -1,0 +1,42 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+
+
+
+.apparatus-wrap{
+    display: flex;
+    height: 450px;
+}
+
+.apparatus-wrap p{
+    margin: 10px 0px;
+}
+
+.apparatus-table{
+    flex: 1;
+    margin: 10px;
+}
+
+.schedule{
+    width: 70%;
+    margin: auto;
+}
+
+.schedule .heading-hier-2{
+    margin: 35px auto -25px auto;
+}
+
+.schedule .heading-hier-3{
+    margin: 70px auto 20px auto;
+}
+
+.button-wrap{
+    width: 70%;
+    margin: auto;
+}
+
+.button-wrap button{
+    width: 50%;
+    margin: 50px 25%;
+}

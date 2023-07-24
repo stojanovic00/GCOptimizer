@@ -1,0 +1,171 @@
+<p class="heading-main">Create schedule</p>
+
+<div class="form-wrapper">
+    <form [formGroup]="paramsForm" class="custom-form">
+
+        <mat-form-field appearance="outline" appearance="fill" class="form-item">
+            <mat-label>Start time</mat-label>
+            <input type="time" matInput name="week" formControlName="startTime" />
+          </mat-form-field>
+
+        <mat-form-field appearance="outline" appearance="fill" class="form-item">
+            <mat-label>End time</mat-label>
+            <input type="time" matInput name="week" formControlName="endTime"/>
+          </mat-form-field>
+
+        <mat-checkbox formControlName="warmupRoomAvailable" class="form-item">Warmup room available</mat-checkbox>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>General warmup time</mat-label>
+            <input type="number" matInput placeholder="general warmup time" formControlName="generalWarmupTime">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Warmup time</mat-label>
+            <input  type="number" matInput placeholder="warmup time" formControlName="warmupTime">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Warmups per apparatus</mat-label>
+            <input  type="number" matInput placeholder="warmups per apparatus" formControlName="warmupsPerApparatus">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Contestant number per apparatus</mat-label>
+            <input  type="number" matInput placeholder="contestant number per apparatus" formControlName="contestantNumPerApparatus">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Execution time</mat-label>
+            <input  type="number" matInput placeholder="execution time" formControlName="executionTime">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Apparatus rotation time</mat-label>
+            <input  type="number" matInput placeholder="apparatus rotation time" formControlName="apparatusRotationTime">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Medal ceremony after one session time</mat-label>
+            <input  type="number" matInput placeholder="medal ceremony after one session time" formControlName="medalCeremonyAfterOneSessionTime">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="form-item">
+            <mat-label>Final medal ceremony time</mat-label>
+            <input  type="number" matInput placeholder="final medal ceremony time" formControlName="finalMedalCeremonyTime">
+        </mat-form-field>
+
+        <!-- <mat-checkbox formControlName="halfApparatusPerSessionMode" class="form-item">Half apparatus per session mode</mat-checkbox> -->
+        
+        <div class="apparatus-wrap">
+            <div class="apparatus-table">
+                <p class="heading-hier-2">Available apparatuses</p>
+                <div class="table-wrap">
+                    <table mat-table [dataSource]="availableApparatusesTable.dataSource" class="mat-elevation-z8 tablee">
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef>Name</th>
+                            <td mat-cell *matCellDef="let apparatus">{{getApparatusName(apparatus)}}</td>
+                        </ng-container>
+                
+                        <tr mat-header-row *matHeaderRowDef="availableApparatusesTable.displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: availableApparatusesTable.displayedColumns;" (click)="selectRow(row)"
+                            [class.selected-row]="isApparatusSelected(row)"></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="apparatus-table">
+                <p class="heading-hier-2">Chosen apparatuses</p>
+                <div class="table-wrap">
+                    <table mat-table [dataSource]="chosenApparatusesTable.dataSource" class="mat-elevation-z8 tablee">
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef>Name</th>
+                            <td mat-cell *matCellDef="let apparatus">{{getApparatusName(apparatus)}}</td>
+                        </ng-container>
+                
+                        <tr mat-header-row *matHeaderRowDef="chosenApparatusesTable.displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: chosenApparatusesTable.displayedColumns;"></tr>
+                    </table>
+                </div>
+            </div>
+            
+            
+        </div>
+        <button
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         (click)="clearSelectedApparatuses()"
+         >Clear selected apparatuses</button>
+
+        <div class="separator"></div> 
+        <button
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         [disabled]="paramsForm.invalid"
+         (click)="generateSchedule()"
+         >Create</button>
+    </form>
+</div>    
+
+
+<p *ngIf="sessionViews.length !== 0" class="heading-main">Generated schedule</p>
+
+<div class="schedule" *ngFor="let sessionView of sessionViews">
+   <p class="heading-hier-1">Session {{sessionView.session}}</p>
+   <p class="heading-hier-2">Starting time: {{sessionView.startTime}}</p>
+
+    <div class="session" *ngFor="let apparatusList of sessionView.apparatusLists">
+        <p class="heading-hier-3">{{apparatusList.apparatusName}}</p>
+
+        <div class="table-wrap">
+            <table mat-table [dataSource]="apparatusList.slots" class="mat-elevation-z8 tablee">
+
+                <ng-container matColumnDef="compId">
+                    <th mat-header-cell *matHeaderCellDef>Num.</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.contestantCompId || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.name || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="team">
+                    <th mat-header-cell *matHeaderCellDef>Team</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.teamNumber || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="ageCat">
+                    <th mat-header-cell *matHeaderCellDef>Category</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.ageCategory || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="organization">
+                    <th mat-header-cell *matHeaderCellDef>Organization</th>
+                    <td mat-cell *matCellDef="let slot">
+                        {{ slot.contestantInfo?.organization || '' }}
+                        <span *ngIf="slot.contestantInfo?.location"> ({{ slot.contestantInfo?.location }})</span>
+                      </td>
+                      
+                </ng-container>
+
+        
+                <tr mat-header-row *matHeaderRowDef="['compId', 'name', 'team', 'ageCat', 'organization']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['compId', 'name', 'team', 'ageCat', 'organization'];"></tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="button-wrap">
+        <button
+         *ngIf="sessionViews.length !== 0" 
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         (click)="saveSchedule()"
+         >Finish</button>
+</div>

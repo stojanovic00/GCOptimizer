@@ -19,6 +19,10 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	applicationClient := grpc_client.NewApplicationClient(applicationServiceAddress)
 	applicationHandler := handler.NewApplicationHandler(applicationClient, authClient)
 
+	schedulingServiceAddress := fmt.Sprintf("%s:%s", a.Config.SchedulingServiceHost, a.Config.SchedulingServicePort)
+	schedulingClient := grpc_client.NewSchedulingClient(schedulingServiceAddress)
+	schedulingHandler := handler.NewSchedulingHandler(schedulingClient)
+
 	// MIDDLEWARE
 	corsMiddleware := cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
@@ -72,11 +76,17 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 
 	//PRIVATE
 	privateRouter := gin.Default()
+	privateRouter.Use(corsMiddleware)
 
 	// ROUTES
 	privateRouter.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"message": "Endpoint doesn't exist"})
 	})
+
+	schGroup := privateRouter.Group("scheduling")
+	schGroup.Use(middleware.ValidateAndExtractToken())
+	schGroup.POST("schedule", middleware.Authorize("Schedule_crud"), schedulingHandler.GenerateSchedule)
+	schGroup.GET("schedule/:id", middleware.Authorize("Schedule_crud"), schedulingHandler.GetByCompetitionId)
 
 	return publicRouter, privateRouter, nil
 }

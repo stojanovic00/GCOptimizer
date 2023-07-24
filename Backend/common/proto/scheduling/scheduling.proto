@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option go_package = "common/scheduling_pb";
+package scheduling_pb;
+
+
+service SchedulingService{
+  rpc GenerateSchedule(SchedulingParameters) returns(Schedule) {}
+  rpc GetByCompetitionId(IdMessage) returns(Schedule) {}
+}
+
+message IdMessage{
+  string id = 1;
+}
+
+enum ApparatusType{
+  Floor = 0;
+  PommelHorse = 1;
+  StillRings = 2;
+  Vault = 3;
+  ParallelBars = 4;
+  HorizontalBar = 5;
+  BalanceBeam = 6;
+  UnevenBars = 7;
+}
+
+
+message AgeCategory{
+  string id = 1;
+  string name = 2;
+  int32 minAge = 3;
+  int32 maxAge = 4;
+}
+
+
+message ContestantInfo{
+  int32 contestantCompId = 1;
+  string name = 2;
+  int32 teamNumber = 3;
+  string organization = 4;
+  string ageCategory = 5;
+  string location = 6;
+}
+
+
+message ScheduleSlot{
+  int32 session = 1;
+  ApparatusType startingApparatus = 2;
+  ContestantInfo contestantInfo = 3;
+}
+
+message Schedule{
+  string id = 1;
+  repeated ScheduleSlot slots = 2;
+  repeated int64 startingTimes = 3;
+}
+
+
+message Apparatus{
+  string id = 1;
+  ApparatusType type = 2;
+}
+
+message SchedulingParameters{
+    string  competitionId = 1;
+    int64  startTime = 2;
+    int64  endTime = 3;
+    bool  warmupRoomAvailable = 4;
+    int32  generalWarmupTime = 5;
+    int32  warmupTime = 6;
+    int32  warmupsPerApparatus = 7;
+    int32  contestantNumPerApparatus = 8;
+    int32  executionTime = 9;
+    int32  apparatusRotationTime = 10;
+    int32  medalCeremonyAfterOneSessionTime = 11;
+    int32  finalMedalCeremonyTime = 12;
+    bool halfApparatusPerSessionMode = 13;
+    repeated  Apparatus apparatusOrder = 14;
+}
