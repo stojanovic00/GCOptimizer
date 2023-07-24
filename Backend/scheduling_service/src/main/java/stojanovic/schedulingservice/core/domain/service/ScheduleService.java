@@ -188,6 +188,7 @@ public class ScheduleService {
                   List<ScheduleSlot> sameOrganizationList = new ArrayList<ScheduleSlot>();
                   List<ScheduleSlot> sameCityList = new ArrayList<ScheduleSlot>();
                   List<ScheduleSlot> sameCountryList = new ArrayList<ScheduleSlot>();
+                  List<ScheduleSlot> notNull = new ArrayList<ScheduleSlot>();
 
                   // Organization groups go first
                   List<List<ScheduleSlot>> groupedByOrganization = groupByOrganization(oneApparatusList);
@@ -222,9 +223,19 @@ public class ScheduleService {
                   //Remove them from further queries
                   oneApparatusList.removeAll(sameCountryList);
 
+                  //Leftovers
+                  for(ScheduleSlot leftover : oneApparatusList){
+                     if(leftover.getContestant() != null){
+                         notNull.add(leftover);
+                     }
+                  }
+
+                  oneApparatusList.removeAll(notNull);
+
                   processed.addAll(sameOrganizationList);
                   processed.addAll(sameCityList);
                   processed.addAll(sameCountryList);
+                  processed.addAll(notNull);
                   //Leftovers
                   processed.addAll(oneApparatusList);
               }

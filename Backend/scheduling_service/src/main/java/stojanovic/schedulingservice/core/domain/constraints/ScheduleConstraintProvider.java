@@ -225,19 +225,20 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
                         1
                 ),
                         slot ->{
-                            int numOfApparatuses = slot.getApparatusOrder().size();
-                            ApparatusType startingApp = slot.getStartingApparatus();
+                            List<ApparatusType> apparatusOrder = slot.getApparatusOrder();
+                            int numOfApparatuses = apparatusOrder.size();
+                            int startingAppIndex = apparatusOrder.indexOf(slot.getStartingApparatus());
+                            
                             int waiting = 0;
 
                             List<ApparatusType> contestantsApparatuses = slot.getContestant().getCompetingApparatuses().stream()
                                     .map(Apparatus::getType).
                                     collect(Collectors.toList());
-                            //LOOOOL
                             // Goes on each apparatus once
                             //Handling overflow with %
                             for(int i = 0; i < numOfApparatuses; i++){
-                                int index = (startingApp.ordinal() + i) % numOfApparatuses;
-                                if(!contestantsApparatuses.remove(slot.getApparatusOrder().get(index))){
+                                int index = (startingAppIndex + i) % numOfApparatuses;
+                                if(!contestantsApparatuses.remove(apparatusOrder.get(index))){
                                     //If it doesn't find and remove apparatus from contestants apparatuses
                                     //That means he waits
                                     waiting++;

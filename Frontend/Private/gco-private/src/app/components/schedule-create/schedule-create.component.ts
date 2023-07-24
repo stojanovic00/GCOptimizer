@@ -164,7 +164,7 @@ clearSelectedApparatuses = () =>{
   generateSchedule = () => {
 
       let apparatusOrder : ApparatusTypeFoScheduling[] = []
-      this.chosenApparatusesTable.dataSource = this.maleApparatuses;
+      this.chosenApparatusesTable.dataSource = this.chosenApparatuses;
       apparatusOrder = this.chosenApparatusesTable.dataSource.map(app => {
           return {
             type : app
