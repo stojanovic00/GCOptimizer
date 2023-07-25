@@ -25,6 +25,9 @@ services:
       SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
       SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
 
+      SCORING_SERVICE_HOST: ${SCORING_SERVICE_HOST}
+      SCORING_SERVICE_PORT: ${SCORING_SERVICE_PORT}
+
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     networks:
       - network
@@ -172,12 +175,41 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${SCHEDULING_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${SCHEDULING_DB_PASS}
 
+
+  scoring-db:
+    image: scoring-db
+    container_name: scoring-db
+    restart: on-failure
+    build:
+      context: ../Database/Scoring
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${SCORING_DB_USER}
+      POSTGRES_PASSWORD: ${SCORING_DB_PASS}
+      POSTGRES_DB: ${SCORING_DB_NAME}
+    volumes: 
+      - scoring_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5004:5432
+
+
+
 volumes:
   auth_db:
     driver: local
   application_db:
     driver: local
   scheduling-db:
+    driver: local
+  scoring_db:
     driver: local
 
 networks:
