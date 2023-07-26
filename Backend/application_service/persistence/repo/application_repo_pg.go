@@ -36,7 +36,7 @@ func (r *ApplicationRepoPg) CreateJudgeApplication(app *domain.JudgeApplication)
 
 func (r *ApplicationRepoPg) GetAllJudgeApplications(compId uuid.UUID) ([]*domain.JudgeApplication, error) {
 	var applications []*domain.JudgeApplication
-	err := r.dbClient.Where("competition_id = ?", compId).Preload("Judge").Find(&applications).Error
+	err := r.dbClient.Where("competition_id = ?", compId).Preload("Judge.SportsOrganization.Address").Find(&applications).Error
 	if err != nil {
 		return nil, nil
 	}

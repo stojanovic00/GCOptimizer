@@ -8,4 +8,5 @@ import (
 type SportsOrganisationRepo interface {
 	Create(organisation *domain.SportsOrganization) (uuid.UUID, error)
 	GetByEmail(email string) (*domain.SportsOrganization, error)
+	GetByName(name string) (*domain.SportsOrganization, error)
 }

@@ -286,3 +286,17 @@ func (h *HandlerRpc) GetAllContestantApplications(ctx context.Context, compId *a
 	}
 	return &application_pb.ContestantApplicationList{ContestantApplications: contestantApplicationListDomToPb(applications)}, nil
 }
+
+func (h *HandlerRpc) GetSportsOrganisationByName(ctx context.Context, request *application_pb.GetSportsOrganisationByNameRequest) (*application_pb.SportsOrganisation, error) {
+
+	sportsOrganization, err := h.soService.GetByName(request.Name)
+	if err != nil {
+		switch err.(type) {
+		case errors.ErrNotFound:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		default:
+			return nil, status.Errorf(codes.Unknown, err.Error())
+		}
+	}
+	return sportsOrganizationDomToPb(sportsOrganization), nil
+}

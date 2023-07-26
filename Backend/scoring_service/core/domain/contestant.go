@@ -10,8 +10,7 @@ type Contestant struct {
 	FullName             string
 	SportsOrganizationID uuid.UUID
 	SportsOrganization   SportsOrganization
-	CompetingApparatuses []Apparatus `gorm:"type:json;scan:scanApparatuses"`
+	CompetingApparatuses []Apparatus `gorm:"serializer:json"`
 	TeamNumber           int32
-	AgeCategoryID        uuid.UUID
-	AgeCategory          AgeCategory
+	AgeCategory          string
 }

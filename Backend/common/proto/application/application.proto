@@ -7,6 +7,7 @@ service ApplicationService{
   //Sports organisation
   rpc RegisterSportsOrganisation(SportsOrganisation) returns(IdMessage) {}
   rpc GetLoggedSportsOrganisation(EmptyMessage) returns(SportsOrganisation) {}
+  rpc GetSportsOrganisationByName(GetSportsOrganisationByNameRequest) returns(SportsOrganisation) {}
   //Delegation members
   rpc RegisterJudge(Judge) returns(IdMessage);
   rpc GetSportOrganisationJudges(EmptyMessage) returns(JudgesList);
@@ -204,4 +205,8 @@ message CreateContestantApplicationRequest{
   string contestantId = 4;
   string ageCategoryId = 5;
   repeated ApparatusAnnouncement apparatusAnnouncements = 6;
+}
+
+message GetSportsOrganisationByNameRequest{
+  string name = 1;
 }

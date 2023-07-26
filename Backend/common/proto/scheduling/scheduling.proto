@@ -34,12 +34,14 @@ message AgeCategory{
 
 
 message ContestantInfo{
-  int32 contestantCompId = 1;
-  string name = 2;
-  int32 teamNumber = 3;
-  string organization = 4;
-  string ageCategory = 5;
-  string location = 6;
+  string id = 1;
+  int32 contestantCompId = 2;
+  string name = 3;
+  int32 teamNumber = 4;
+  string organization = 5;
+  string ageCategory = 6;
+  string location = 7;
+  repeated ApparatusType competingApparatuses = 8;
 }
 
 
@@ -53,6 +55,7 @@ message Schedule{
   string id = 1;
   repeated ScheduleSlot slots = 2;
   repeated int64 startingTimes = 3;
+  repeated ApparatusType apparatusOrder = 4;
 }
 
 

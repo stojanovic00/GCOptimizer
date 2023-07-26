@@ -25,6 +25,7 @@ type ApplicationServiceClient interface {
 	// Sports organisation
 	RegisterSportsOrganisation(ctx context.Context, in *SportsOrganisation, opts ...grpc.CallOption) (*IdMessage, error)
 	GetLoggedSportsOrganisation(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SportsOrganisation, error)
+	GetSportsOrganisationByName(ctx context.Context, in *GetSportsOrganisationByNameRequest, opts ...grpc.CallOption) (*SportsOrganisation, error)
 	// Delegation members
 	RegisterJudge(ctx context.Context, in *Judge, opts ...grpc.CallOption) (*IdMessage, error)
 	GetSportOrganisationJudges(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgesList, error)
@@ -62,6 +63,15 @@ func (c *applicationServiceClient) RegisterSportsOrganisation(ctx context.Contex
 func (c *applicationServiceClient) GetLoggedSportsOrganisation(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SportsOrganisation, error) {
 	out := new(SportsOrganisation)
 	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetLoggedSportsOrganisation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationServiceClient) GetSportsOrganisationByName(ctx context.Context, in *GetSportsOrganisationByNameRequest, opts ...grpc.CallOption) (*SportsOrganisation, error) {
+	out := new(SportsOrganisation)
+	err := c.cc.Invoke(ctx, "/application_pb.ApplicationService/GetSportsOrganisationByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +202,7 @@ type ApplicationServiceServer interface {
 	// Sports organisation
 	RegisterSportsOrganisation(context.Context, *SportsOrganisation) (*IdMessage, error)
 	GetLoggedSportsOrganisation(context.Context, *EmptyMessage) (*SportsOrganisation, error)
+	GetSportsOrganisationByName(context.Context, *GetSportsOrganisationByNameRequest) (*SportsOrganisation, error)
 	// Delegation members
 	RegisterJudge(context.Context, *Judge) (*IdMessage, error)
 	GetSportOrganisationJudges(context.Context, *EmptyMessage) (*JudgesList, error)
@@ -219,6 +230,9 @@ func (UnimplementedApplicationServiceServer) RegisterSportsOrganisation(context.
 }
 func (UnimplementedApplicationServiceServer) GetLoggedSportsOrganisation(context.Context, *EmptyMessage) (*SportsOrganisation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLoggedSportsOrganisation not implemented")
+}
+func (UnimplementedApplicationServiceServer) GetSportsOrganisationByName(context.Context, *GetSportsOrganisationByNameRequest) (*SportsOrganisation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSportsOrganisationByName not implemented")
 }
 func (UnimplementedApplicationServiceServer) RegisterJudge(context.Context, *Judge) (*IdMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterJudge not implemented")
@@ -304,6 +318,24 @@ func _ApplicationService_GetLoggedSportsOrganisation_Handler(srv interface{}, ct
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApplicationServiceServer).GetLoggedSportsOrganisation(ctx, req.(*EmptyMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationService_GetSportsOrganisationByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSportsOrganisationByNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServiceServer).GetSportsOrganisationByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/application_pb.ApplicationService/GetSportsOrganisationByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServiceServer).GetSportsOrganisationByName(ctx, req.(*GetSportsOrganisationByNameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -556,6 +588,10 @@ var ApplicationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLoggedSportsOrganisation",
 			Handler:    _ApplicationService_GetLoggedSportsOrganisation_Handler,
+		},
+		{
+			MethodName: "GetSportsOrganisationByName",
+			Handler:    _ApplicationService_GetSportsOrganisationByName_Handler,
 		},
 		{
 			MethodName: "RegisterJudge",

@@ -7,7 +7,7 @@ type ScheduleSlot struct {
 	SessionID         uuid.UUID
 	Session           Session
 	StartingApparatus Apparatus
-	ScoredApparatuses []Apparatus `gorm:"type:json;scan:scanApparatuses"`
+	ScoredApparatuses []Apparatus `gorm:"serializer:json"`
 	ContestantID      uuid.UUID
 	Contestant        Contestant
 }

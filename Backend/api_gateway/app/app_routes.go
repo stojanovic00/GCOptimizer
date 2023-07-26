@@ -23,6 +23,10 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	schedulingClient := grpc_client.NewSchedulingClient(schedulingServiceAddress)
 	schedulingHandler := handler.NewSchedulingHandler(schedulingClient)
 
+	scoringServiceAddress := fmt.Sprintf("%s:%s", a.Config.ScoringServiceHost, a.Config.ScoringServicePort)
+	scoringClient := grpc_client.NewScoringClient(scoringServiceAddress)
+	scoringHandler := handler.NewScoringHandler(scoringClient)
+
 	// MIDDLEWARE
 	corsMiddleware := cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
@@ -87,6 +91,10 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	schGroup.Use(middleware.ValidateAndExtractToken())
 	schGroup.POST("schedule", middleware.Authorize("Schedule_crud"), schedulingHandler.GenerateSchedule)
 	schGroup.GET("schedule/:id", middleware.Authorize("Schedule_crud"), schedulingHandler.GetByCompetitionId)
+
+	scoGroup := privateRouter.Group("scoring")
+	scoGroup.Use(middleware.ValidateAndExtractToken())
+	scoGroup.POST("competition", middleware.Authorize("LiveSchedule_cu"), scoringHandler.StartCompetition)
 
 	return publicRouter, privateRouter, nil
 }

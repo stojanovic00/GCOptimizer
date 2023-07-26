@@ -16,4 +16,10 @@ proto-scheduling:
 	--go-grpc_out ./common/proto/scheduling/generated --go-grpc_opt paths=source_relative \
 	./common/proto/scheduling/scheduling.proto
 
-proto-all: proto-auth proto-application proto-scheduling
+proto-scoring:
+	protoc -I ./common/proto/scoring -I ./common/proto \
+	--go_out ./common/proto/scoring/generated --go_opt paths=source_relative \
+	--go-grpc_out ./common/proto/scoring/generated --go-grpc_opt paths=source_relative \
+	./common/proto/scoring/scoring.proto
+
+proto-all: proto-auth proto-application proto-scheduling proto-scoring

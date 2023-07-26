@@ -19,5 +19,5 @@ type Competition struct {
 	Organizer         SportsOrganization
 	TeamCompositionID uuid.UUID
 	TeamComposition   TeamComposition
-	AgeCategories     []AgeCategory
+	AgeCategories     []string `gorm:"serializer:json"`
 }

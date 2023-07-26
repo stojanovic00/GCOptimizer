@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "common/scoring_pb";
+package scoring_pb;
+
+service ScoringService{
+  rpc StartCompetition(IdMessage) returns(EmptyMessage) {}
+}
+
+message IdMessage{
+  string id = 1;
+}
+message EmptyMessage{ }

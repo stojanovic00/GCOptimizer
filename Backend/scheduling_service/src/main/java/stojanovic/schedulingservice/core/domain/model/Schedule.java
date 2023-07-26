@@ -44,6 +44,7 @@ public class Schedule {
 
     //For persisting order when reading from in database
     private List<Long> startingTimes;
+    private List<ApparatusType> apparatusOrder;
     @Indexed
     private UUID competitionId;
 

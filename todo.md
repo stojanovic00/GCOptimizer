@@ -51,11 +51,14 @@ parter konj karike preskok
 
 
 Endpoints:
+    - Start + 
+
+    - get judges - from app
+    - get assigned judges - from 
     - Assign judge 
     - Assign score calculation 
     - Change password?
 
-    - Start
     - Get contestants for apparatus
     - Get current contestant for apparatus
 

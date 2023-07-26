@@ -88,25 +88,38 @@ public class ProtoMapper {
                .collect(Collectors.toList());
     }
 
+    public static List<Scheduling.ApparatusType> apparatusTypeListPb(List<Apparatus> types){
+       return types.stream().map(apparatus -> Scheduling.ApparatusType.forNumber(apparatus.getType().ordinal())).collect(Collectors.toList());
+    }
+
     public static Scheduling.ContestantInfo contestantToContestantInfo(Contestant contestant){
         if(contestant == null)
             return null;
        return Scheduling.ContestantInfo.newBuilder()
+               .setId(contestant.getId().toString())
                .setContestantCompId(contestant.getContestantCompId())
                .setName(contestant.getName())
                .setTeamNumber(contestant.getTeamNumber())
                .setOrganization(contestant.getOrganization())
                .setAgeCategory(contestant.getAgeCategory().getName())
                .setLocation(contestant.getCountry() + ", " + contestant.getCity())
+               .addAllCompetingApparatuses(apparatusTypeListPb(contestant.getCompetingApparatuses()))
                .build();
     }
 
+    public  static Scheduling.ApparatusType apparatusTypeDomToPb(ApparatusType apparatusType){
+       return Scheduling.ApparatusType.forNumber(apparatusType.ordinal());
+    }
+    public  static List<Scheduling.ApparatusType> apparatusTypeListDomToPb(List<ApparatusType> apparatusTypes){
+        return apparatusTypes.stream().map(ProtoMapper::apparatusTypeDomToPb).collect(Collectors.toList());
+    }
     public static Scheduling.Schedule schedulePb(Schedule schedule) {
         List<Scheduling.ScheduleSlot> slotsPb = ProtoMapper.scheduleSlotListPb(schedule.getSlots());
         return Scheduling.Schedule.newBuilder()
                 .setId(schedule.getId().toString())
                 .addAllSlots(slotsPb)
                 .addAllStartingTimes(schedule.getStartingTimes())
+                .addAllApparatusOrder(apparatusTypeListDomToPb(schedule.getApparatusOrder()))
                 .build();
     }
 
