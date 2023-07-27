@@ -9,6 +9,7 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.0
 	github.com/jessevdk/go-flags v1.5.0
+	github.com/wneessen/go-mail v0.4.0
 	golang.org/x/crypto v0.9.0
 	google.golang.org/grpc v1.56.2
 	gorm.io/driver/postgres v1.5.2

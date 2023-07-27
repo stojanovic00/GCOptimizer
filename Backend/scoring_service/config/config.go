@@ -18,6 +18,8 @@ type Config struct {
 	SchedulingServicePort  string `long:"scheduling-service-port" env:"SCHEDULING_SERVICE_PORT"`
 	ApplicationServiceHost string `long:"application-service-host" env:"APPLICATION_SERVICE_HOST"`
 	ApplicationServicePort string `long:"application-service-port" env:"APPLICATION_SERVICE_PORT"`
+	AuthServiceHost        string `long:"auth-service-host" env:"AUTH_SERVICE_HOST"`
+	AuthServicePort        string `long:"auth-service-port" env:"AUTH_SERVICE_PORT"`
 }
 
 func LoadConfig() (Config, error) {

@@ -5,9 +5,99 @@ package scoring_pb;
 
 service ScoringService{
   rpc StartCompetition(IdMessage) returns(EmptyMessage) {}
+  //Judging panel
+  rpc GetApparatusesWithoutPanel(IdMessage) returns(ApparatusList) {}
+  rpc CreateJudgingPanelsForApparatus(CreateJudgingPanelsForApparatusRequest) returns(CreateJudgingPanelsForApparatusResponse) {}
+  rpc AssignJudge(AssignJudgeRequest) returns(EmptyMessage){}
+  rpc GetAssignedJudges(IdMessage) returns(JudgeList){}
+  rpc AssignScoreCalculation(AssignScoreCalculationRequest) returns(EmptyMessage){}
+  //Live scoring
 }
 
 message IdMessage{
   string id = 1;
 }
 message EmptyMessage{ }
+
+enum Apparatus{
+  Floor = 0;
+  PommelHorse = 1;
+  StillRings = 2;
+  Vault = 3;
+  ParallelBars = 4;
+  HorizontalBar = 5;
+  BalanceBeam = 6;
+  UnevenBars = 7;
+}
+
+enum JudgingPanelType{
+  EPanel = 0;
+  DPanel = 1;
+}
+
+message ApparatusList {
+  repeated Apparatus apparatuses = 1;
+}
+enum LicenceType{
+  National  = 0;
+  International = 1;
+}
+message Address{
+  string id = 1;
+  string country = 2;
+  string city = 3;
+  string street = 4;
+  string streetNumber =5;
+}
+message SportsOrganization{
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string contactPersonFullName = 5;
+  bool competitionOrganisingPrivilege = 6;
+  Address address = 7;
+}
+
+
+message Judge{
+  string id = 1;
+  string fullName = 2;
+  string email = 3;
+  LicenceType licenceType = 4;
+  string licenceName = 5;
+
+  SportsOrganization sportsOrganization = 6;
+//  string panel = 6;
+}
+
+message JudgeList{
+  repeated Judge judges = 1;
+}
+
+
+message ScoreCalculationMethod{
+  string id = 1;
+  int32 ScoreDeductionNum = 2;
+}
+
+// DTOS
+message CreateJudgingPanelsForApparatusRequest{
+  Apparatus apparatus = 1;
+  string competitionId = 2;
+}
+
+message CreateJudgingPanelsForApparatusResponse{
+  string dPanelId = 1;
+  string ePanelId = 2;
+}
+
+message AssignJudgeRequest{
+  Judge judge = 1;
+  string panelId = 2;
+}
+
+message AssignScoreCalculationRequest{
+  ScoreCalculationMethod method = 1;
+  string panelId = 2;
+}

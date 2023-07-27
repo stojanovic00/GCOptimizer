@@ -5,10 +5,9 @@ import "github.com/google/uuid"
 type Judge struct {
 	ID                   uuid.UUID
 	FullName             string
+	Email                string
 	LicenceType          LicenceType
 	LicenceName          string
 	SportsOrganizationID uuid.UUID
 	SportsOrganization   SportsOrganization
-	PanelID              uuid.UUID
-	Panel                Panel
 }

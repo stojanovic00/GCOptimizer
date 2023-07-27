@@ -23,6 +23,12 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ScoringServiceClient interface {
 	StartCompetition(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
+	// Judging panel
+	GetApparatusesWithoutPanel(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*ApparatusList, error)
+	CreateJudgingPanelsForApparatus(ctx context.Context, in *CreateJudgingPanelsForApparatusRequest, opts ...grpc.CallOption) (*CreateJudgingPanelsForApparatusResponse, error)
+	AssignJudge(ctx context.Context, in *AssignJudgeRequest, opts ...grpc.CallOption) (*EmptyMessage, error)
+	GetAssignedJudges(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*JudgeList, error)
+	AssignScoreCalculation(ctx context.Context, in *AssignScoreCalculationRequest, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
 type scoringServiceClient struct {
@@ -42,11 +48,62 @@ func (c *scoringServiceClient) StartCompetition(ctx context.Context, in *IdMessa
 	return out, nil
 }
 
+func (c *scoringServiceClient) GetApparatusesWithoutPanel(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*ApparatusList, error) {
+	out := new(ApparatusList)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetApparatusesWithoutPanel", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) CreateJudgingPanelsForApparatus(ctx context.Context, in *CreateJudgingPanelsForApparatusRequest, opts ...grpc.CallOption) (*CreateJudgingPanelsForApparatusResponse, error) {
+	out := new(CreateJudgingPanelsForApparatusResponse)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/CreateJudgingPanelsForApparatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) AssignJudge(ctx context.Context, in *AssignJudgeRequest, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/AssignJudge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) GetAssignedJudges(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*JudgeList, error) {
+	out := new(JudgeList)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetAssignedJudges", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) AssignScoreCalculation(ctx context.Context, in *AssignScoreCalculationRequest, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/AssignScoreCalculation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScoringServiceServer is the server API for ScoringService service.
 // All implementations must embed UnimplementedScoringServiceServer
 // for forward compatibility
 type ScoringServiceServer interface {
 	StartCompetition(context.Context, *IdMessage) (*EmptyMessage, error)
+	// Judging panel
+	GetApparatusesWithoutPanel(context.Context, *IdMessage) (*ApparatusList, error)
+	CreateJudgingPanelsForApparatus(context.Context, *CreateJudgingPanelsForApparatusRequest) (*CreateJudgingPanelsForApparatusResponse, error)
+	AssignJudge(context.Context, *AssignJudgeRequest) (*EmptyMessage, error)
+	GetAssignedJudges(context.Context, *IdMessage) (*JudgeList, error)
+	AssignScoreCalculation(context.Context, *AssignScoreCalculationRequest) (*EmptyMessage, error)
 	mustEmbedUnimplementedScoringServiceServer()
 }
 
@@ -56,6 +113,21 @@ type UnimplementedScoringServiceServer struct {
 
 func (UnimplementedScoringServiceServer) StartCompetition(context.Context, *IdMessage) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartCompetition not implemented")
+}
+func (UnimplementedScoringServiceServer) GetApparatusesWithoutPanel(context.Context, *IdMessage) (*ApparatusList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetApparatusesWithoutPanel not implemented")
+}
+func (UnimplementedScoringServiceServer) CreateJudgingPanelsForApparatus(context.Context, *CreateJudgingPanelsForApparatusRequest) (*CreateJudgingPanelsForApparatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateJudgingPanelsForApparatus not implemented")
+}
+func (UnimplementedScoringServiceServer) AssignJudge(context.Context, *AssignJudgeRequest) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssignJudge not implemented")
+}
+func (UnimplementedScoringServiceServer) GetAssignedJudges(context.Context, *IdMessage) (*JudgeList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAssignedJudges not implemented")
+}
+func (UnimplementedScoringServiceServer) AssignScoreCalculation(context.Context, *AssignScoreCalculationRequest) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssignScoreCalculation not implemented")
 }
 func (UnimplementedScoringServiceServer) mustEmbedUnimplementedScoringServiceServer() {}
 
@@ -88,6 +160,96 @@ func _ScoringService_StartCompetition_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScoringService_GetApparatusesWithoutPanel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetApparatusesWithoutPanel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetApparatusesWithoutPanel",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetApparatusesWithoutPanel(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_CreateJudgingPanelsForApparatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateJudgingPanelsForApparatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).CreateJudgingPanelsForApparatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/CreateJudgingPanelsForApparatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).CreateJudgingPanelsForApparatus(ctx, req.(*CreateJudgingPanelsForApparatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_AssignJudge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignJudgeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).AssignJudge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/AssignJudge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).AssignJudge(ctx, req.(*AssignJudgeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_GetAssignedJudges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetAssignedJudges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetAssignedJudges",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetAssignedJudges(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_AssignScoreCalculation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignScoreCalculationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).AssignScoreCalculation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/AssignScoreCalculation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).AssignScoreCalculation(ctx, req.(*AssignScoreCalculationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScoringService_ServiceDesc is the grpc.ServiceDesc for ScoringService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +260,26 @@ var ScoringService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartCompetition",
 			Handler:    _ScoringService_StartCompetition_Handler,
+		},
+		{
+			MethodName: "GetApparatusesWithoutPanel",
+			Handler:    _ScoringService_GetApparatusesWithoutPanel_Handler,
+		},
+		{
+			MethodName: "CreateJudgingPanelsForApparatus",
+			Handler:    _ScoringService_CreateJudgingPanelsForApparatus_Handler,
+		},
+		{
+			MethodName: "AssignJudge",
+			Handler:    _ScoringService_AssignJudge_Handler,
+		},
+		{
+			MethodName: "GetAssignedJudges",
+			Handler:    _ScoringService_GetAssignedJudges_Handler,
+		},
+		{
+			MethodName: "AssignScoreCalculation",
+			Handler:    _ScoringService_AssignScoreCalculation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

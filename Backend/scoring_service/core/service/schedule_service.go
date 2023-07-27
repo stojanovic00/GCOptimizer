@@ -72,7 +72,7 @@ func (s *ScheduleService) generateSessions(slots []domain.ScheduleSlot) ([]domai
 			return nil, err
 		}
 
-		filteredSlots[idx].Contestant.SportsOrganization = *mapper.SportsOrganizationPbToDom(sportsOrg)
+		filteredSlots[idx].Contestant.SportsOrganization = *mapper.SportsOrganizationPbToDomApp(sportsOrg)
 	}
 
 	// Group by session number

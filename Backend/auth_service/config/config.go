@@ -5,14 +5,16 @@ import (
 )
 
 type Config struct {
-	Host         string `long:"host" env:"AUTH_SERVICE_HOST"`
-	Port         string `long:"port" env:"AUTH_SERVICE_PORT"`
-	AuthDbName   string `long:"auth-db-name" env:"AUTH_DB_NAME"`
-	AuthDbHost   string `long:"auth-db-host" env:"AUTH_DB_HOST"`
-	AuthDbPort   string `long:"auth-db-port" env:"AUTH_DB_PORT"`
-	AuthDbUser   string `long:"auth-db-user" env:"AUTH_DB_USER"`
-	AuthDbPass   string `long:"auth-db-pass" env:"AUTH_DB_PASS"`
-	JwtSecretKey string `long:"jwt-secret-key" env:"JWT_SECRET_KEY"`
+	Host               string `long:"host" env:"AUTH_SERVICE_HOST"`
+	Port               string `long:"port" env:"AUTH_SERVICE_PORT"`
+	AuthDbName         string `long:"auth-db-name" env:"AUTH_DB_NAME"`
+	AuthDbHost         string `long:"auth-db-host" env:"AUTH_DB_HOST"`
+	AuthDbPort         string `long:"auth-db-port" env:"AUTH_DB_PORT"`
+	AuthDbUser         string `long:"auth-db-user" env:"AUTH_DB_USER"`
+	AuthDbPass         string `long:"auth-db-pass" env:"AUTH_DB_PASS"`
+	JwtSecretKey       string `long:"jwt-secret-key" env:"JWT_SECRET_KEY"`
+	MailClientMail     string `long:"mail-client-mail" env:"MAIL_CLIENT_MAIL"`
+	MailClientPassword string `long:"mail-client-password" env:"MAIL_CLIENT_PASSWORD"`
 }
 
 func LoadConfig() (Config, error) {

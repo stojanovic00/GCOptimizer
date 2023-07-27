@@ -1,10 +1,11 @@
 - Dodeli sudije na svakoj spravi:
     - ides redom za svaku spravu
-        - dodelis d sudije
-        - dodelis e sudije
-        - nacin ocenjivanja (koliko se odbija e ocena)
-        - ujedno se prave nalozi za sudije i salju im se sifre na mail
-        - ako imades vremena napravi menjanje sifre
+        - napravis panel 
+            - dodelis d sudije
+            - dodelis e sudije
+            - nacin ocenjivanja (koliko se odbija e ocena)
+            - ujedno se prave nalozi za sudije i salju im se sifre na mail
+            - ako imades vremena napravi menjanje sifre
 
 - startuj takmicenje
     - dobavi schedule preko comp id 
@@ -51,22 +52,35 @@ parter konj karike preskok
 
 
 Endpoints:
-    - Start + 
+    - Preparation
+        + Start
 
-    - get judges - from app
-    - get assigned judges - from 
-    - Assign judge 
-    - Assign score calculation 
-    - Change password?
+        + get apparatuses that need panel
+        + create panels for apparatus
+        + get judges(applications) - from app
+        + get assigned judges - from scoring
+        + Assign judge 
+            + register judge account
+        + Assign score calculation 
 
-    - Get contestants for apparatus
-    - Get current contestant for apparatus
+        ? Change password
+    - Live
+        - get logged judge
+        - Get contestants for apparatus <-- new rot
+        - Get current contestant for apparatus <-- final score submitted <-- new rot
 
-    - Submit temp score
-    - Save final score
-    - Check rotation finish
-    - Check session finish
-    - Check competition finish
+        - Submit temp score --> temp score submitted
+        - get temp scores for contestant <-- temp score submitted
+        - Save final score --> final score submitted
+        - Check rotation finish <-- final score submitted
+        
+        - Check all rotations finished
+        - Start new rotation --> new rot
 
-    - Generate scoreboard
-    - Generate team scoreboard
+        - Check session finish
+        - Start new session
+
+        - Check competition finish
+    - Finish
+        - Generate scoreboard
+        - Generate team scoreboard

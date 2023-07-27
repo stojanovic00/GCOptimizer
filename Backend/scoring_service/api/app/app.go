@@ -50,9 +50,17 @@ func (a *App) Run() error {
 
 	applicationServiceAddress := fmt.Sprintf("%s:%s", a.Config.ApplicationServiceHost, a.Config.ApplicationServicePort)
 	appClient := client.NewApplicationClient(applicationServiceAddress)
+
+	authServiceAddress := fmt.Sprintf("%s:%s", a.Config.AuthServiceHost, a.Config.AuthServicePort)
+	authClient := client.NewAuthClient(authServiceAddress)
+
 	schRepo := repo.NewScheduleRepoPg(pgClient)
 	schService := service.NewScheduleService(appClient, schClient, schRepo)
-	rpcHandler := handler.NewHandlerRpc(schService)
+
+	jpRepo := repo.NewJudgePanelRepoPg(pgClient)
+	jpService := service.NewJudgePanelService(jpRepo, authClient)
+
+	rpcHandler := handler.NewHandlerRpc(schService, jpService)
 
 	a.startGrpcServer(rpcHandler)
 	return nil

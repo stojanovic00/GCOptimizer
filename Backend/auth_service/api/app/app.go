@@ -30,7 +30,8 @@ func (a *App) Run() error {
 	log.Printf("Connected and updated pg database")
 
 	accountRepo := repo.NewAccountRepositoryPg(pgClient)
-	accountService := service.NewAccountService(accountRepo)
+	mailService := service.NewMailService(a.Config.MailClientMail, a.Config.MailClientPassword)
+	accountService := service.NewAccountService(accountRepo, mailService)
 	accountHandler := handler.NewAccountHandler(accountService)
 
 	a.startGrpcServer(accountHandler)
