@@ -33,15 +33,9 @@ func (h *ScoringHandler) StartCompetition(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 func (h *ScoringHandler) GetApparatusesWithoutPanel(ctx *gin.Context) {
-	var compId scoring_pb.IdMessage
+	compId := ctx.Param("id")
 
-	err := ctx.ShouldBindJSON(&compId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
-		return
-	}
-
-	result, err := h.client.GetApparatusesWithoutPanel(context.Background(), &compId)
+	result, err := h.client.GetApparatusesWithoutPanel(context.Background(), &scoring_pb.IdMessage{Id: compId})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return

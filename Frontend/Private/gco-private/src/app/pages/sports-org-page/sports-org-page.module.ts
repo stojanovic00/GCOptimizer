@@ -9,6 +9,8 @@ import { CompetitionViewComponent } from 'src/app/components/competition-view/co
 import { ScheduleCreateComponent } from 'src/app/components/schedule-create/schedule-create.component';
 import { ScheduleViewComponent } from 'src/app/components/schedule-view/schedule-view.component';
 import { ApplicationViewComponent } from 'src/app/components/application-view/application-view.component';
+import { ChoosePanelComponent } from 'src/app/components/choose-panel/choose-panel.component';
+import { FormPanelComponent } from 'src/app/components/form-panel/form-panel.component';
 
 
 
@@ -19,7 +21,10 @@ import { ApplicationViewComponent } from 'src/app/components/application-view/ap
     CompetitionViewComponent,
     ScheduleCreateComponent,
     ScheduleViewComponent,
-    ApplicationViewComponent
+    ApplicationViewComponent,
+    ChoosePanelComponent,
+    FormPanelComponent
+
 
   ],
   imports: [

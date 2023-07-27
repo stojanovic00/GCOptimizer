@@ -119,7 +119,7 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
                         BENDABLE_SCORE_HARD_LEVELS_SIZE,
                         BENDABLE_SCORE_SOFT_LEVELS_SIZE,
                         0,
-                        1
+                        3
                 ))
                 .asConstraint("Contestants with lesser age category in greater session");
     }

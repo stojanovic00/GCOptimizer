@@ -97,7 +97,7 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	scoGroup.POST("competition", middleware.Authorize("LiveSchedule_cu"), scoringHandler.StartCompetition)
 
 	jpGroup := scoGroup.Group("judging-panel")
-	jpGroup.GET("unassigned", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetApparatusesWithoutPanel)
+	jpGroup.GET("competition/:id/unassigned", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetApparatusesWithoutPanel)
 	jpGroup.POST("", middleware.Authorize("JudgingPanel_crud"), scoringHandler.CreateJudgingPanelsForApparatus)
 	jpGroup.POST("/:id/judge", middleware.Authorize("JudgingPanel_crud"), scoringHandler.AssignJudge)
 	jpGroup.GET("judge/competition/:id", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetAssignedJudges)
