@@ -7,6 +7,7 @@ export const environment = {
   applicationPath: "http://localhost:8081/application",
   authPath: "http://localhost:8081/auth",
   schedulingPath: "http://localhost:8082/scheduling",
+  scoringPath: "http://localhost:8082/scoring",
 };
 
 /*

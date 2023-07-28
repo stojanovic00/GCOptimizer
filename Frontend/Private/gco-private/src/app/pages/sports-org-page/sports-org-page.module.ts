@@ -11,6 +11,7 @@ import { ScheduleViewComponent } from 'src/app/components/schedule-view/schedule
 import { ApplicationViewComponent } from 'src/app/components/application-view/application-view.component';
 import { ChoosePanelComponent } from 'src/app/components/choose-panel/choose-panel.component';
 import { FormPanelComponent } from 'src/app/components/form-panel/form-panel.component';
+import { CompetitionMonitoringComponent } from 'src/app/components/competition-monitoring/competition-monitoring.component';
 
 
 
@@ -23,8 +24,8 @@ import { FormPanelComponent } from 'src/app/components/form-panel/form-panel.com
     ScheduleViewComponent,
     ApplicationViewComponent,
     ChoosePanelComponent,
-    FormPanelComponent
-
+    FormPanelComponent,
+    CompetitionMonitoringComponent
 
   ],
   imports: [

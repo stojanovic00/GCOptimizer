@@ -89,6 +89,7 @@ func (s *ScheduleService) generateSessions(slots []domain.ScheduleSlot) ([]domai
 			ID:              uuid.New(),
 			Number:          sessionSlots[0].Session.Number,
 			CurrentRotation: 0,
+			Finished:        false,
 			ScheduleSlots:   sessionSlots,
 		}
 		for idx, _ := range sessionSlots {

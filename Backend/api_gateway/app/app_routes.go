@@ -94,7 +94,7 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 
 	scoGroup := privateRouter.Group("scoring")
 	scoGroup.Use(middleware.ValidateAndExtractToken())
-	scoGroup.POST("competition", middleware.Authorize("LiveSchedule_cu"), scoringHandler.StartCompetition)
+	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cu"), scoringHandler.StartCompetition)
 
 	jpGroup := scoGroup.Group("judging-panel")
 	jpGroup.GET("competition/:id/unassigned", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetApparatusesWithoutPanel)

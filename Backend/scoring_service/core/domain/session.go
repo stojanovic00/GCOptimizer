@@ -7,6 +7,7 @@ type Session struct {
 	Number          int32
 	CurrentRotation int32
 	ScheduleSlots   []ScheduleSlot
+	Finished        bool
 	ScheduleID      uuid.UUID
 	Schedule        Schedule
 }

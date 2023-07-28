@@ -16,15 +16,9 @@ func NewScoringHandler(client scoring_pb.ScoringServiceClient) *ScoringHandler {
 }
 
 func (h *ScoringHandler) StartCompetition(ctx *gin.Context) {
-	var id scoring_pb.IdMessage
+	compId := ctx.Param("id")
 
-	err := ctx.ShouldBindJSON(&id)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
-		return
-	}
-
-	_, err = h.client.StartCompetition(context.Background(), &id)
+	_, err := h.client.StartCompetition(context.Background(), &scoring_pb.IdMessage{Id: compId})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -41,7 +35,7 @@ func (h *ScoringHandler) GetApparatusesWithoutPanel(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, result)
+	ctx.JSON(http.StatusOK, result.Apparatuses)
 }
 
 func (h *ScoringHandler) CreateJudgingPanelsForApparatus(ctx *gin.Context) {
@@ -62,17 +56,19 @@ func (h *ScoringHandler) CreateJudgingPanelsForApparatus(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 func (h *ScoringHandler) AssignJudge(ctx *gin.Context) {
-	var request scoring_pb.AssignJudgeRequest
+	var judge scoring_pb.Judge
 	panelId := ctx.Param("id")
-	request.PanelId = panelId
 
-	err := ctx.ShouldBindJSON(&request)
+	err := ctx.ShouldBindJSON(&judge)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
 		return
 	}
 
-	result, err := h.client.AssignJudge(context.Background(), &request)
+	result, err := h.client.AssignJudge(context.Background(), &scoring_pb.AssignJudgeRequest{
+		Judge:   &judge,
+		PanelId: panelId,
+	})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -89,20 +85,22 @@ func (h *ScoringHandler) GetAssignedJudges(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, result)
+	ctx.JSON(http.StatusOK, result.Judges)
 }
 func (h *ScoringHandler) AssignScoreCalculationMethod(ctx *gin.Context) {
-	var request scoring_pb.AssignScoreCalculationRequest
+	var method scoring_pb.ScoreCalculationMethod
 	panelId := ctx.Param("id")
-	request.PanelId = panelId
 
-	err := ctx.ShouldBindJSON(&request)
+	err := ctx.ShouldBindJSON(&method)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
 		return
 	}
 
-	_, err = h.client.AssignScoreCalculation(context.Background(), &request)
+	_, err = h.client.AssignScoreCalculation(context.Background(), &scoring_pb.AssignScoreCalculationRequest{
+		Method:  &method,
+		PanelId: panelId,
+	})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return

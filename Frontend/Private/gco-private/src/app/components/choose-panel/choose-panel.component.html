@@ -1,1 +1,34 @@
-<p>choose-panel works!</p>
+<p class="heading-main">Create judge panels</p>
+<div class="wrap">
+    <p class="heading-hier-2">Apparatuses without assigned judge panel</p>
+    <div class="table-wrap">
+        <table mat-table [dataSource]="unassignedApps.dataSource" class="mat-elevation-z8 tablee">
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let apparatus">{{getApparatusName(apparatus)}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="unassignedApps.displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: unassignedApps.displayedColumns;" (click)="selectRow(row)"
+                [class.selected-row]="isApparatusSelected(row)"></tr>
+        </table>
+    </div>
+    <div class="button-wrap">
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <button
+        mat-raised-button
+        color="primary"
+        [disabled]="unassignedApps.selectedRow === null"
+        (click)="createPanels()"
+        >Create panels</button>
+
+    <div class="separator"></div> 
+    <button
+        mat-raised-button
+        color="primary"
+        [disabled]="unassignedApps.dataSource.length !== 0"
+        (click)="finishAssignments()"
+        >Finish</button>
+    </div>
+</div>

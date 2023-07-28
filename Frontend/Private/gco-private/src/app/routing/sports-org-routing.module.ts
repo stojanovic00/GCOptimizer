@@ -7,6 +7,7 @@ import { ScheduleViewComponent } from '../components/schedule-view/schedule-view
 import { ApplicationViewComponent } from '../components/application-view/application-view.component';
 import { ChoosePanelComponent } from '../components/choose-panel/choose-panel.component';
 import { FormPanelComponent } from '../components/form-panel/form-panel.component';
+import { CompetitionMonitoringComponent } from '../components/competition-monitoring/competition-monitoring.component';
 
 const routes: Routes = [
   {
@@ -30,12 +31,16 @@ const routes: Routes = [
     component: ScheduleViewComponent
   },
   {
-    path: 'competition/:id/judging-panel/unasigned',
+    path: 'competition/:id/judging-panel/unassigned',
     component: ChoosePanelComponent
   },
   {
-    path: 'competition/:id/judging-panel/form',
+    path: 'competition/:id/judging-panel/form/:apparatus',
     component: FormPanelComponent
+  },
+  {
+    path: 'competition/:id/monitoring',
+    component: CompetitionMonitoringComponent
   },
   {
     path: '',

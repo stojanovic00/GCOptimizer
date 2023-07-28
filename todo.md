@@ -52,18 +52,21 @@ parter konj karike preskok
 
 
 Endpoints:
-    - Preparation
-        + Start
+    - Preparation DONE
 
-        + get apparatuses that need panel
-        + create panels for apparatus
-        + get judges(applications) - from app
-        + get assigned judges - from scoring
-        + Assign judge 
-            + register judge account
-        + Assign score calculation 
+        + Start + 
+
+        + get apparatuses that need panel +
+        + create panels for apparatus +
+        + get judges(applications) - from app +
+        + get assigned judges - from scoring +
+        + Assign judge +
+            + register judge account +
+        + Assign score calculation +
 
         ? Change password
+
+
     - Live
         - get logged judge
         - Get contestants for apparatus <-- new rot

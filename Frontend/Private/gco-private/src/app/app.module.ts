@@ -11,6 +11,7 @@ import { SportsOrgPageModule } from './pages/sports-org-page/sports-org-page.mod
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ChoosePanelComponent } from './components/choose-panel/choose-panel.component';
 import { FormPanelComponent } from './components/form-panel/form-panel.component';
+import { CompetitionMonitoringComponent } from './components/competition-monitoring/competition-monitoring.component';
 
 @NgModule({
   declarations: [

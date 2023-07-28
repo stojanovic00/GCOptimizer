@@ -1,0 +1,32 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+.table-wrap{
+    width: 70%;
+    margin: 100px auto 0px auto ;
+    text-align: right;
+}
+
+#assign-button{
+    margin-bottom: 20px;
+}
+
+#assigned-judges{
+    margin-top: 20px;
+}
+
+
+.button-wrap{
+    width: 100%;
+    text-align: center;
+}
+
+.button-wrap button{
+    width: 30%;
+    margin: 40px auto;
+}
+
+/* Disables manual stepping on stepper */
+::ng-deep .mat-horizontal-stepper-header{
+    pointer-events: none !important;
+}

@@ -19,3 +19,7 @@ export function getApparatusName(value: Apparatus): string {
     return Apparatus[value] || Apparatus[0];
 }
 
+export function parseApparatus(value: string): Apparatus | undefined {
+    // Convert the string to the enum value
+    return (Apparatus as any)[value] as Apparatus | undefined;
+  }
