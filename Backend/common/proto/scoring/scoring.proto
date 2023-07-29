@@ -21,12 +21,26 @@ service ScoringService{
   rpc GetContestantsTempScores(ScoreRequest) returns(TempScoreList){}
   rpc CalculateScore(ScoreRequest) returns(Score){}
   rpc SubmitScore(Score) returns(EmptyMessage){}
+    //Events
+  rpc FinishRotation(IdMessage) returns(EmptyMessage){}
+  rpc FinishSession(IdMessage) returns(EmptyMessage){}
+  rpc FinishCompetition(IdMessage) returns(EmptyMessage){}
+
+  rpc IsRotationFinished(IdMessage) returns(BoolMessage){}
+  rpc IsSessionFinished(IdMessage) returns(BoolMessage){}
+  rpc IsCompetitionFinished(IdMessage) returns(BoolMessage){}
+
 }
+
+message EmptyMessage{ }
 
 message IdMessage{
   string id = 1;
 }
-message EmptyMessage{ }
+
+message BoolMessage{
+  bool isTrue = 1;
+}
 
 enum Apparatus{
   Floor = 0;

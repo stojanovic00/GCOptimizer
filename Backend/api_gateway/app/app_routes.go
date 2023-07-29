@@ -87,22 +87,35 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 		c.JSON(404, gin.H{"message": "Endpoint doesn't exist"})
 	})
 
+	//Schedule
 	schGroup := privateRouter.Group("scheduling")
 	schGroup.Use(middleware.ValidateAndExtractToken())
 	schGroup.POST("schedule", middleware.Authorize("Schedule_crud"), schedulingHandler.GenerateSchedule)
 	schGroup.GET("schedule/:id", middleware.Authorize("Schedule_crud"), schedulingHandler.GetByCompetitionId)
 
+	//Live scoring
 	scoGroup := privateRouter.Group("scoring")
 	scoGroup.Use(middleware.ValidateAndExtractToken())
-	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cu"), scoringHandler.StartCompetition)
+	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cru"), scoringHandler.StartCompetition)
+
 	scoGroup.GET("judge", middleware.Authorize("LiveJudge_r"), scoringHandler.GetLoggedJudgeInfo)
 	scoGroup.GET("competition/:id/contestant", middleware.Authorize("LiveContestant_r"), scoringHandler.GetCurrentApparatusContestants)
 	scoGroup.GET("competition/:id/contestant/current", middleware.Authorize("LiveContestant_r"), scoringHandler.GetNextCurrentApparatusContestant)
+
 	scoGroup.POST("competition/:id/temp-score", middleware.Authorize("Score_c"), scoringHandler.SubmitTempScore)
 	scoGroup.GET("competition/:id/temp-score", middleware.Authorize("Score_r"), scoringHandler.GetContestantsTempScores)
 	scoGroup.GET("competition/:id/score", middleware.Authorize("Score_r"), scoringHandler.CalculateScore)
 	scoGroup.POST("competition/:id/score", middleware.Authorize("Score_c"), scoringHandler.SubmitScore)
 
+	scoGroup.POST("competition/:id/rotation/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishRotation)
+	scoGroup.POST("competition/:id/session/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishSession)
+	scoGroup.POST("competition/:id/finish", middleware.Authorize("Scoreboard_c"), scoringHandler.FinishCompetition)
+
+	scoGroup.GET("competition/:id/rotation/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsRotationFinished)
+	scoGroup.GET("competition/:id/session/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsSessionFinished)
+	scoGroup.GET("competition/:id/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsCompetitionFinished)
+
+	//Judging panel
 	jpGroup := scoGroup.Group("judging-panel")
 	jpGroup.GET("competition/:id/unassigned", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetApparatusesWithoutPanel)
 	jpGroup.POST("", middleware.Authorize("JudgingPanel_crud"), scoringHandler.CreateJudgingPanelsForApparatus)

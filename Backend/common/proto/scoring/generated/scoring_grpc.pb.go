@@ -39,6 +39,13 @@ type ScoringServiceClient interface {
 	GetContestantsTempScores(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*TempScoreList, error)
 	CalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error)
 	SubmitScore(ctx context.Context, in *Score, opts ...grpc.CallOption) (*EmptyMessage, error)
+	// Events
+	FinishRotation(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
+	FinishSession(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
+	FinishCompetition(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
+	IsRotationFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error)
+	IsSessionFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error)
+	IsCompetitionFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error)
 }
 
 type scoringServiceClient struct {
@@ -166,6 +173,60 @@ func (c *scoringServiceClient) SubmitScore(ctx context.Context, in *Score, opts 
 	return out, nil
 }
 
+func (c *scoringServiceClient) FinishRotation(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/FinishRotation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) FinishSession(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/FinishSession", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) FinishCompetition(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/FinishCompetition", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) IsRotationFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error) {
+	out := new(BoolMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/IsRotationFinished", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) IsSessionFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error) {
+	out := new(BoolMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/IsSessionFinished", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) IsCompetitionFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error) {
+	out := new(BoolMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/IsCompetitionFinished", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScoringServiceServer is the server API for ScoringService service.
 // All implementations must embed UnimplementedScoringServiceServer
 // for forward compatibility
@@ -187,6 +248,13 @@ type ScoringServiceServer interface {
 	GetContestantsTempScores(context.Context, *ScoreRequest) (*TempScoreList, error)
 	CalculateScore(context.Context, *ScoreRequest) (*Score, error)
 	SubmitScore(context.Context, *Score) (*EmptyMessage, error)
+	// Events
+	FinishRotation(context.Context, *IdMessage) (*EmptyMessage, error)
+	FinishSession(context.Context, *IdMessage) (*EmptyMessage, error)
+	FinishCompetition(context.Context, *IdMessage) (*EmptyMessage, error)
+	IsRotationFinished(context.Context, *IdMessage) (*BoolMessage, error)
+	IsSessionFinished(context.Context, *IdMessage) (*BoolMessage, error)
+	IsCompetitionFinished(context.Context, *IdMessage) (*BoolMessage, error)
 	mustEmbedUnimplementedScoringServiceServer()
 }
 
@@ -232,6 +300,24 @@ func (UnimplementedScoringServiceServer) CalculateScore(context.Context, *ScoreR
 }
 func (UnimplementedScoringServiceServer) SubmitScore(context.Context, *Score) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitScore not implemented")
+}
+func (UnimplementedScoringServiceServer) FinishRotation(context.Context, *IdMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinishRotation not implemented")
+}
+func (UnimplementedScoringServiceServer) FinishSession(context.Context, *IdMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinishSession not implemented")
+}
+func (UnimplementedScoringServiceServer) FinishCompetition(context.Context, *IdMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinishCompetition not implemented")
+}
+func (UnimplementedScoringServiceServer) IsRotationFinished(context.Context, *IdMessage) (*BoolMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsRotationFinished not implemented")
+}
+func (UnimplementedScoringServiceServer) IsSessionFinished(context.Context, *IdMessage) (*BoolMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsSessionFinished not implemented")
+}
+func (UnimplementedScoringServiceServer) IsCompetitionFinished(context.Context, *IdMessage) (*BoolMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsCompetitionFinished not implemented")
 }
 func (UnimplementedScoringServiceServer) mustEmbedUnimplementedScoringServiceServer() {}
 
@@ -480,6 +566,114 @@ func _ScoringService_SubmitScore_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScoringService_FinishRotation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).FinishRotation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/FinishRotation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).FinishRotation(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_FinishSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).FinishSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/FinishSession",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).FinishSession(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_FinishCompetition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).FinishCompetition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/FinishCompetition",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).FinishCompetition(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_IsRotationFinished_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).IsRotationFinished(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/IsRotationFinished",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).IsRotationFinished(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_IsSessionFinished_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).IsSessionFinished(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/IsSessionFinished",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).IsSessionFinished(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_IsCompetitionFinished_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).IsCompetitionFinished(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/IsCompetitionFinished",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).IsCompetitionFinished(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScoringService_ServiceDesc is the grpc.ServiceDesc for ScoringService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -538,6 +732,30 @@ var ScoringService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubmitScore",
 			Handler:    _ScoringService_SubmitScore_Handler,
+		},
+		{
+			MethodName: "FinishRotation",
+			Handler:    _ScoringService_FinishRotation_Handler,
+		},
+		{
+			MethodName: "FinishSession",
+			Handler:    _ScoringService_FinishSession_Handler,
+		},
+		{
+			MethodName: "FinishCompetition",
+			Handler:    _ScoringService_FinishCompetition_Handler,
+		},
+		{
+			MethodName: "IsRotationFinished",
+			Handler:    _ScoringService_IsRotationFinished_Handler,
+		},
+		{
+			MethodName: "IsSessionFinished",
+			Handler:    _ScoringService_IsSessionFinished_Handler,
+		},
+		{
+			MethodName: "IsCompetitionFinished",
+			Handler:    _ScoringService_IsCompetitionFinished_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

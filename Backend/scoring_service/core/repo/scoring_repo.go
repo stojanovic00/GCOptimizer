@@ -14,4 +14,9 @@ type ScoringRepo interface {
 	SubmitTempScore(tempScore *domain.TempScore) error
 	GetContestantsTempScores(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) ([]domain.TempScore, error)
 	SubmitScore(score *domain.Score) error
+	FinishRotation(competitionId uuid.UUID) error
+	FinishSession(competitionId uuid.UUID) error
+	IsRotationFinished(competitionId uuid.UUID) (bool, error)
+	IsSessionFinished(competitionId uuid.UUID) (bool, error)
+	IsCompetitionFinished(competitionId uuid.UUID) (bool, error)
 }

@@ -32,9 +32,22 @@
                     - tiebrake = true nema deljenja mesta, false moze se deli mesto 
 
 
-
-
-
+Eventovi:
+  - Judge side:
+    - Submited temp score
+      - Refresh temp scores(judge)
+    - Submited score
+      - Get current contestant(judge) - if null = no more contestants to score
+      - check rotation finish(admin)
+      - check session finish(admin)
+  - Admin side
+    - finish rotation: pristupi sesiji i poveca trenutnu rotaciju
+      - get all contestants(judge)
+      - get current contestant(judge)
+    - finish session: trenutnu sesiju stavi na finished
+      - check competition finish - ako su sve sesije finished
+      - get all contestants(judge)
+      - get current contestant(judge)
 
 
 
@@ -54,7 +67,7 @@ Endpoints:
         ? Change password
 
 
-    - Live
+    - Live DONE
         + get logged judge (judge info + panel info)
 
         + Get contestants for apparatus <-- new rot
@@ -63,17 +76,20 @@ Endpoints:
         + Submit temp score --> temp score submitted
         + get temp scores for contestant <-- temp score submitted
         + get final score for contestant <-- temp score submitted
-        + Save final score --> final score submitted
+        + Submit final score --> final score submitted
 
 
-        - Check rotation finish <-- final score submitted
-        - Start new rotation --> new rot
+        + Finish rotation
+        + Finish session
 
-        - Check session finish
-        - Start new session
+        + Check rotation finish 
+        + Check session finish
+        + Check competition finish
 
-        - Check competition finish
+    - Scoreboards
+        - Finish competition:
+          - Generate scoreboard
+          - Generate team scoreboard
 
-    - Finish
-        - Generate scoreboard
-        - Generate team scoreboard
+        - Get scoreboard
+        - Get team scoreboard

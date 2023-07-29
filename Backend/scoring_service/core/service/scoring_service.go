@@ -160,6 +160,24 @@ func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, a
 		Contestant:    domain.Contestant{}, // Db resolved
 	}, nil
 }
+
 func (s *ScoringService) SubmitScore(score *domain.Score) error {
 	return s.scRepo.SubmitScore(score)
+}
+
+func (s *ScoringService) FinishRotation(competitionId uuid.UUID) error {
+	return s.scRepo.FinishRotation(competitionId)
+}
+
+func (s *ScoringService) FinishSession(competitionId uuid.UUID) error {
+	return s.scRepo.FinishSession(competitionId)
+}
+func (s *ScoringService) IsRotationFinished(competitionId uuid.UUID) (bool, error) {
+	return s.scRepo.IsRotationFinished(competitionId)
+}
+func (s *ScoringService) IsSessionFinished(competitionId uuid.UUID) (bool, error) {
+	return s.scRepo.IsSessionFinished(competitionId)
+}
+func (s *ScoringService) IsCompetitionFinished(competitionId uuid.UUID) (bool, error) {
+	return s.scRepo.IsCompetitionFinished(competitionId)
 }

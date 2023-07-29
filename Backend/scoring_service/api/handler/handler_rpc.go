@@ -170,3 +170,52 @@ func (h *HandlerRpc) SubmitScore(ctx context.Context, score *scoring_pb.Score) (
 
 	return &scoring_pb.EmptyMessage{}, nil
 }
+func (h *HandlerRpc) FinishRotation(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.EmptyMessage, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	err := h.scService.FinishRotation(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.EmptyMessage{}, nil
+}
+
+func (h *HandlerRpc) FinishSession(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.EmptyMessage, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	err := h.scService.FinishSession(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.EmptyMessage{}, nil
+}
+func (h *HandlerRpc) FinishCompetition(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.EmptyMessage, error) {
+	return &scoring_pb.EmptyMessage{}, nil
+}
+func (h *HandlerRpc) IsRotationFinished(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.BoolMessage, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	finished, err := h.scService.IsRotationFinished(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.BoolMessage{IsTrue: finished}, nil
+}
+func (h *HandlerRpc) IsSessionFinished(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.BoolMessage, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	finished, err := h.scService.IsSessionFinished(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.BoolMessage{IsTrue: finished}, nil
+}
+func (h *HandlerRpc) IsCompetitionFinished(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.BoolMessage, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	finished, err := h.scService.IsCompetitionFinished(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.BoolMessage{IsTrue: finished}, nil
+}

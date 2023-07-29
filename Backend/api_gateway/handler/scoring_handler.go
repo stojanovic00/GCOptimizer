@@ -259,3 +259,76 @@ func (h *ScoringHandler) SubmitScore(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *ScoringHandler) FinishRotation(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	_, err := h.client.FinishRotation(context.Background(), &scoring_pb.IdMessage{Id: competitionId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *ScoringHandler) FinishSession(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	_, err := h.client.FinishSession(context.Background(), &scoring_pb.IdMessage{Id: competitionId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+func (h *ScoringHandler) FinishCompetition(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	_, err := h.client.FinishCompetition(context.Background(), &scoring_pb.IdMessage{Id: competitionId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	//TODO REVERT TO STATUS ONLY
+	//ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, "SRBIJA DO TOKIJA, KUPI TELEFON KOD ZOKIJA")
+}
+
+func (h *ScoringHandler) IsRotationFinished(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	finished, err := h.client.IsRotationFinished(context.Background(), &scoring_pb.IdMessage{Id: competitionId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, finished.IsTrue)
+}
+
+func (h *ScoringHandler) IsSessionFinished(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	finished, err := h.client.IsSessionFinished(context.Background(), &scoring_pb.IdMessage{Id: competitionId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, finished.IsTrue)
+}
+
+func (h *ScoringHandler) IsCompetitionFinished(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	finished, err := h.client.IsCompetitionFinished(context.Background(), &scoring_pb.IdMessage{Id: competitionId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, finished.IsTrue)
+}
