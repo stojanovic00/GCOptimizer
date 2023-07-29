@@ -1,0 +1,15 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+.schedule{
+    width: 70%;
+    margin: auto;
+}
+
+.schedule .heading-hier-2{
+    margin: 35px auto -25px auto;
+}
+
+.schedule .heading-hier-3{
+    margin: 70px auto 20px auto;
+}

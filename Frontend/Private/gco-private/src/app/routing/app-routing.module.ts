@@ -6,6 +6,8 @@ import { SportsOrgRoutingModule } from './sports-org-routing.module';
 import { RoleGuardService as RoleGuard } from '../auth/guards/role-guard.service';
 import { IncognitoGuardService as IncognitoGuard } from '../auth/guards/incognito-guard.service';
 import { JudgeInfoComponent } from '../components/judge-info/judge-info.component';
+import { JudgePageComponent } from '../pages/judge-page/judge-page.component';
+import { JudgeRoutingModule } from './judge-routing.module';
 
 const routes: Routes = [
   {
@@ -25,12 +27,12 @@ const routes: Routes = [
   },
   {
     path: 'judge',
-    component: JudgeInfoComponent,
+    component: JudgePageComponent,
     canActivate: [RoleGuard],
     data: { expectedRoles: ['D_JUDGE', 'E_JUDGE'] },
     loadChildren: () =>  
       import('./judge-routing.module').then(
-        (m) => SportsOrgRoutingModule
+        (m) => JudgeRoutingModule
       ),
   },
   {

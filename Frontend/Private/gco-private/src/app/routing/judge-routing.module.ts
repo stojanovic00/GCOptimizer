@@ -20,12 +20,12 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'view',
+    redirectTo: 'info',
     pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: 'view',
+    redirectTo: 'info',
     pathMatch: 'full'
   },
 ];
@@ -36,4 +36,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class SportsOrgRoutingModule { }
+export class JudgeRoutingModule { }
