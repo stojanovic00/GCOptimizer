@@ -9,9 +9,7 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { SportsOrgPageModule } from './pages/sports-org-page/sports-org-page.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ChoosePanelComponent } from './components/choose-panel/choose-panel.component';
-import { FormPanelComponent } from './components/form-panel/form-panel.component';
-import { CompetitionMonitoringComponent } from './components/competition-monitoring/competition-monitoring.component';
+import { JudgePageModule } from './pages/judge-page/judge-page.module';
 
 @NgModule({
   declarations: [
@@ -20,6 +18,7 @@ import { CompetitionMonitoringComponent } from './components/competition-monitor
   imports: [
     LoginPageModule,
     SportsOrgPageModule,
+    JudgePageModule,
 
 
     BrowserModule,

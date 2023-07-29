@@ -15,7 +15,7 @@ export class RoleGuardService implements CanActivate {
   ) { }
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    const expectedRole = route.data['expectedRole'];
+    const expectedRoles :string[] = route.data['expectedRoles'];
     const token = localStorage.getItem('jwt');
     if (!token) {
       this.router.navigate(['login']);
@@ -25,9 +25,10 @@ export class RoleGuardService implements CanActivate {
     const tokenPayload = this.jwtHelper.decodeToken(token!);
     const role = tokenPayload['role'];
 
+    const hasRole = expectedRoles.includes(role)
+
     if (
-      !this.auth.isAuthenticated() ||
-      role !== expectedRole
+      !this.auth.isAuthenticated() || !hasRole
     ) {
       this.router.navigate(['login']);
       return false;
