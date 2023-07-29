@@ -10,4 +10,5 @@ type ScheduleSlot struct {
 	ScoredApparatuses []Apparatus `gorm:"serializer:json"`
 	ContestantID      uuid.UUID
 	Contestant        Contestant
+	Position          int
 }

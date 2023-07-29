@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"scoring_service/core/domain"
 	"scoring_service/core/domain/dto"
+	"sort"
 )
 
 type ScoringRepoPg struct {
@@ -89,6 +90,25 @@ func (r *ScoringRepoPg) GetCurrentSession(competitionId uuid.UUID) (*domain.Sess
 	return &session, nil
 }
 
+func (r *ScoringRepoPg) GetCurrentSessionWithSlots(competitionId uuid.UUID) (*domain.Session, error) {
+	schedule, err := r.GetScheduleByCompetitionId(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	var session domain.Session
+	result := r.dbClient.
+		Where("schedule_id = ? and finished = false", schedule.ID).
+		Order("number asc").
+		Preload("ScheduleSlots.Session").
+		First(&session)
+	if result.Error != nil {
+		return nil, err
+	}
+
+	return &session, nil
+}
+
 func (r *ScoringRepoPg) GetSlotsWithStartingApparatus(competitionId uuid.UUID, sessionNumber int32, apparatus domain.Apparatus) ([]domain.ScheduleSlot, error) {
 	schedule, err := r.GetScheduleByCompetitionId(competitionId)
 	if err != nil {
@@ -108,6 +128,11 @@ func (r *ScoringRepoPg) GetSlotsWithStartingApparatus(competitionId uuid.UUID, s
 			slots = append(slots, slot)
 		}
 	}
+
+	//!!!SORT BY POSITION ASCENDING!!!
+	sort.Slice(slots, func(i, j int) bool {
+		return slots[i].Position < slots[j].Position
+	})
 
 	return slots, nil
 }
@@ -145,18 +170,48 @@ func (r *ScoringRepoPg) SubmitScore(score *domain.Score) error {
 	return nil
 }
 func (r *ScoringRepoPg) FinishRotation(competitionId uuid.UUID) error {
-	session, err := r.GetCurrentSession(competitionId)
+	session, err := r.GetCurrentSessionWithSlots(competitionId)
 	if err != nil {
 		return err
 	}
 
+	// Start a transaction
+	tx := r.dbClient.Begin()
+
 	session.CurrentRotation++
 
-	result := r.dbClient.Save(session)
+	//MOVE EVERYONE ONE POSITION UP INSIDE APPARATUS GROUP
+
+	//This is map of counters for each apparatus separately
+	apparatusCount := make(map[domain.Apparatus]int)
+	for _, slot := range session.ScheduleSlots {
+		apparatusCount[slot.StartingApparatus]++
+	}
+
+	for idx := range session.ScheduleSlots {
+		slot := &session.ScheduleSlots[idx]
+		slot.Position = (slot.Position + 1) % apparatusCount[slot.StartingApparatus]
+		//Gorm will not update slots when saving session, so we are doing it one by one
+		//That's why I started transaction to not make n calls to db
+		result := tx.Save(&slot)
+		if result.Error != nil {
+			tx.Rollback()
+			return result.Error
+		}
+	}
+
+	result := tx.Save(&session)
 	if result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
 
+	// Commit the transaction
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 	return nil
 }
 func (r *ScoringRepoPg) FinishSession(competitionId uuid.UUID) error {

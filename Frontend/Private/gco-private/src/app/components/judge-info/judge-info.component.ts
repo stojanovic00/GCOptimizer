@@ -4,6 +4,7 @@ import { ScoringService } from '../../services/scoring.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { JudgingPanelType } from 'src/app/model/core/judging-panel-type';
 import { getLicenceTypeName } from 'src/app/model/core/licence-type';
+import { getApparatusName } from 'src/app/model/core/apparatus';
 
 @Component({
   selector: 'app-judge-info',
@@ -15,6 +16,8 @@ export class JudgeInfoComponent implements OnInit {
 
   judgingInfo: JudgeJudgingInfo | null = null;
   getLicenceTypeName = getLicenceTypeName
+  getApparatusName = getApparatusName
+
   public get JudgeType() :string {
     if(this.judgingInfo?.judgingPanelType == JudgingPanelType.DPanel){
       return "D";
@@ -22,7 +25,6 @@ export class JudgeInfoComponent implements OnInit {
     else{
       return "E";
     }
-    return "";
   }
 
   constructor(

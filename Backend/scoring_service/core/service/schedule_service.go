@@ -30,10 +30,10 @@ func (s *ScheduleService) StartCompetition(competitionId uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-
+	apparatusOrder := mapper.ApparatusListPbToDom(schedulePb.GetApparatusOrder())
 	//Process slots to sessions
 	slots := mapper.SlotListPbToDom(schedulePb.Slots)
-	sessions, err := s.generateSessions(slots)
+	sessions, err := s.generateSessions(slots, apparatusOrder)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (s *ScheduleService) StartCompetition(competitionId uuid.UUID) error {
 		ID:             uuid.New(),
 		CompetitionID:  uuid.UUID{},
 		Competition:    *mapper.CompetitionPbToDom(competitionPb),
-		ApparatusOrder: mapper.ApparatusListPbToDom(schedulePb.GetApparatusOrder()),
+		ApparatusOrder: apparatusOrder,
 		Sessions:       sessions,
 	}
 
@@ -50,11 +50,10 @@ func (s *ScheduleService) StartCompetition(competitionId uuid.UUID) error {
 		sessions[idx].Schedule = *schedule //Because of gorm
 	}
 
-	//TODO SAVE TO DB GODSPEED
 	return s.schRepo.Save(schedule)
 }
 
-func (s *ScheduleService) generateSessions(slots []domain.ScheduleSlot) ([]domain.Session, error) {
+func (s *ScheduleService) generateSessions(slots []domain.ScheduleSlot, apparatusOrder []domain.Apparatus) ([]domain.Session, error) {
 	filteredSlots := make([]domain.ScheduleSlot, 0)
 
 	//Filter empty slots
@@ -77,7 +76,6 @@ func (s *ScheduleService) generateSessions(slots []domain.ScheduleSlot) ([]domai
 
 	// Group by session number
 	groupedBySession := make(map[int32][]domain.ScheduleSlot)
-
 	for _, slot := range filteredSlots {
 		groupedBySession[slot.Session.Number] = append(groupedBySession[slot.Session.Number], slot)
 	}
@@ -92,11 +90,24 @@ func (s *ScheduleService) generateSessions(slots []domain.ScheduleSlot) ([]domai
 			Finished:        false,
 			ScheduleSlots:   sessionSlots,
 		}
-		for idx, _ := range sessionSlots {
-			sessionSlots[idx].Session = session //Updating (until now only number was defined)
+
+		//Assign positions inside one apparatus
+		//This is map of counters for each apparatus separately
+		apparatusCount := make(map[domain.Apparatus]int)
+		for _, apparatus := range apparatusOrder {
+			apparatusCount[apparatus] = -1
+		}
+
+		for idx := range sessionSlots {
+			//Updating (until now only number was defined)
+			sessionSlots[idx].Session = session
+			//Assigning positions
+			apparatusCount[sessionSlots[idx].StartingApparatus]++
+			sessionSlots[idx].Position = apparatusCount[sessionSlots[idx].StartingApparatus]
 		}
 
 		sessions = append(sessions, session)
+
 	}
 	return sessions, nil
 }
