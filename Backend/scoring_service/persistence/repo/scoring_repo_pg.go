@@ -34,12 +34,30 @@ func (r *ScoringRepoPg) GetJudgeJudgingInfo(email string) (*dto.JudgeJudgingInfo
 		return nil, result.Error
 	}
 
+	//If it is D panel it must retrieve E score calculation method so frontend can show deductions on D panel GUI
+	var calcMethod domain.ScoreCalculationMethod
+	if panel.Type == domain.DPanel {
+		//retrieve E panel for this competition and this apparatus
+		var ePanel domain.Panel
+		result = r.dbClient.
+			Where("competition_id = ? and apparatus = ? and type = ?", panel.CompetitionID, panel.Apparatus, domain.EPanel).
+			Preload("ScoreCalculationMethod").
+			Find(&ePanel)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+
+		calcMethod = ePanel.ScoreCalculationMethod
+	} else {
+		calcMethod = panel.ScoreCalculationMethod
+	}
+
 	return &dto.JudgeJudgingInfo{
 		Judge:             judge,
 		CompetitionId:     panel.CompetitionID,
 		Apparatus:         panel.Apparatus,
 		JudgingPanelType:  panel.Type,
-		CalculationMethod: panel.ScoreCalculationMethod,
+		CalculationMethod: calcMethod,
 	}, nil
 
 }
