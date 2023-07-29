@@ -95,6 +95,9 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	scoGroup := privateRouter.Group("scoring")
 	scoGroup.Use(middleware.ValidateAndExtractToken())
 	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cu"), scoringHandler.StartCompetition)
+	scoGroup.GET("judge", middleware.Authorize("LiveJudge_r"), scoringHandler.GetLoggedJudgeInfo)
+	scoGroup.GET("competition/:id/contestant", middleware.Authorize("LiveContestant_r"), scoringHandler.GetApparatusContestants)
+	scoGroup.GET("competition/:id/contestant/current", middleware.Authorize("LiveContestant_r"), scoringHandler.GetCurrentApparatusContestant)
 
 	jpGroup := scoGroup.Group("judging-panel")
 	jpGroup.GET("competition/:id/unassigned", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetApparatusesWithoutPanel)

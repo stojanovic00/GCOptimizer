@@ -6,6 +6,7 @@ import (
 	scoring_pb "common/proto/scoring/generated"
 	"github.com/google/uuid"
 	"scoring_service/core/domain"
+	"scoring_service/core/domain/dto"
 	"time"
 )
 
@@ -230,4 +231,61 @@ func ScoreCalcMethodPbToDom(method *scoring_pb.ScoreCalculationMethod) *domain.S
 		ID:                id,
 		ScoreDeductionNum: method.ScoreDeductionNum,
 	}
+}
+
+func JudgeJudgingInfoDomToPb(info *dto.JudgeJudgingInfo) *scoring_pb.JudgeJudgingInfo {
+	return &scoring_pb.JudgeJudgingInfo{
+		Judge:            JudgeDomToPb(&info.Judge),
+		CompetitionId:    info.CompetitionId.String(),
+		Apparatus:        scoring_pb.Apparatus(info.Apparatus),
+		JudgingPanelType: scoring_pb.JudgingPanelType(info.JudgingPanelType),
+	}
+}
+
+func ContestantDomToPb(contestant *domain.Contestant) *scoring_pb.Contestant {
+	return &scoring_pb.Contestant{
+		Id:                   contestant.ID.String(),
+		CompetingId:          contestant.CompetingId,
+		FullName:             contestant.FullName,
+		SportsOrganization:   sportsOrganizationDomToPb(&contestant.SportsOrganization),
+		CompetingApparatuses: ApparatusListDomToPb(contestant.CompetingApparatuses),
+		TeamNumber:           contestant.TeamNumber,
+		AgeCategory:          contestant.AgeCategory,
+	}
+}
+func ContestantListDomToPb(contestants []domain.Contestant) []*scoring_pb.Contestant {
+	var contListPb []*scoring_pb.Contestant
+	for _, contestant := range contestants {
+		contListPb = append(contListPb, ContestantDomToPb(&contestant))
+	}
+
+	return contListPb
+}
+
+func ContestantCompetingDomToPb(contestant *domain.Contestant, apparatus domain.Apparatus) *scoring_pb.ContestantCompeting {
+	return &scoring_pb.ContestantCompeting{
+		Contestant: ContestantDomToPb(contestant),
+		Competes:   contestant.CompetesApparatus(apparatus),
+	}
+}
+
+func ContestantCompetingListDomToPbSorted(contestants []domain.Contestant, apparatus domain.Apparatus) []*scoring_pb.ContestantCompeting {
+	var contListPb []*scoring_pb.ContestantCompeting
+	for _, contestant := range contestants {
+		contListPb = append(contListPb, ContestantCompetingDomToPb(&contestant, apparatus))
+	}
+
+	//Filter those who compete on this apparatus and those who don't
+	competing := make([]*scoring_pb.ContestantCompeting, 0)
+	notCompeting := make([]*scoring_pb.ContestantCompeting, 0)
+
+	for _, contestant := range contListPb {
+		if contestant.Competes {
+			competing = append(competing, contestant)
+		} else {
+			notCompeting = append(notCompeting, contestant)
+		}
+	}
+	//First goes all who competes then those who don't
+	return append(competing, notCompeting...)
 }

@@ -29,6 +29,10 @@ type ScoringServiceClient interface {
 	AssignJudge(ctx context.Context, in *AssignJudgeRequest, opts ...grpc.CallOption) (*EmptyMessage, error)
 	GetAssignedJudges(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*JudgeList, error)
 	AssignScoreCalculation(ctx context.Context, in *AssignScoreCalculationRequest, opts ...grpc.CallOption) (*EmptyMessage, error)
+	// Live scoring
+	GetLoggedJudgeInfo(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgeJudgingInfo, error)
+	GetCurrentApparatusContestants(ctx context.Context, in *GetByApparatusRequest, opts ...grpc.CallOption) (*ContestantList, error)
+	GetNextCurrentApparatusContestant(ctx context.Context, in *GetByApparatusRequest, opts ...grpc.CallOption) (*Contestant, error)
 }
 
 type scoringServiceClient struct {
@@ -93,6 +97,33 @@ func (c *scoringServiceClient) AssignScoreCalculation(ctx context.Context, in *A
 	return out, nil
 }
 
+func (c *scoringServiceClient) GetLoggedJudgeInfo(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgeJudgingInfo, error) {
+	out := new(JudgeJudgingInfo)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetLoggedJudgeInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) GetCurrentApparatusContestants(ctx context.Context, in *GetByApparatusRequest, opts ...grpc.CallOption) (*ContestantList, error) {
+	out := new(ContestantList)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetCurrentApparatusContestants", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) GetNextCurrentApparatusContestant(ctx context.Context, in *GetByApparatusRequest, opts ...grpc.CallOption) (*Contestant, error) {
+	out := new(Contestant)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetNextCurrentApparatusContestant", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScoringServiceServer is the server API for ScoringService service.
 // All implementations must embed UnimplementedScoringServiceServer
 // for forward compatibility
@@ -104,6 +135,10 @@ type ScoringServiceServer interface {
 	AssignJudge(context.Context, *AssignJudgeRequest) (*EmptyMessage, error)
 	GetAssignedJudges(context.Context, *IdMessage) (*JudgeList, error)
 	AssignScoreCalculation(context.Context, *AssignScoreCalculationRequest) (*EmptyMessage, error)
+	// Live scoring
+	GetLoggedJudgeInfo(context.Context, *EmptyMessage) (*JudgeJudgingInfo, error)
+	GetCurrentApparatusContestants(context.Context, *GetByApparatusRequest) (*ContestantList, error)
+	GetNextCurrentApparatusContestant(context.Context, *GetByApparatusRequest) (*Contestant, error)
 	mustEmbedUnimplementedScoringServiceServer()
 }
 
@@ -128,6 +163,15 @@ func (UnimplementedScoringServiceServer) GetAssignedJudges(context.Context, *IdM
 }
 func (UnimplementedScoringServiceServer) AssignScoreCalculation(context.Context, *AssignScoreCalculationRequest) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignScoreCalculation not implemented")
+}
+func (UnimplementedScoringServiceServer) GetLoggedJudgeInfo(context.Context, *EmptyMessage) (*JudgeJudgingInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLoggedJudgeInfo not implemented")
+}
+func (UnimplementedScoringServiceServer) GetCurrentApparatusContestants(context.Context, *GetByApparatusRequest) (*ContestantList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCurrentApparatusContestants not implemented")
+}
+func (UnimplementedScoringServiceServer) GetNextCurrentApparatusContestant(context.Context, *GetByApparatusRequest) (*Contestant, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNextCurrentApparatusContestant not implemented")
 }
 func (UnimplementedScoringServiceServer) mustEmbedUnimplementedScoringServiceServer() {}
 
@@ -250,6 +294,60 @@ func _ScoringService_AssignScoreCalculation_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScoringService_GetLoggedJudgeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetLoggedJudgeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetLoggedJudgeInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetLoggedJudgeInfo(ctx, req.(*EmptyMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_GetCurrentApparatusContestants_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByApparatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetCurrentApparatusContestants(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetCurrentApparatusContestants",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetCurrentApparatusContestants(ctx, req.(*GetByApparatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_GetNextCurrentApparatusContestant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByApparatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetNextCurrentApparatusContestant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetNextCurrentApparatusContestant",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetNextCurrentApparatusContestant(ctx, req.(*GetByApparatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScoringService_ServiceDesc is the grpc.ServiceDesc for ScoringService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -280,6 +378,18 @@ var ScoringService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AssignScoreCalculation",
 			Handler:    _ScoringService_AssignScoreCalculation_Handler,
+		},
+		{
+			MethodName: "GetLoggedJudgeInfo",
+			Handler:    _ScoringService_GetLoggedJudgeInfo_Handler,
+		},
+		{
+			MethodName: "GetCurrentApparatusContestants",
+			Handler:    _ScoringService_GetCurrentApparatusContestants_Handler,
+		},
+		{
+			MethodName: "GetNextCurrentApparatusContestant",
+			Handler:    _ScoringService_GetNextCurrentApparatusContestant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"auth_service/api/middleware"
 	scoring_pb "common/proto/scoring/generated"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type ScoringHandler struct {
@@ -107,4 +109,75 @@ func (h *ScoringHandler) AssignScoreCalculationMethod(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+func (h *ScoringHandler) GetLoggedJudgeInfo(ctx *gin.Context) {
+	ctxWithInfo, err := middleware.GetGrpcContextWithUserInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
+		ctx.Abort()
+		return
+	}
+
+	loggedInfo, err := h.client.GetLoggedJudgeInfo(ctxWithInfo, &scoring_pb.EmptyMessage{})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, loggedInfo)
+}
+
+func (h *ScoringHandler) GetApparatusContestants(ctx *gin.Context) {
+	apparatusStr := ctx.Query("apparatus")
+
+	if apparatusStr == "" {
+		// If "apparatusStr" is not provided in the query, return an error response
+		ctx.JSON(400, gin.H{"error": "apparatus query parameter is missing"})
+		return
+	}
+	apparatus, err := strconv.Atoi(apparatusStr)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "invalid apparatus query parameter"})
+		return
+	}
+
+	competitionId := ctx.Param("id")
+
+	response, err := h.client.GetCurrentApparatusContestants(context.Background(), &scoring_pb.GetByApparatusRequest{
+		CompetitionId: competitionId,
+		Apparatus:     scoring_pb.Apparatus(apparatus),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, response.Contestants)
+}
+func (h *ScoringHandler) GetCurrentApparatusContestant(ctx *gin.Context) {
+	apparatusStr := ctx.Query("apparatus")
+
+	if apparatusStr == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "apparatus query parameter is missing"})
+		return
+	}
+	apparatus, err := strconv.Atoi(apparatusStr)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "invalid apparatus query parameter"})
+		return
+	}
+
+	competitionId := ctx.Param("id")
+
+	contestant, err := h.client.GetNextCurrentApparatusContestant(context.Background(), &scoring_pb.GetByApparatusRequest{
+		CompetitionId: competitionId,
+		Apparatus:     scoring_pb.Apparatus(apparatus),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, contestant)
 }

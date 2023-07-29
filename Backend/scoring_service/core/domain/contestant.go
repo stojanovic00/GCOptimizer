@@ -14,3 +14,16 @@ type Contestant struct {
 	TeamNumber           int32
 	AgeCategory          string
 }
+
+func (c *Contestant) CompetesApparatus(apparatus Apparatus) bool {
+	found := false
+
+	for _, app := range c.CompetingApparatuses {
+		if app == apparatus {
+			found = true
+			break
+		}
+	}
+
+	return found
+}

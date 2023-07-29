@@ -68,22 +68,24 @@ Endpoints:
 
 
     - Live
-        - get logged judge
-        - Get contestants for apparatus <-- new rot
+        + get logged judge (judge info + panel info)
+
+        + Get contestants for apparatus <-- new rot
         - Get current contestant for apparatus <-- final score submitted <-- new rot
 
         - Submit temp score --> temp score submitted
         - get temp scores for contestant <-- temp score submitted
         - Save final score --> final score submitted
+
+
         - Check rotation finish <-- final score submitted
-        
-        - Check all rotations finished
         - Start new rotation --> new rot
 
         - Check session finish
         - Start new session
 
         - Check competition finish
+
     - Finish
         - Generate scoreboard
         - Generate team scoreboard

@@ -12,6 +12,9 @@ service ScoringService{
   rpc GetAssignedJudges(IdMessage) returns(JudgeList){}
   rpc AssignScoreCalculation(AssignScoreCalculationRequest) returns(EmptyMessage){}
   //Live scoring
+  rpc GetLoggedJudgeInfo(EmptyMessage) returns(JudgeJudgingInfo){}
+  rpc GetCurrentApparatusContestants(GetByApparatusRequest) returns(ContestantList){}
+  rpc GetNextCurrentApparatusContestant(GetByApparatusRequest) returns(Contestant){}
 }
 
 message IdMessage{
@@ -81,6 +84,27 @@ message ScoreCalculationMethod{
   int32 ScoreDeductionNum = 2;
 }
 
+message Contestant{
+  string id = 1;
+  int32 competingId = 2;
+  string fullName = 3;
+  SportsOrganization sportsOrganization = 4;
+  repeated Apparatus competingApparatuses = 5;
+  int32 teamNumber = 6;
+  string ageCategory = 7;
+}
+
+message ContestantCompeting{
+  Contestant contestant = 1;
+  bool competes = 2;
+}
+
+message ContestantList{
+  repeated ContestantCompeting contestants = 1;
+}
+
+
+
 // DTOS
 message CreateJudgingPanelsForApparatusRequest{
   Apparatus apparatus = 1;
@@ -100,4 +124,16 @@ message AssignJudgeRequest{
 message AssignScoreCalculationRequest{
   ScoreCalculationMethod method = 1;
   string panelId = 2;
+}
+
+message JudgeJudgingInfo{
+  Judge judge = 1;
+  string competitionId = 2;
+  Apparatus apparatus = 3;
+  JudgingPanelType judgingPanelType = 4;
+}
+
+message GetByApparatusRequest{
+  string competitionId = 1;
+  Apparatus apparatus = 2;
 }

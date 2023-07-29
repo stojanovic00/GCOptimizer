@@ -60,7 +60,10 @@ func (a *App) Run() error {
 	jpRepo := repo.NewJudgePanelRepoPg(pgClient)
 	jpService := service.NewJudgePanelService(jpRepo, authClient)
 
-	rpcHandler := handler.NewHandlerRpc(schService, jpService)
+	scRepo := repo.NewScoringRepoPg(pgClient)
+	scService := service.NewScoringService(scRepo)
+
+	rpcHandler := handler.NewHandlerRpc(schService, jpService, scService)
 
 	a.startGrpcServer(rpcHandler)
 	return nil

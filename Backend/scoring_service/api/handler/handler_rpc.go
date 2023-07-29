@@ -13,10 +13,11 @@ type HandlerRpc struct {
 	scoring_pb.UnimplementedScoringServiceServer
 	compService *service.ScheduleService
 	jpService   *service.JudgePanelService
+	scService   *service.ScoringService
 }
 
-func NewHandlerRpc(compService *service.ScheduleService, jpService *service.JudgePanelService) *HandlerRpc {
-	return &HandlerRpc{compService: compService, jpService: jpService}
+func NewHandlerRpc(compService *service.ScheduleService, jpService *service.JudgePanelService, scService *service.ScoringService) *HandlerRpc {
+	return &HandlerRpc{compService: compService, jpService: jpService, scService: scService}
 }
 
 func (h *HandlerRpc) StartCompetition(ctx context.Context, id *scoring_pb.IdMessage) (*scoring_pb.EmptyMessage, error) {
@@ -88,4 +89,41 @@ func (h *HandlerRpc) AssignScoreCalculation(ctx context.Context, request *scorin
 	}
 
 	return &scoring_pb.EmptyMessage{}, nil
+}
+
+func (h *HandlerRpc) GetLoggedJudgeInfo(ctx context.Context, _ *scoring_pb.EmptyMessage) (*scoring_pb.JudgeJudgingInfo, error) {
+	userInfo, err := ParseUserInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := h.scService.GetJudgeJudgingInfo(userInfo.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.JudgeJudgingInfoDomToPb(info), nil
+}
+func (h *HandlerRpc) GetCurrentApparatusContestants(ctx context.Context, request *scoring_pb.GetByApparatusRequest) (*scoring_pb.ContestantList, error) {
+	compId, _ := uuid.Parse(request.CompetitionId)
+	apparatus := domain.Apparatus(request.Apparatus)
+
+	contestants, err := h.scService.GetCurrentApparatusContestants(compId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.ContestantList{Contestants: mapper.ContestantCompetingListDomToPbSorted(contestants, apparatus)}, nil
+}
+
+func (h *HandlerRpc) GetNextCurrentApparatusContestant(ctx context.Context, request *scoring_pb.GetByApparatusRequest) (*scoring_pb.Contestant, error) {
+	compId, _ := uuid.Parse(request.CompetitionId)
+	apparatus := domain.Apparatus(request.Apparatus)
+
+	contestant, err := h.scService.GetNextCurrentApparatusContestant(compId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ContestantDomToPb(contestant), nil
 }
