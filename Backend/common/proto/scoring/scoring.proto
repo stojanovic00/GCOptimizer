@@ -12,9 +12,15 @@ service ScoringService{
   rpc GetAssignedJudges(IdMessage) returns(JudgeList){}
   rpc AssignScoreCalculation(AssignScoreCalculationRequest) returns(EmptyMessage){}
   //Live scoring
+    //Judge and contestant info
   rpc GetLoggedJudgeInfo(EmptyMessage) returns(JudgeJudgingInfo){}
   rpc GetCurrentApparatusContestants(GetByApparatusRequest) returns(ContestantList){}
   rpc GetNextCurrentApparatusContestant(GetByApparatusRequest) returns(Contestant){}
+    //Scores
+  rpc SubmitTempScore(TempScore) returns(EmptyMessage){}
+  rpc GetContestantsTempScores(ScoreRequest) returns(TempScoreList){}
+  rpc CalculateScore(ScoreRequest) returns(Score){}
+  rpc SubmitScore(Score) returns(EmptyMessage){}
 }
 
 message IdMessage{
@@ -103,6 +109,36 @@ message ContestantList{
   repeated ContestantCompeting contestants = 1;
 }
 
+enum ScoreType{
+  D = 0;
+  E = 1;
+}
+
+message TempScore{
+    string id = 1;
+    ScoreType type = 2;
+    Apparatus apparatus = 3;
+    float value = 4;
+    Contestant contestant = 5;
+    string competitionId = 6; //Too large to put whole message
+    Judge judge = 7;
+}
+
+message TempScoreList{
+  repeated TempScore tempScores = 1;
+}
+
+
+message Score{
+  string id = 1;
+  Apparatus apparatus = 2;
+  float dScore = 3;
+  float eScore = 4;
+  float totalScore = 5;
+  string competitionId = 6;
+  Contestant contestant = 7;
+}
+
 
 
 // DTOS
@@ -131,9 +167,16 @@ message JudgeJudgingInfo{
   string competitionId = 2;
   Apparatus apparatus = 3;
   JudgingPanelType judgingPanelType = 4;
+  ScoreCalculationMethod calculationMethod = 5;
 }
 
 message GetByApparatusRequest{
   string competitionId = 1;
   Apparatus apparatus = 2;
+}
+
+message ScoreRequest{
+  string competitionId = 1;
+  string contestantId = 2;
+  Apparatus apparatus = 3;
 }

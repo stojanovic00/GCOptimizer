@@ -127,3 +127,46 @@ func (h *HandlerRpc) GetNextCurrentApparatusContestant(ctx context.Context, requ
 
 	return mapper.ContestantDomToPb(contestant), nil
 }
+
+func (h *HandlerRpc) SubmitTempScore(ctx context.Context, tempScore *scoring_pb.TempScore) (*scoring_pb.EmptyMessage, error) {
+	err := h.scService.SubmitTempScore(mapper.TempScorePbToDom(tempScore))
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.EmptyMessage{}, nil
+}
+
+func (h *HandlerRpc) GetContestantsTempScores(ctx context.Context, request *scoring_pb.ScoreRequest) (*scoring_pb.TempScoreList, error) {
+	competitionId, _ := uuid.Parse(request.CompetitionId)
+	contestantId, _ := uuid.Parse(request.ContestantId)
+	apparatus := domain.Apparatus(request.Apparatus)
+
+	tempScores, err := h.scService.GetContestantsTempScores(competitionId, contestantId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.TempScoreList{TempScores: mapper.TempScoreListDomToPb(tempScores)}, nil
+}
+
+func (h *HandlerRpc) CalculateScore(ctx context.Context, request *scoring_pb.ScoreRequest) (*scoring_pb.Score, error) {
+	competitionId, _ := uuid.Parse(request.CompetitionId)
+	contestantId, _ := uuid.Parse(request.ContestantId)
+	apparatus := domain.Apparatus(request.Apparatus)
+
+	score, err := h.scService.CalculateScore(competitionId, contestantId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ScoreDomToPb(score), nil
+}
+func (h *HandlerRpc) SubmitScore(ctx context.Context, score *scoring_pb.Score) (*scoring_pb.EmptyMessage, error) {
+	err := h.scService.SubmitScore(mapper.ScorePbToDom(score))
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.EmptyMessage{}, nil
+}

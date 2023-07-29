@@ -6,8 +6,9 @@ import (
 )
 
 type JudgeJudgingInfo struct {
-	Judge            domain.Judge
-	CompetitionId    uuid.UUID
-	Apparatus        domain.Apparatus
-	JudgingPanelType domain.JudgingPanelType
+	Judge             domain.Judge
+	CompetitionId     uuid.UUID
+	Apparatus         domain.Apparatus
+	JudgingPanelType  domain.JudgingPanelType
+	CalculationMethod domain.ScoreCalculationMethod
 }

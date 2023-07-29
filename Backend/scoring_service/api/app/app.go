@@ -61,7 +61,7 @@ func (a *App) Run() error {
 	jpService := service.NewJudgePanelService(jpRepo, authClient)
 
 	scRepo := repo.NewScoringRepoPg(pgClient)
-	scService := service.NewScoringService(scRepo)
+	scService := service.NewScoringService(scRepo, jpRepo)
 
 	rpcHandler := handler.NewHandlerRpc(schService, jpService, scService)
 

@@ -127,7 +127,7 @@ func (h *ScoringHandler) GetLoggedJudgeInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, loggedInfo)
 }
 
-func (h *ScoringHandler) GetApparatusContestants(ctx *gin.Context) {
+func (h *ScoringHandler) GetCurrentApparatusContestants(ctx *gin.Context) {
 	apparatusStr := ctx.Query("apparatus")
 
 	if apparatusStr == "" {
@@ -154,7 +154,7 @@ func (h *ScoringHandler) GetApparatusContestants(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response.Contestants)
 }
-func (h *ScoringHandler) GetCurrentApparatusContestant(ctx *gin.Context) {
+func (h *ScoringHandler) GetNextCurrentApparatusContestant(ctx *gin.Context) {
 	apparatusStr := ctx.Query("apparatus")
 
 	if apparatusStr == "" {
@@ -180,4 +180,82 @@ func (h *ScoringHandler) GetCurrentApparatusContestant(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, contestant)
+}
+func (h *ScoringHandler) SubmitTempScore(ctx *gin.Context) {
+	var tempScore scoring_pb.TempScore
+	competitionId := ctx.Param("id")
+
+	err := ctx.ShouldBindJSON(&tempScore)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
+		return
+	}
+	tempScore.CompetitionId = competitionId
+
+	_, err = h.client.SubmitTempScore(context.Background(), &tempScore)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *ScoringHandler) GetContestantsTempScores(ctx *gin.Context) {
+	var request scoring_pb.ScoreRequest
+	competitionId := ctx.Param("id")
+
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
+		return
+	}
+	request.CompetitionId = competitionId
+
+	response, err := h.client.GetContestantsTempScores(context.Background(), &request)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, response.TempScores)
+}
+
+func (h *ScoringHandler) CalculateScore(ctx *gin.Context) {
+	var request scoring_pb.ScoreRequest
+	competitionId := ctx.Param("id")
+
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
+		return
+	}
+	request.CompetitionId = competitionId
+
+	score, err := h.client.CalculateScore(context.Background(), &request)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, score)
+}
+func (h *ScoringHandler) SubmitScore(ctx *gin.Context) {
+	var score scoring_pb.Score
+	competitionId := ctx.Param("id")
+
+	err := ctx.ShouldBindJSON(&score)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
+		return
+	}
+	score.CompetitionId = competitionId
+
+	_, err = h.client.SubmitScore(context.Background(), &score)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }

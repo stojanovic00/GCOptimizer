@@ -27,16 +27,18 @@ func (r *ScoringRepoPg) GetJudgeJudgingInfo(email string) (*dto.JudgeJudgingInfo
 	result = r.dbClient.Model(domain.Panel{}).
 		Joins("left join panel_judges pj on id = pj.panel_id").
 		Where("judge_id = ?", judge.ID).
+		Preload("ScoreCalculationMethod").
 		Find(&panel)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	return &dto.JudgeJudgingInfo{
-		Judge:            judge,
-		CompetitionId:    panel.CompetitionID,
-		Apparatus:        panel.Apparatus,
-		JudgingPanelType: panel.Type,
+		Judge:             judge,
+		CompetitionId:     panel.CompetitionID,
+		Apparatus:         panel.Apparatus,
+		JudgingPanelType:  panel.Type,
+		CalculationMethod: panel.ScoreCalculationMethod,
 	}, nil
 
 }
@@ -86,4 +88,37 @@ func (r *ScoringRepoPg) GetSlotsWithStartingApparatus(competitionId uuid.UUID, s
 	}
 
 	return slots, nil
+}
+
+func (r *ScoringRepoPg) SubmitTempScore(tempScore *domain.TempScore) error {
+	tempScore.ID = uuid.New()
+
+	result := r.dbClient.Create(tempScore)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *ScoringRepoPg) GetContestantsTempScores(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) ([]domain.TempScore, error) {
+	var tempScores []domain.TempScore
+
+	result := r.dbClient.
+		Where("competition_id = ? and contestant_id = ? and apparatus = ?", competitionId, contestantId, apparatus).
+		Preload("Judge.SportsOrganization.Address").
+		Find(&tempScores)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return tempScores, nil
+}
+func (r *ScoringRepoPg) SubmitScore(score *domain.Score) error {
+	result := r.dbClient.Create(score)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }

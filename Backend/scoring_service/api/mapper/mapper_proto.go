@@ -233,12 +233,20 @@ func ScoreCalcMethodPbToDom(method *scoring_pb.ScoreCalculationMethod) *domain.S
 	}
 }
 
+func ScoreCalcMethodDomToPb(method *domain.ScoreCalculationMethod) *scoring_pb.ScoreCalculationMethod {
+	return &scoring_pb.ScoreCalculationMethod{
+		Id:                method.ID.String(),
+		ScoreDeductionNum: method.ScoreDeductionNum,
+	}
+}
+
 func JudgeJudgingInfoDomToPb(info *dto.JudgeJudgingInfo) *scoring_pb.JudgeJudgingInfo {
 	return &scoring_pb.JudgeJudgingInfo{
-		Judge:            JudgeDomToPb(&info.Judge),
-		CompetitionId:    info.CompetitionId.String(),
-		Apparatus:        scoring_pb.Apparatus(info.Apparatus),
-		JudgingPanelType: scoring_pb.JudgingPanelType(info.JudgingPanelType),
+		Judge:             JudgeDomToPb(&info.Judge),
+		CompetitionId:     info.CompetitionId.String(),
+		Apparatus:         scoring_pb.Apparatus(info.Apparatus),
+		JudgingPanelType:  scoring_pb.JudgingPanelType(info.JudgingPanelType),
+		CalculationMethod: ScoreCalcMethodDomToPb(&info.CalculationMethod),
 	}
 }
 
@@ -288,4 +296,77 @@ func ContestantCompetingListDomToPbSorted(contestants []domain.Contestant, appar
 	}
 	//First goes all who competes then those who don't
 	return append(competing, notCompeting...)
+}
+
+func TempScorePbToDom(ts *scoring_pb.TempScore) *domain.TempScore {
+	contestantId, _ := uuid.Parse(ts.Contestant.Id)
+	competitionId, _ := uuid.Parse(ts.CompetitionId)
+	judgeId, _ := uuid.Parse(ts.Judge.Id)
+	return &domain.TempScore{
+		ID:            uuid.Nil,
+		Type:          domain.ScoreType(ts.Type),
+		Apparatus:     domain.Apparatus(ts.Apparatus),
+		Value:         ts.Value,
+		ContestantID:  contestantId,
+		Contestant:    domain.Contestant{}, //Will be retrieved from db
+		CompetitionID: competitionId,
+		Competition:   domain.Competition{}, //Will be retrieved from db
+		JudgeID:       judgeId,
+		Judge:         domain.Judge{}, //Will be retrieved from db
+	}
+}
+
+func TempScoreDomToPb(ts *domain.TempScore) *scoring_pb.TempScore {
+	return &scoring_pb.TempScore{
+		Id:            ts.ID.String(),
+		Type:          scoring_pb.ScoreType(ts.Type),
+		Apparatus:     scoring_pb.Apparatus(ts.Apparatus),
+		Value:         ts.Value,
+		Contestant:    &scoring_pb.Contestant{Id: ts.ContestantID.String()},
+		CompetitionId: ts.CompetitionID.String(),
+		Judge:         JudgeDomToPb(&ts.Judge),
+	}
+}
+
+func TempScoreListDomToPb(tScores []domain.TempScore) []*scoring_pb.TempScore {
+	var tempScoreListPb []*scoring_pb.TempScore
+	for _, tempScore := range tScores {
+		tempScoreListPb = append(tempScoreListPb, TempScoreDomToPb(&tempScore))
+	}
+
+	return tempScoreListPb
+}
+
+func ScorePbToDom(s *scoring_pb.Score) *domain.Score {
+	var id uuid.UUID
+	if s.Id == "" {
+		id = uuid.Nil
+	} else {
+		id, _ = uuid.Parse(s.Id)
+	}
+	competitionId, _ := uuid.Parse(s.CompetitionId)
+	contestantId, _ := uuid.Parse(s.Contestant.Id)
+	return &domain.Score{
+		ID:            id,
+		Apparatus:     domain.Apparatus(s.Apparatus),
+		DScore:        s.DScore,
+		EScore:        s.EScore,
+		TotalScore:    s.TotalScore,
+		CompetitionID: competitionId,
+		Competition:   domain.Competition{}, //  Will be retrieved from db
+		ContestantID:  contestantId,
+		Contestant:    domain.Contestant{}, //  Will be retrieved from db
+	}
+}
+
+func ScoreDomToPb(s *domain.Score) *scoring_pb.Score {
+	return &scoring_pb.Score{
+		Id:            s.ID.String(),
+		Apparatus:     scoring_pb.Apparatus(s.Apparatus),
+		DScore:        s.DScore,
+		EScore:        s.EScore,
+		TotalScore:    s.TotalScore,
+		CompetitionId: s.CompetitionID.String(),
+		Contestant:    &scoring_pb.Contestant{Id: s.ContestantID.String()},
+	}
 }

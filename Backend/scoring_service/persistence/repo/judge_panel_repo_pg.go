@@ -141,3 +141,16 @@ func (r *JudgePanelRepoPg) AssignScoreCalculationMethod(scoreCalcMethod *domain.
 
 	return nil
 }
+func (r *JudgePanelRepoPg) GetJudgePanelByCompetitionIdAndApparatus(competitionId uuid.UUID, apparatus domain.Apparatus, panelType domain.JudgingPanelType) (*domain.Panel, error) {
+	var panel domain.Panel
+
+	result := r.dbClient.
+		Where("competition_id = ? and apparatus = ?", competitionId, apparatus).
+		Preload("ScoreCalculationMethod").
+		First(&panel)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &panel, nil
+}

@@ -11,4 +11,6 @@ type TempScore struct {
 	Contestant    Contestant
 	CompetitionID uuid.UUID
 	Competition   Competition
+	JudgeID       uuid.UUID
+	Judge         Judge
 }

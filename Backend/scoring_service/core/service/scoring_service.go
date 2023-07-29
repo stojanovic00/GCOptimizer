@@ -5,14 +5,16 @@ import (
 	"scoring_service/core/domain"
 	"scoring_service/core/domain/dto"
 	"scoring_service/core/repo"
+	"sort"
 )
 
 type ScoringService struct {
 	scRepo repo.ScoringRepo
+	jpRepo repo.JudgePanelRepo
 }
 
-func NewScoringService(scRepo repo.ScoringRepo) *ScoringService {
-	return &ScoringService{scRepo: scRepo}
+func NewScoringService(scRepo repo.ScoringRepo, jpRepo repo.JudgePanelRepo) *ScoringService {
+	return &ScoringService{scRepo: scRepo, jpRepo: jpRepo}
 }
 
 func (s *ScoringService) GetJudgeJudgingInfo(email string) (*dto.JudgeJudgingInfo, error) {
@@ -87,4 +89,77 @@ func (s *ScoringService) GetNextCurrentApparatusContestant(competitionId uuid.UU
 	}
 
 	return &contestant, nil
+}
+
+func (s *ScoringService) SubmitTempScore(tempScore *domain.TempScore) error {
+	return s.scRepo.SubmitTempScore(tempScore)
+}
+func (s *ScoringService) GetContestantsTempScores(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) ([]domain.TempScore, error) {
+	return s.scRepo.GetContestantsTempScores(competitionId, contestantId, apparatus)
+}
+
+func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (*domain.Score, error) {
+	tempScores, err := s.GetContestantsTempScores(competitionId, contestantId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	//Group scores
+	dScores := make([]domain.TempScore, 0)
+	eScores := make([]domain.TempScore, 0)
+
+	for _, tempScore := range tempScores {
+		switch tempScore.Type {
+		case domain.D:
+			dScores = append(dScores, tempScore)
+		case domain.E:
+			eScores = append(eScores, tempScore)
+		}
+	}
+
+	//Calculate d score
+	var dSum float32 = 0
+	for _, dScore := range dScores {
+		dSum += dScore.Value
+	}
+	dAverage := dSum / float32(len(dScores))
+
+	//Calculate e score
+
+	//Get calculation method for e panel
+	ePanel, err := s.jpRepo.GetJudgePanelByCompetitionIdAndApparatus(competitionId, apparatus, domain.EPanel)
+	if err != nil {
+		return nil, err
+	}
+
+	deductionNumber := ePanel.ScoreCalculationMethod.ScoreDeductionNum
+
+	// Sort the slice in ascending order based on the Value field
+	sort.Slice(eScores, func(i, j int) bool {
+		return eScores[i].Value < eScores[j].Value
+	})
+
+	//Deduce n highest and lowest scores
+	eMiddleScores := eScores[deductionNumber : deductionNumber+1]
+
+	var eSum float32 = 0
+	for _, eScore := range eMiddleScores {
+		eSum += eScore.Value
+	}
+	eAverage := eSum / float32(len(eMiddleScores))
+
+	return &domain.Score{
+		ID:            uuid.New(),
+		Apparatus:     apparatus,
+		DScore:        dAverage,
+		EScore:        eAverage,
+		TotalScore:    dAverage + eAverage,
+		CompetitionID: competitionId,
+		Competition:   domain.Competition{}, // Db resolved
+		ContestantID:  contestantId,
+		Contestant:    domain.Contestant{}, // Db resolved
+	}, nil
+}
+func (s *ScoringService) SubmitScore(score *domain.Score) error {
+	return s.scRepo.SubmitScore(score)
 }

@@ -30,9 +30,15 @@ type ScoringServiceClient interface {
 	GetAssignedJudges(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*JudgeList, error)
 	AssignScoreCalculation(ctx context.Context, in *AssignScoreCalculationRequest, opts ...grpc.CallOption) (*EmptyMessage, error)
 	// Live scoring
+	// Judge and contestant info
 	GetLoggedJudgeInfo(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*JudgeJudgingInfo, error)
 	GetCurrentApparatusContestants(ctx context.Context, in *GetByApparatusRequest, opts ...grpc.CallOption) (*ContestantList, error)
 	GetNextCurrentApparatusContestant(ctx context.Context, in *GetByApparatusRequest, opts ...grpc.CallOption) (*Contestant, error)
+	// Scores
+	SubmitTempScore(ctx context.Context, in *TempScore, opts ...grpc.CallOption) (*EmptyMessage, error)
+	GetContestantsTempScores(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*TempScoreList, error)
+	CalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error)
+	SubmitScore(ctx context.Context, in *Score, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
 type scoringServiceClient struct {
@@ -124,6 +130,42 @@ func (c *scoringServiceClient) GetNextCurrentApparatusContestant(ctx context.Con
 	return out, nil
 }
 
+func (c *scoringServiceClient) SubmitTempScore(ctx context.Context, in *TempScore, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/SubmitTempScore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) GetContestantsTempScores(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*TempScoreList, error) {
+	out := new(TempScoreList)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetContestantsTempScores", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) CalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error) {
+	out := new(Score)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/CalculateScore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) SubmitScore(ctx context.Context, in *Score, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/SubmitScore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScoringServiceServer is the server API for ScoringService service.
 // All implementations must embed UnimplementedScoringServiceServer
 // for forward compatibility
@@ -136,9 +178,15 @@ type ScoringServiceServer interface {
 	GetAssignedJudges(context.Context, *IdMessage) (*JudgeList, error)
 	AssignScoreCalculation(context.Context, *AssignScoreCalculationRequest) (*EmptyMessage, error)
 	// Live scoring
+	// Judge and contestant info
 	GetLoggedJudgeInfo(context.Context, *EmptyMessage) (*JudgeJudgingInfo, error)
 	GetCurrentApparatusContestants(context.Context, *GetByApparatusRequest) (*ContestantList, error)
 	GetNextCurrentApparatusContestant(context.Context, *GetByApparatusRequest) (*Contestant, error)
+	// Scores
+	SubmitTempScore(context.Context, *TempScore) (*EmptyMessage, error)
+	GetContestantsTempScores(context.Context, *ScoreRequest) (*TempScoreList, error)
+	CalculateScore(context.Context, *ScoreRequest) (*Score, error)
+	SubmitScore(context.Context, *Score) (*EmptyMessage, error)
 	mustEmbedUnimplementedScoringServiceServer()
 }
 
@@ -172,6 +220,18 @@ func (UnimplementedScoringServiceServer) GetCurrentApparatusContestants(context.
 }
 func (UnimplementedScoringServiceServer) GetNextCurrentApparatusContestant(context.Context, *GetByApparatusRequest) (*Contestant, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNextCurrentApparatusContestant not implemented")
+}
+func (UnimplementedScoringServiceServer) SubmitTempScore(context.Context, *TempScore) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitTempScore not implemented")
+}
+func (UnimplementedScoringServiceServer) GetContestantsTempScores(context.Context, *ScoreRequest) (*TempScoreList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContestantsTempScores not implemented")
+}
+func (UnimplementedScoringServiceServer) CalculateScore(context.Context, *ScoreRequest) (*Score, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CalculateScore not implemented")
+}
+func (UnimplementedScoringServiceServer) SubmitScore(context.Context, *Score) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitScore not implemented")
 }
 func (UnimplementedScoringServiceServer) mustEmbedUnimplementedScoringServiceServer() {}
 
@@ -348,6 +408,78 @@ func _ScoringService_GetNextCurrentApparatusContestant_Handler(srv interface{}, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScoringService_SubmitTempScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TempScore)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).SubmitTempScore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/SubmitTempScore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).SubmitTempScore(ctx, req.(*TempScore))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_GetContestantsTempScores_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetContestantsTempScores(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetContestantsTempScores",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetContestantsTempScores(ctx, req.(*ScoreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_CalculateScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).CalculateScore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/CalculateScore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).CalculateScore(ctx, req.(*ScoreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_SubmitScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Score)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).SubmitScore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/SubmitScore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).SubmitScore(ctx, req.(*Score))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScoringService_ServiceDesc is the grpc.ServiceDesc for ScoringService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -390,6 +522,22 @@ var ScoringService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNextCurrentApparatusContestant",
 			Handler:    _ScoringService_GetNextCurrentApparatusContestant_Handler,
+		},
+		{
+			MethodName: "SubmitTempScore",
+			Handler:    _ScoringService_SubmitTempScore_Handler,
+		},
+		{
+			MethodName: "GetContestantsTempScores",
+			Handler:    _ScoringService_GetContestantsTempScores_Handler,
+		},
+		{
+			MethodName: "CalculateScore",
+			Handler:    _ScoringService_CalculateScore_Handler,
+		},
+		{
+			MethodName: "SubmitScore",
+			Handler:    _ScoringService_SubmitScore_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
