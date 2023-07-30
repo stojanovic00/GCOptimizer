@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
+func (a *App) CreateRoutersAndSetRoutes() error {
 	//DEPENDENCIES
 	authServiceAddress := fmt.Sprintf("%s:%s", a.Config.AuthServiceHost, a.Config.AuthServicePort)
 	authClient := grpc_client.NewAuthClient(authServiceAddress)
@@ -125,5 +125,8 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	jpGroup.GET("judge/competition/:id", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetAssignedJudges)
 	jpGroup.POST("/:id/score-calc-method", middleware.Authorize("JudgingPanel_crud"), scoringHandler.AssignScoreCalculationMethod)
 
-	return publicRouter, privateRouter, nil
+	a.PublicRouter = publicRouter
+	a.PrivateRouter = privateRouter
+
+	return nil
 }
