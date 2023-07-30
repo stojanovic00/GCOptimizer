@@ -12,4 +12,5 @@ type JudgePanelRepo interface {
 	GetAssignedJudges(competitionId uuid.UUID) ([]domain.Judge, error)
 	AssignScoreCalculationMethod(scoreCalcMethod *domain.ScoreCalculationMethod, panelId uuid.UUID) error
 	GetJudgePanelByCompetitionIdAndApparatus(competitionId uuid.UUID, apparatus domain.Apparatus, panelType domain.JudgingPanelType) (*domain.Panel, error)
+	GetApparatusPanels(competitionId uuid.UUID, apparatus domain.Apparatus) ([]domain.Panel, error)
 }

@@ -150,6 +150,19 @@ func (h *HandlerRpc) GetContestantsTempScores(ctx context.Context, request *scor
 	return &scoring_pb.TempScoreList{TempScores: mapper.TempScoreListDomToPb(tempScores)}, nil
 }
 
+func (h *HandlerRpc) CanCalculateScore(ctx context.Context, request *scoring_pb.ScoreRequest) (*scoring_pb.BoolMessage, error) {
+	competitionId, _ := uuid.Parse(request.CompetitionId)
+	contestantId, _ := uuid.Parse(request.ContestantId)
+	apparatus := domain.Apparatus(request.Apparatus)
+
+	canCalculate, err := h.scService.CanCalculateScore(competitionId, contestantId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.BoolMessage{IsTrue: canCalculate}, nil
+}
+
 func (h *HandlerRpc) CalculateScore(ctx context.Context, request *scoring_pb.ScoreRequest) (*scoring_pb.Score, error) {
 	competitionId, _ := uuid.Parse(request.CompetitionId)
 	contestantId, _ := uuid.Parse(request.ContestantId)
@@ -170,6 +183,20 @@ func (h *HandlerRpc) SubmitScore(ctx context.Context, score *scoring_pb.Score) (
 
 	return &scoring_pb.EmptyMessage{}, nil
 }
+
+func (h *HandlerRpc) GetScore(ctx context.Context, request *scoring_pb.ScoreRequest) (*scoring_pb.Score, error) {
+	competitionId, _ := uuid.Parse(request.CompetitionId)
+	contestantId, _ := uuid.Parse(request.ContestantId)
+	apparatus := domain.Apparatus(request.Apparatus)
+
+	score, err := h.scService.GetScore(competitionId, contestantId, apparatus)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ScoreDomToPb(score), nil
+}
+
 func (h *HandlerRpc) FinishRotation(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.EmptyMessage, error) {
 	competitionId, _ := uuid.Parse(request.Id)
 	err := h.scService.FinishRotation(competitionId)

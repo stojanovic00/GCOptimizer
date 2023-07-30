@@ -161,14 +161,44 @@ func (r *ScoringRepoPg) GetContestantsTempScores(competitionId, contestantId uui
 
 	return tempScores, nil
 }
+
 func (r *ScoringRepoPg) SubmitScore(score *domain.Score) error {
 	result := r.dbClient.Create(score)
 	if result.Error != nil {
 		return result.Error
 	}
 
+	//Update schedule slots scoredApparatuses
+	var slot domain.ScheduleSlot
+	result = r.dbClient.
+		Where("contestant_id = ?", score.ContestantID).
+		First(&slot)
+	if result.Error != nil {
+		return result.Error
+	}
+	slot.ScoredApparatuses = append(slot.ScoredApparatuses, score.Apparatus)
+
+	result = r.dbClient.Save(slot)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
+
+func (r *ScoringRepoPg) GetScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (*domain.Score, error) {
+	var score domain.Score
+
+	result := r.dbClient.
+		Where("competition_id = ? and contestant_id = ? and apparatus = ?", competitionId, contestantId, apparatus).
+		First(&score)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &score, nil
+}
+
 func (r *ScoringRepoPg) FinishRotation(competitionId uuid.UUID) error {
 	session, err := r.GetCurrentSessionWithSlots(competitionId)
 	if err != nil {

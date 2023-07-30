@@ -37,8 +37,10 @@ type ScoringServiceClient interface {
 	// Scores
 	SubmitTempScore(ctx context.Context, in *TempScore, opts ...grpc.CallOption) (*EmptyMessage, error)
 	GetContestantsTempScores(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*TempScoreList, error)
+	CanCalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*BoolMessage, error)
 	CalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error)
 	SubmitScore(ctx context.Context, in *Score, opts ...grpc.CallOption) (*EmptyMessage, error)
+	GetScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error)
 	// Events
 	FinishRotation(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
 	FinishSession(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
@@ -155,6 +157,15 @@ func (c *scoringServiceClient) GetContestantsTempScores(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *scoringServiceClient) CanCalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*BoolMessage, error) {
+	out := new(BoolMessage)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/CanCalculateScore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *scoringServiceClient) CalculateScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error) {
 	out := new(Score)
 	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/CalculateScore", in, out, opts...)
@@ -167,6 +178,15 @@ func (c *scoringServiceClient) CalculateScore(ctx context.Context, in *ScoreRequ
 func (c *scoringServiceClient) SubmitScore(ctx context.Context, in *Score, opts ...grpc.CallOption) (*EmptyMessage, error) {
 	out := new(EmptyMessage)
 	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/SubmitScore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scoringServiceClient) GetScore(ctx context.Context, in *ScoreRequest, opts ...grpc.CallOption) (*Score, error) {
+	out := new(Score)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetScore", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,8 +266,10 @@ type ScoringServiceServer interface {
 	// Scores
 	SubmitTempScore(context.Context, *TempScore) (*EmptyMessage, error)
 	GetContestantsTempScores(context.Context, *ScoreRequest) (*TempScoreList, error)
+	CanCalculateScore(context.Context, *ScoreRequest) (*BoolMessage, error)
 	CalculateScore(context.Context, *ScoreRequest) (*Score, error)
 	SubmitScore(context.Context, *Score) (*EmptyMessage, error)
+	GetScore(context.Context, *ScoreRequest) (*Score, error)
 	// Events
 	FinishRotation(context.Context, *IdMessage) (*EmptyMessage, error)
 	FinishSession(context.Context, *IdMessage) (*EmptyMessage, error)
@@ -295,11 +317,17 @@ func (UnimplementedScoringServiceServer) SubmitTempScore(context.Context, *TempS
 func (UnimplementedScoringServiceServer) GetContestantsTempScores(context.Context, *ScoreRequest) (*TempScoreList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContestantsTempScores not implemented")
 }
+func (UnimplementedScoringServiceServer) CanCalculateScore(context.Context, *ScoreRequest) (*BoolMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CanCalculateScore not implemented")
+}
 func (UnimplementedScoringServiceServer) CalculateScore(context.Context, *ScoreRequest) (*Score, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalculateScore not implemented")
 }
 func (UnimplementedScoringServiceServer) SubmitScore(context.Context, *Score) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitScore not implemented")
+}
+func (UnimplementedScoringServiceServer) GetScore(context.Context, *ScoreRequest) (*Score, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetScore not implemented")
 }
 func (UnimplementedScoringServiceServer) FinishRotation(context.Context, *IdMessage) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinishRotation not implemented")
@@ -530,6 +558,24 @@ func _ScoringService_GetContestantsTempScores_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScoringService_CanCalculateScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).CanCalculateScore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/CanCalculateScore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).CanCalculateScore(ctx, req.(*ScoreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ScoringService_CalculateScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ScoreRequest)
 	if err := dec(in); err != nil {
@@ -562,6 +608,24 @@ func _ScoringService_SubmitScore_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ScoringServiceServer).SubmitScore(ctx, req.(*Score))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScoringService_GetScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetScore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetScore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetScore(ctx, req.(*ScoreRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -726,12 +790,20 @@ var ScoringService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ScoringService_GetContestantsTempScores_Handler,
 		},
 		{
+			MethodName: "CanCalculateScore",
+			Handler:    _ScoringService_CanCalculateScore_Handler,
+		},
+		{
 			MethodName: "CalculateScore",
 			Handler:    _ScoringService_CalculateScore_Handler,
 		},
 		{
 			MethodName: "SubmitScore",
 			Handler:    _ScoringService_SubmitScore_Handler,
+		},
+		{
+			MethodName: "GetScore",
+			Handler:    _ScoringService_GetScore_Handler,
 		},
 		{
 			MethodName: "FinishRotation",

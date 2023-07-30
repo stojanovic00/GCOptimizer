@@ -202,17 +202,32 @@ func (h *ScoringHandler) SubmitTempScore(ctx *gin.Context) {
 }
 
 func (h *ScoringHandler) GetContestantsTempScores(ctx *gin.Context) {
-	var request scoring_pb.ScoreRequest
 	competitionId := ctx.Param("id")
 
-	err := ctx.ShouldBindJSON(&request)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
+	contestantId := ctx.Query("contestantId")
+	if contestantId == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "contestantId query parameter is missing"})
 		return
 	}
-	request.CompetitionId = competitionId
 
-	response, err := h.client.GetContestantsTempScores(context.Background(), &request)
+	apparatusStr := ctx.Query("apparatus")
+	if apparatusStr == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "apparatus query parameter is missing"})
+		return
+	}
+	apparatus, err := strconv.Atoi(apparatusStr)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "invalid apparatus query parameter"})
+		return
+	}
+
+	response, err := h.client.GetContestantsTempScores(context.Background(), &scoring_pb.ScoreRequest{
+		CompetitionId: competitionId,
+		ContestantId:  contestantId,
+		Apparatus:     scoring_pb.Apparatus(apparatus),
+	})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -221,22 +236,68 @@ func (h *ScoringHandler) GetContestantsTempScores(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response.TempScores)
 }
 
-func (h *ScoringHandler) CalculateScore(ctx *gin.Context) {
-	var request scoring_pb.ScoreRequest
+func (h *ScoringHandler) CanCalculateScore(ctx *gin.Context) {
 	competitionId := ctx.Param("id")
 
-	err := ctx.ShouldBindJSON(&request)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Parsing error"})
+	contestantId := ctx.Query("contestantId")
+	if contestantId == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "contestantId query parameter is missing"})
 		return
 	}
-	request.CompetitionId = competitionId
 
-	score, err := h.client.CalculateScore(context.Background(), &request)
+	apparatusStr := ctx.Query("apparatus")
+	if apparatusStr == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "apparatus query parameter is missing"})
+		return
+	}
+	apparatus, err := strconv.Atoi(apparatusStr)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "invalid apparatus query parameter"})
+		return
+	}
+
+	response, err := h.client.CanCalculateScore(context.Background(), &scoring_pb.ScoreRequest{
+		CompetitionId: competitionId,
+		ContestantId:  contestantId,
+		Apparatus:     scoring_pb.Apparatus(apparatus),
+	})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
+
+	ctx.JSON(http.StatusOK, response.IsTrue)
+}
+
+func (h *ScoringHandler) CalculateScore(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	contestantId := ctx.Query("contestantId")
+	if contestantId == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "contestantId query parameter is missing"})
+		return
+	}
+
+	apparatusStr := ctx.Query("apparatus")
+	if apparatusStr == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "apparatus query parameter is missing"})
+		return
+	}
+	apparatus, err := strconv.Atoi(apparatusStr)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "invalid apparatus query parameter"})
+		return
+	}
+
+	score, err := h.client.CalculateScore(context.Background(), &scoring_pb.ScoreRequest{
+		CompetitionId: competitionId,
+		ContestantId:  contestantId,
+		Apparatus:     scoring_pb.Apparatus(apparatus),
+	})
 
 	ctx.JSON(http.StatusOK, score)
 }
@@ -258,6 +319,37 @@ func (h *ScoringHandler) SubmitScore(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *ScoringHandler) GetScore(ctx *gin.Context) {
+	competitionId := ctx.Param("id")
+
+	contestantId := ctx.Query("contestantId")
+	if contestantId == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "contestantId query parameter is missing"})
+		return
+	}
+
+	apparatusStr := ctx.Query("apparatus")
+	if apparatusStr == "" {
+		// If "apparatusStr" is not provided in the query, return an error contestant
+		ctx.JSON(400, gin.H{"error": "apparatus query parameter is missing"})
+		return
+	}
+	apparatus, err := strconv.Atoi(apparatusStr)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "invalid apparatus query parameter"})
+		return
+	}
+
+	score, err := h.client.GetScore(context.Background(), &scoring_pb.ScoreRequest{
+		CompetitionId: competitionId,
+		ContestantId:  contestantId,
+		Apparatus:     scoring_pb.Apparatus(apparatus),
+	})
+
+	ctx.JSON(http.StatusOK, score)
 }
 
 func (h *ScoringHandler) FinishRotation(ctx *gin.Context) {

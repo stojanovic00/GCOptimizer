@@ -1,15 +1,46 @@
 @import '../../styles/forms-and-headings.css';
 @import '../../styles/tables.css';
 
-.schedule{
+.info{
     width: 70%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+h2{
+    font-size: 40px;
+}
+
+h3{
+    font-size: 30px;
+}
+
+.table-wrap{
+    width: 50%;
     margin: auto;
 }
 
-.schedule .heading-hier-2{
-    margin: 35px auto -25px auto;
+.table-wrap p{
+    margin-bottom: 20px;
 }
 
-.schedule .heading-hier-3{
-    margin: 70px auto 20px auto;
+.heading-hier-3{
+    margin: 15px auto 0px auto;
+    text-align: left;
+}
+
+.button-wrap{
+    width: 60%;
+    margin: 40px auto 40px auto;
+    display: flex;
+    text-align: center;
+}
+
+.button-wrap button{
+    flex: 1;
+    margin:0px 20px;
+}
+
+.deducted{
+    background-color: rgb(245, 199, 199);
 }

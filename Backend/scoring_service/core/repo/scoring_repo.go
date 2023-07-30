@@ -19,4 +19,5 @@ type ScoringRepo interface {
 	IsRotationFinished(competitionId uuid.UUID) (bool, error)
 	IsSessionFinished(competitionId uuid.UUID) (bool, error)
 	IsCompetitionFinished(competitionId uuid.UUID) (bool, error)
+	GetScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (*domain.Score, error)
 }

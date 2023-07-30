@@ -98,6 +98,25 @@ func (s *ScoringService) GetContestantsTempScores(competitionId, contestantId uu
 	return s.scRepo.GetContestantsTempScores(competitionId, contestantId, apparatus)
 }
 
+func (s *ScoringService) CanCalculateScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (bool, error) {
+	tempScores, err := s.GetContestantsTempScores(competitionId, contestantId, apparatus)
+	if err != nil {
+		return false, err
+	}
+
+	panels, err := s.jpRepo.GetApparatusPanels(competitionId, apparatus)
+	if err != nil {
+		return false, err
+	}
+
+	lenSum := 0
+	for _, panel := range panels {
+		lenSum += len(panel.Judges)
+	}
+
+	return len(tempScores) == lenSum, nil
+}
+
 func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (*domain.Score, error) {
 	tempScores, err := s.GetContestantsTempScores(competitionId, contestantId, apparatus)
 	if err != nil {
@@ -140,7 +159,7 @@ func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, a
 	})
 
 	//Deduce n highest and lowest scores
-	eMiddleScores := eScores[deductionNumber : deductionNumber+1]
+	eMiddleScores := eScores[deductionNumber:(len(eScores) - int(deductionNumber))]
 
 	var eSum float32 = 0
 	for _, eScore := range eMiddleScores {
@@ -163,6 +182,10 @@ func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, a
 
 func (s *ScoringService) SubmitScore(score *domain.Score) error {
 	return s.scRepo.SubmitScore(score)
+}
+
+func (s *ScoringService) GetScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (*domain.Score, error) {
+	return s.scRepo.GetScore(competitionId, contestantId, apparatus)
 }
 
 func (s *ScoringService) FinishRotation(competitionId uuid.UUID) error {

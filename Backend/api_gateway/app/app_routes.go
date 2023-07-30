@@ -104,8 +104,10 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 
 	scoGroup.POST("competition/:id/temp-score", middleware.Authorize("Score_c"), scoringHandler.SubmitTempScore)
 	scoGroup.GET("competition/:id/temp-score", middleware.Authorize("Score_r"), scoringHandler.GetContestantsTempScores)
-	scoGroup.GET("competition/:id/score", middleware.Authorize("Score_r"), scoringHandler.CalculateScore)
+	scoGroup.GET("competition/:id/score/can-calculate", middleware.Authorize("Score_r"), scoringHandler.CanCalculateScore)
+	scoGroup.GET("competition/:id/score/calculate", middleware.Authorize("Score_r"), scoringHandler.CalculateScore)
 	scoGroup.POST("competition/:id/score", middleware.Authorize("Score_c"), scoringHandler.SubmitScore)
+	scoGroup.GET("competition/:id/score", middleware.Authorize("Score_c"), scoringHandler.GetScore)
 
 	scoGroup.POST("competition/:id/rotation/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishRotation)
 	scoGroup.POST("competition/:id/session/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishSession)
