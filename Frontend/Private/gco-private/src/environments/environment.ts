@@ -8,6 +8,7 @@ export const environment = {
   authPath: "http://localhost:8081/auth",
   schedulingPath: "http://localhost:8082/scheduling",
   scoringPath: "http://localhost:8082/scoring",
+  webSocketPath: "ws://localhost:8082/scoring/web-socket",
 };
 
 /*

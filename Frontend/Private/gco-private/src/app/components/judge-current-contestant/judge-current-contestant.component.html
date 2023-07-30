@@ -43,10 +43,12 @@
         <p  *ngIf="score" class="heading-hier-3">Average D: {{score.dScore}}</p>
     </div>
 </div>
-
-    <div  *ngIf="!IsDJudge && !scoreSubmitted" class="e-score-form">
+    <!-- DEVELOPMENT COMMENT UNCOMMENT LATER -->
+    <!-- <div  *ngIf="!IsDJudge && !scoreSubmitted" class="e-score-form"> -->
+    <div  *ngIf="!IsDJudge" class="e-score-form">
         <p class="heading-hier-1">Submit score</p>
-        <div *ngIf="!scoreSubmitted" class="form-wrapper">
+        <!-- <div *ngIf="!scoreSubmitted" class="form-wrapper"> -->
+        <div  class="form-wrapper">
             <form [formGroup]="eScoreForm" class="custom-form">
                 
                 <mat-form-field appearance="fill" class="form-item">

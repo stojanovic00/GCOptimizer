@@ -11,6 +11,9 @@ import { TempScore, TempScoreTable } from 'src/app/model/core/temp-score';
 import { JudgeJudgingInfo } from 'src/app/model/dto/judge-judging-info';
 import { ScoreRequest } from 'src/app/model/dto/score-request';
 import { ScoringService } from 'src/app/services/scoring.service';
+import { WebSocketService } from 'src/app/services/web-socket.service';
+import { WebSocketMessage } from '../../model/web-socket/web-socket-message';
+import { ScoringEvent } from 'src/app/model/web-socket/scoring-event';
 
 @Component({
   selector: 'app-judge-current-contestant',
@@ -81,6 +84,7 @@ dScoreTable :TempScoreTable = {
   score :Score | null = null;
   contestantScored : boolean = false;
 
+  private  socket : WebSocketService | null= null;
   constructor(
     private readonly route : ActivatedRoute,
     private readonly router : Router,
@@ -88,15 +92,35 @@ dScoreTable :TempScoreTable = {
   ){}
 
 
-  ngOnInit(): void {
-      this.loadData()
-  }
+
+  public ngOnInit() {
+    this.loadData()
+}
+
+public ngOnDestroy() {
+  this.socket!.close();
+}
 
   loadData = () =>{
     //Get judging info
     this.scService.getLoggedJudgeInfo().subscribe({
       next: (response: JudgeJudgingInfo) => {
         this.judgingInfo = response;
+        //WARNING
+
+
+
+          this.socket = new WebSocketService(this.judgingInfo?.apparatus ?? 0, this.judgingInfo?.competitionId) 
+          this.socket.getEventListener().subscribe(event => {
+          if(event.type == "message") {
+            console.log(event)
+          }
+      });
+
+
+
+
+        //WARNING
         this.loadCurrentContestant()
       },
       error: (err: HttpErrorResponse) => {
@@ -127,6 +151,11 @@ dScoreTable :TempScoreTable = {
     }
     this.scService.getContestantsTempScores(this.judgingInfo?.competitionId!, scoreRequest).subscribe({
       next: (response: TempScore[]) => {
+        if(response === null){
+          this.dScoreTable.dataSource = []
+          this.eScoreTable.dataSource = []
+          return
+        }
 
         this.tempScores = response
 
@@ -175,6 +204,12 @@ dScoreTable :TempScoreTable = {
     this.scService.submitTempScore(this.judgingInfo?.competitionId!, tempScore).subscribe({
     next: (response: string) => {
       this.scoreSubmitted = true;
+      let socketMessage : WebSocketMessage = {
+          event: ScoringEvent.TempScoreSubmitted,
+          competitionId: this.judgingInfo?.competitionId!,
+          apparatus: this.judgingInfo?.apparatus!
+      }
+      this.socket?.send(socketMessage) 
     },
     error: (err: HttpErrorResponse) => {
       alert(err.error);
