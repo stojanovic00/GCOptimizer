@@ -12,7 +12,7 @@ import { JudgeJudgingInfo } from 'src/app/model/dto/judge-judging-info';
 import { ScoreRequest } from 'src/app/model/dto/score-request';
 import { ScoringService } from 'src/app/services/scoring.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
-import { WebSocketMessage } from '../../model/web-socket/web-socket-message';
+import { WebSocketEventMessage } from '../../model/web-socket/web-socket-event-message';
 import { ScoringEvent } from 'src/app/model/web-socket/scoring-event';
 
 @Component({
@@ -24,7 +24,6 @@ export class JudgeCurrentContestantComponent implements OnInit {
 
 judgingInfo: JudgeJudgingInfo | null = null;
 currentContestant: ContestantScoring | null = null;
-tempScores: TempScore[] = []
 
 get IsDJudge():boolean{
     if(this.judgingInfo?.judgingPanelType === JudgingPanelType.DPanel){
@@ -106,27 +105,27 @@ public ngOnDestroy() {
     this.scService.getLoggedJudgeInfo().subscribe({
       next: (response: JudgeJudgingInfo) => {
         this.judgingInfo = response;
-        //WARNING
-
-
-
-          this.socket = new WebSocketService(this.judgingInfo?.apparatus ?? 0, this.judgingInfo?.competitionId) 
-          this.socket.getEventListener().subscribe(event => {
-          if(event.type == "message") {
-            console.log(event)
-          }
-      });
-
-
-
-
-        //WARNING
+        //OPENING WEB SOCKET!!!
+        this.openWebSocket()
         this.loadCurrentContestant()
       },
       error: (err: HttpErrorResponse) => {
         alert(err.error);
       }
     })
+  }
+
+  openWebSocket = () => {
+    this.socket = new WebSocketService(this.judgingInfo?.apparatus ?? 0, this.judgingInfo?.competitionId!)
+    this.socket.getEventListener().subscribe(event => {
+      if (event.type == "message") {
+        switch(event.data.event){
+          case ScoringEvent.RetrievedContestantsTempScores:
+            this.parseTempScoresResponse(event.data.response) 
+            break;
+        }
+      }
+    });
   }
 
 
@@ -157,24 +156,25 @@ public ngOnDestroy() {
           return
         }
 
-        this.tempScores = response
-
-        if(this.tempScores.map(tmpScore => tmpScore.judge.id).includes(this.judgingInfo?.judge.id!)){
-          this.scoreSubmitted = true;
-        }
-        
-        this.dScoreTable.dataSource = this.tempScores.filter(tmpScore => tmpScore.type === undefined || tmpScore.type === ScoreType.D)
-        this.eScoreTable.dataSource = this.tempScores
-            .filter(tmpScore => tmpScore.type === ScoreType.E)
-            .sort((a,b) => a.value - b.value)
-
-
+        this.parseTempScoresResponse(response)
       },
       error: (err: HttpErrorResponse) => {
         alert(err.error);
       }
     })
   }
+
+parseTempScoresResponse = (tempScores: TempScore[]) =>{
+        if(tempScores.map(tmpScore => tmpScore.judge.id).includes(this.judgingInfo?.judge.id!)){
+          this.scoreSubmitted = true;
+        }
+        
+        this.dScoreTable.dataSource = tempScores.filter(tmpScore => tmpScore.type === undefined || tmpScore.type === ScoreType.D)
+        this.eScoreTable.dataSource = tempScores
+            .filter(tmpScore => tmpScore.type === ScoreType.E)
+            .sort((a,b) => a.value - b.value)
+}
+
 
   checkCanCalculate = () => {
     let scoreRequest: ScoreRequest = {
@@ -204,10 +204,12 @@ public ngOnDestroy() {
     this.scService.submitTempScore(this.judgingInfo?.competitionId!, tempScore).subscribe({
     next: (response: string) => {
       this.scoreSubmitted = true;
-      let socketMessage : WebSocketMessage = {
+
+      let socketMessage : WebSocketEventMessage = {
           event: ScoringEvent.TempScoreSubmitted,
           competitionId: this.judgingInfo?.competitionId!,
-          apparatus: this.judgingInfo?.apparatus!
+          apparatus: this.judgingInfo?.apparatus!,
+          ContestantId: this.currentContestant?.id!,
       }
       this.socket?.send(socketMessage) 
     },

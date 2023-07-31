@@ -1,11 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Apparatus } from '../model/core/apparatus';
-import { WebSocketMessage } from '../model/web-socket/web-socket-message';
+import { WebSocketEventMessage } from '../model/web-socket/web-socket-event-message';
 
-// @Injectable({
-//   providedIn: 'root'
-// })
 export class WebSocketService {
 
     private socket: WebSocket;
@@ -32,7 +29,7 @@ export class WebSocketService {
         }
     }
 
-    public send(data: WebSocketMessage) {
+    public send(data: WebSocketEventMessage) {
         const jsonString :string = JSON.stringify(data)
         this.socket.send(jsonString);
     }

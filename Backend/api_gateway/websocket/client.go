@@ -1,38 +1,37 @@
-package domain
+package websocket
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
-type WsClient struct {
-	id            uuid.UUID
-	socket        *websocket.Conn
-	send          chan Message
+type Client struct {
+	id     uuid.UUID
+	socket *websocket.Conn
+	send   chan EventResponse
+	//Used for filtering to which client response will be sent
 	Apparatus     Apparatus
 	CompetitionId string
 }
 
-func (client *WsClient) read(server *WsServer) {
+// Reads incoming messages and sends it to server
+func (client *Client) read(server *Server) {
 	defer func() {
 		server.unregister <- client
 		client.socket.Close()
 	}()
 
-	//Each received message is broadcast to all other clients
 	for {
-		var message Message
+		var message EventMessage
 		err := client.socket.ReadJSON(&message)
 		if err != nil {
 			break
 		}
-		jsonMessage, err := json.Marshal(message)
-		server.broadcast <- jsonMessage
+		server.broadcast <- message
 	}
 }
 
-func (client *WsClient) write() {
+func (client *Client) write() {
 	defer func() {
 		client.socket.Close()
 	}()

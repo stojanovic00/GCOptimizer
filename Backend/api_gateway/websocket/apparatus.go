@@ -1,4 +1,4 @@
-package domain
+package websocket
 
 type Apparatus int8
 

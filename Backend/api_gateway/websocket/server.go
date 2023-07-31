@@ -1,7 +1,6 @@
-package domain
+package websocket
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -9,23 +8,25 @@ import (
 	"strconv"
 )
 
-type WsServer struct {
-	clients    map[*WsClient]bool //bool value is irrelevant, we use map because of convenient search and delete
-	broadcast  chan []byte
-	register   chan *WsClient
-	unregister chan *WsClient
+type Server struct {
+	clients      map[*Client]bool //bool value is irrelevant, we use map because of convenient search and delete
+	broadcast    chan EventMessage
+	register     chan *Client
+	unregister   chan *Client
+	eventHandler *EventHandler
 }
 
-func NewWsServer() *WsServer {
-	return &WsServer{
-		clients:    make(map[*WsClient]bool),
-		broadcast:  make(chan []byte),
-		register:   make(chan *WsClient),
-		unregister: make(chan *WsClient),
+func NewServer(eventHandler *EventHandler) *Server {
+	return &Server{
+		clients:      make(map[*Client]bool),
+		broadcast:    make(chan EventMessage),
+		register:     make(chan *Client),
+		unregister:   make(chan *Client),
+		eventHandler: eventHandler,
 	}
 }
 
-func (server *WsServer) Start() {
+func (server *Server) Start() {
 	//Runs forever
 	for {
 		select {
@@ -37,21 +38,20 @@ func (server *WsServer) Start() {
 				delete(server.clients, client)
 			}
 		case message := <-server.broadcast:
-			var jsonMessage Message
-			json.Unmarshal(message, &jsonMessage)
-			server.send(jsonMessage)
+			response := server.PrepareResponse(&message)
+			server.sendToAll(response)
 		}
 	}
 }
 
-func (server *WsServer) send(message Message) {
+func (server *Server) sendToAll(response *EventResponse) {
 	// Send only to clients with same competitionId and same apparatus
 	for client := range server.clients {
-		if client.CompetitionId == message.CompetitionId && client.Apparatus == message.Apparatus {
+		if client.CompetitionId == response.CompetitionId && client.Apparatus == response.Apparatus {
 			select {
-			case client.send <- message:
+			case client.send <- *response:
 			default:
-				//If client is unable to receive message we close it its channel and delete it
+				//If client is unable to receive response we close it its channel and delete it
 				close(client.send)
 				delete(server.clients, client)
 			}
@@ -59,7 +59,21 @@ func (server *WsServer) send(message Message) {
 	}
 }
 
-func (server *WsServer) OpenConnection(ctx *gin.Context) {
+func (server *Server) PrepareResponse(message *EventMessage) *EventResponse {
+	switch message.Event {
+	case TempScoreSubmitted:
+		return server.eventHandler.GetContestantsTempScores(message)
+	default:
+		return &EventResponse{
+			Event:         Error,
+			Apparatus:     message.Apparatus,
+			CompetitionId: message.CompetitionId,
+			Response:      &ErrorResponse{Message: "Unknown error"},
+		}
+	}
+}
+
+func (server *Server) OpenConnection(ctx *gin.Context) {
 	competitionId := ctx.Query("competitionId")
 	if competitionId == "" {
 		// If "apparatusStr" is not provided in the query, return an error contestant
@@ -87,10 +101,10 @@ func (server *WsServer) OpenConnection(ctx *gin.Context) {
 		return
 	}
 
-	client := &WsClient{
+	client := &Client{
 		id:            uuid.New(),
 		socket:        connection,
-		send:          make(chan Message),
+		send:          make(chan EventResponse),
 		Apparatus:     Apparatus(apparatus),
 		CompetitionId: competitionId,
 	}

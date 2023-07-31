@@ -1,3 +1,6 @@
 export enum ScoringEvent{
-    TempScoreSubmitted = 0
+	Error = 0,
+	TempScoreSubmitted,
+	RetrievedContestantsTempScores
+
 }

@@ -3,7 +3,7 @@ package app
 import (
 	grpc_client "api_gateway/client"
 	handler "api_gateway/handler"
-	"api_gateway/websocket/domain"
+	"api_gateway/websocket"
 	"auth_service/api/middleware"
 	"fmt"
 	"github.com/gin-contrib/cors"
@@ -29,7 +29,8 @@ func (a *App) CreateRoutersAndSetRoutes() error {
 	scoringHandler := handler.NewScoringHandler(scoringClient)
 
 	//Web sockets
-	webSocketServer := domain.NewWsServer()
+	wsEventHandler := websocket.NewEventHandler(scoringClient)
+	webSocketServer := websocket.NewServer(wsEventHandler)
 	go webSocketServer.Start()
 
 	// MIDDLEWARE
@@ -100,8 +101,6 @@ func (a *App) CreateRoutersAndSetRoutes() error {
 
 	//Live scoring
 	scoGroup := privateRouter.Group("scoring")
-	//TODO authorization
-	//scoGroup.GET("web-socket", webSocketServer.OpenConnection)
 	//auth
 	scoGroup.Use(middleware.ValidateAndExtractToken())
 	scoGroup.GET("web-socket", middleware.Authorize("WebSocket"), webSocketServer.OpenConnection)
