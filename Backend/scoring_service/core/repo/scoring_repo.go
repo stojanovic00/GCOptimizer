@@ -13,6 +13,7 @@ type ScoringRepo interface {
 	GetSlotsWithStartingApparatus(competitionId uuid.UUID, sessionNumber int32, apparatus domain.Apparatus) ([]domain.ScheduleSlot, error)
 	SubmitTempScore(tempScore *domain.TempScore) error
 	GetContestantsTempScores(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) ([]domain.TempScore, error)
+	SaveScore(score *domain.Score) error
 	SubmitScore(score *domain.Score) error
 	FinishRotation(competitionId uuid.UUID) error
 	FinishSession(competitionId uuid.UUID) error

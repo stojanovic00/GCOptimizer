@@ -12,4 +12,5 @@ type Score struct {
 	Competition   Competition
 	ContestantID  uuid.UUID
 	Contestant    Contestant
+	Submitted     bool
 }

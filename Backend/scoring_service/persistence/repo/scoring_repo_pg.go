@@ -161,9 +161,24 @@ func (r *ScoringRepoPg) GetContestantsTempScores(competitionId, contestantId uui
 
 	return tempScores, nil
 }
+func (r *ScoringRepoPg) SaveScore(score *domain.Score) error {
+	result := r.dbClient.Create(score)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
 
 func (r *ScoringRepoPg) SubmitScore(score *domain.Score) error {
-	result := r.dbClient.Create(score)
+	//Update score to submitted
+	scoreDb, err := r.GetScore(score.CompetitionID, score.ContestantID, score.Apparatus)
+	if err != nil {
+		return err
+	}
+
+	scoreDb.Submitted = true
+	result := r.dbClient.Save(scoreDb)
 	if result.Error != nil {
 		return result.Error
 	}

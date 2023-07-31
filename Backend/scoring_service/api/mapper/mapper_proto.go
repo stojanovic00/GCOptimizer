@@ -356,6 +356,7 @@ func ScorePbToDom(s *scoring_pb.Score) *domain.Score {
 		Competition:   domain.Competition{}, //  Will be retrieved from db
 		ContestantID:  contestantId,
 		Contestant:    domain.Contestant{}, //  Will be retrieved from db
+		Submitted:     s.Submitted,
 	}
 }
 
@@ -368,5 +369,6 @@ func ScoreDomToPb(s *domain.Score) *scoring_pb.Score {
 		TotalScore:    s.TotalScore,
 		CompetitionId: s.CompetitionID.String(),
 		Contestant:    &scoring_pb.Contestant{Id: s.ContestantID.String()},
+		Submitted:     s.Submitted,
 	}
 }

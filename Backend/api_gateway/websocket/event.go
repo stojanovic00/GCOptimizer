@@ -6,4 +6,10 @@ const (
 	Error Event = iota
 	TempScoreSubmitted
 	RetrievedContestantsTempScores
+	RetrievedCanCalculate
+	CalculatedScore
+	RetrievedScore
+	SubmittedScore
+	ScoredContestant
+	RetrievedNextCurrentApparatusContestant
 )

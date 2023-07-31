@@ -6,5 +6,6 @@ export interface Score{
     eScore: number;
     totalScore: number;
     competitionId: string;
-    contestant: IdMessage
+    contestant: IdMessage;
+    submitted: boolean;
 }

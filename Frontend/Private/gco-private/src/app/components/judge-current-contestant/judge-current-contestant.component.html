@@ -1,111 +1,116 @@
-<p class="heading-hier-1">Contestant</p>
-<div *ngIf="currentContestant" class="info">
-    <h2>{{currentContestant.competingId}} {{currentContestant.fullName}}, {{currentContestant.sportsOrganization.name}}</h2>
-</div>
-
-<div *ngIf="IsDJudge" class="scores">
-    <div class="table-wrap">
-        <p class="heading-hier-2">E scores</p>
-        <table mat-table [dataSource]="eScoreTable.dataSource" class="mat-elevation-z8 tablee">
-
-            <ng-container matColumnDef="judge">
-                <th mat-header-cell *matHeaderCellDef>Judge</th>
-                <td mat-cell *matCellDef="let score">{{score.judge.fullName}}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef>Value</th>
-                <td mat-cell *matCellDef="let score">{{score.value}}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="eScoreTable.displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; let idx = index; columns: eScoreTable.displayedColumns;" [class.deducted]="isFirstOrLastNScore(idx, eScoreTable.dataSource.length) && score"></tr>
-        </table>
-        <p *ngIf="score" class="heading-hier-3">Average E: {{score.eScore}}</p>
+<div *ngIf="!rotationFinished">
+    <p class="heading-hier-1">Contestant</p>
+    <div *ngIf="currentContestant" class="info">
+        <h2>{{currentContestant.competingId}} {{currentContestant.fullName}}, {{currentContestant.sportsOrganization.name}}</h2>
     </div>
-    <div class="table-wrap">
-        <p class="heading-hier-2">D scores</p>
-        <table mat-table [dataSource]="dScoreTable.dataSource" class="mat-elevation-z8 tablee">
 
-            <ng-container matColumnDef="judge">
-                <th mat-header-cell *matHeaderCellDef>Judge</th>
-                <td mat-cell *matCellDef="let score">{{score.judge.fullName}}</td>
-            </ng-container>
+    <div *ngIf="IsDJudge" class="scores">
+        <div class="table-wrap">
+            <p class="heading-hier-2">E scores</p>
+            <table mat-table [dataSource]="eScoreTable.dataSource" class="mat-elevation-z8 tablee">
 
-            <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef>Value</th>
-                <td mat-cell *matCellDef="let score">{{score.value}}</td>
-            </ng-container>
+                <ng-container matColumnDef="judge">
+                    <th mat-header-cell *matHeaderCellDef>Judge</th>
+                    <td mat-cell *matCellDef="let score">{{score.judge.fullName}}</td>
+                </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="dScoreTable.displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: dScoreTable.displayedColumns;"></tr>
-        </table>
-        <p  *ngIf="score" class="heading-hier-3">Average D: {{score.dScore}}</p>
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef>Value</th>
+                    <td mat-cell *matCellDef="let score">{{score.value}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="eScoreTable.displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; let idx = index; columns: eScoreTable.displayedColumns;" [class.deducted]="isFirstOrLastNScore(idx, eScoreTable.dataSource.length) && score"></tr>
+            </table>
+            <p *ngIf="score" class="heading-hier-3">Average E: {{score.eScore}}</p>
+        </div>
+        <div class="table-wrap">
+            <p class="heading-hier-2">D scores</p>
+            <table mat-table [dataSource]="dScoreTable.dataSource" class="mat-elevation-z8 tablee">
+
+                <ng-container matColumnDef="judge">
+                    <th mat-header-cell *matHeaderCellDef>Judge</th>
+                    <td mat-cell *matCellDef="let score">{{score.judge.fullName}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef>Value</th>
+                    <td mat-cell *matCellDef="let score">{{score.value}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="dScoreTable.displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: dScoreTable.displayedColumns;"></tr>
+            </table>
+            <p  *ngIf="score" class="heading-hier-3">Average D: {{score.dScore}}</p>
+        </div>
     </div>
-</div>
-    <!-- DEVELOPMENT COMMENT UNCOMMENT LATER -->
-    <!-- <div  *ngIf="!IsDJudge && !scoreSubmitted" class="e-score-form"> -->
-    <div  *ngIf="!IsDJudge" class="e-score-form">
+        <!-- DEVELOPMENT COMMENT UNCOMMENT LATER -->
+        <!-- <div  *ngIf="!IsDJudge && !scoreSubmitted" class="e-score-form"> -->
+        <div  *ngIf="!IsDJudge" class="e-score-form">
+            <p class="heading-hier-1">Submit score</p>
+            <!-- <div *ngIf="!scoreSubmitted" class="form-wrapper"> -->
+            <div  class="form-wrapper">
+                <form [formGroup]="eScoreForm" class="custom-form">
+                    
+                    <mat-form-field appearance="fill" class="form-item">
+                        <mat-label>E score</mat-label>
+                        <input  type="number" matInput placeholder="e score" formControlName="eScore">
+                    </mat-form-field>
+
+                    <button
+                    mat-raised-button
+                    color="primary"
+                    class="form-item"
+                    (click)="submitEScore()"
+                    >Submit</button>
+                </form>
+            </div>
+        </div>
+        <div *ngIf="tempScoreSubmitted && !score" class="score-submited">
+            <p class="heading-hier-1">Score submitted</p>
+        </div>
+        <div *ngIf="tempScoreSubmitted" class="score-submited">
+            <p  *ngIf="score" class="heading-hier-1">Final score: {{score.totalScore}}</p>
+        </div>
+
+    <div  *ngIf="IsDJudge && !tempScoreSubmitted" class="e-score-form">
         <p class="heading-hier-1">Submit score</p>
-        <!-- <div *ngIf="!scoreSubmitted" class="form-wrapper"> -->
-        <div  class="form-wrapper">
-            <form [formGroup]="eScoreForm" class="custom-form">
+        <div *ngIf="!tempScoreSubmitted" class="form-wrapper">
+            <form [formGroup]="dScoreForm" class="custom-form">
                 
                 <mat-form-field appearance="fill" class="form-item">
-                    <mat-label>E score</mat-label>
-                    <input  type="number" matInput placeholder="e score" formControlName="eScore">
+                    <mat-label>D score</mat-label>
+                    <input  type="number" matInput placeholder="d score" formControlName="dScore">
                 </mat-form-field>
 
                 <button
                 mat-raised-button
                 color="primary"
                 class="form-item"
-                (click)="submitEScore()"
+                (click)="submitDScore()"
                 >Submit</button>
             </form>
         </div>
     </div>
-    <div *ngIf="scoreSubmitted && !score" class="score-submited">
-        <p class="heading-hier-1">Score submitted</p>
-    </div>
-    <div *ngIf="scoreSubmitted" class="score-submited">
-        <p  *ngIf="score" class="heading-hier-1">Final score: {{score.totalScore}}</p>
-    </div>
-
-<div  *ngIf="IsDJudge && !scoreSubmitted" class="e-score-form">
-    <p class="heading-hier-1">Submit score</p>
-    <div *ngIf="!scoreSubmitted" class="form-wrapper">
-        <form [formGroup]="dScoreForm" class="custom-form">
-            
-            <mat-form-field appearance="fill" class="form-item">
-                <mat-label>D score</mat-label>
-                <input  type="number" matInput placeholder="d score" formControlName="dScore">
-            </mat-form-field>
-
-            <button
+    <div *ngIf="IsDJudge && !contestantScored" class="button-wrap">
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <button
             mat-raised-button
             color="primary"
-            class="form-item"
-            (click)="submitDScore()"
-            >Submit</button>
-        </form>
-    </div>
-</div>
-<div *ngIf="IsDJudge && !contestantScored" class="button-wrap">
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <button
-        mat-raised-button
-        color="primary"
-        [disabled]="!canCalculateScore"
-        (click)="calculateScore()"
-        >Calculate score</button>
+            [disabled]="!canCalculateScore"
+            (click)="calculateScore()"
+            >Calculate score</button>
 
-    <div class="separator"></div> 
-    <button
-        mat-raised-button
-        color="primary"
-        [disabled]="!score"
-        (click)="submitScore()"
-        >Submit score</button>
-    </div>
+        <div class="separator"></div> 
+        <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!score"
+            (click)="submitScore()"
+            >Submit score</button>
+        </div>
+</div>
+<div  *ngIf="rotationFinished" class="rotation-finished">
+    <h2>Rotation finished</h2>
+</div>

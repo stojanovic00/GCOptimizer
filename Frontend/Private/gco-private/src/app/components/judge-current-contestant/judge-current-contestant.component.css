@@ -40,7 +40,18 @@ h3{
     flex: 1;
     margin:0px 20px;
 }
-
+  
 .deducted{
     background-color: rgb(245, 199, 199);
 }
+
+.rotation-finished {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+  }
+  
+  .rotation-finished h2 {
+    text-align: center; /* Center the text horizontally */
+  }

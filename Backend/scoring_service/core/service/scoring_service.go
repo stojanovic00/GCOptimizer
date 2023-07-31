@@ -167,7 +167,7 @@ func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, a
 	}
 	eAverage := eSum / float32(len(eMiddleScores))
 
-	return &domain.Score{
+	score := &domain.Score{
 		ID:            uuid.New(),
 		Apparatus:     apparatus,
 		DScore:        dAverage,
@@ -177,7 +177,16 @@ func (s *ScoringService) CalculateScore(competitionId, contestantId uuid.UUID, a
 		Competition:   domain.Competition{}, // Db resolved
 		ContestantID:  contestantId,
 		Contestant:    domain.Contestant{}, // Db resolved
-	}, nil
+		Submitted:     false,
+	}
+
+	err = s.scRepo.SaveScore(score)
+	if err != nil {
+		return nil, err
+	}
+
+	return score, nil
+
 }
 
 func (s *ScoringService) SubmitScore(score *domain.Score) error {

@@ -153,6 +153,7 @@ message Score{
   float totalScore = 5;
   string competitionId = 6;
   Contestant contestant = 7;
+  bool submitted = 8;
 }
 
 

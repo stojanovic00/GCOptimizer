@@ -22,6 +22,7 @@ import { ScoringEvent } from 'src/app/model/web-socket/scoring-event';
 })
 export class JudgeCurrentContestantComponent implements OnInit {
 
+rotationFinished = false;
 judgingInfo: JudgeJudgingInfo | null = null;
 currentContestant: ContestantScoring | null = null;
 
@@ -45,7 +46,7 @@ get scoreType():ScoreType{
 
 //SCORING
 
-scoreSubmitted : boolean = false;
+tempScoreSubmitted : boolean = false;
 
 //E SCORE
   eScoreForm = new FormGroup({
@@ -104,6 +105,7 @@ public ngOnDestroy() {
     //Get judging info
     this.scService.getLoggedJudgeInfo().subscribe({
       next: (response: JudgeJudgingInfo) => {
+        //Gets info needed for web socket connection (apparatus and competitionId)
         this.judgingInfo = response;
         //OPENING WEB SOCKET!!!
         this.openWebSocket()
@@ -122,16 +124,55 @@ public ngOnDestroy() {
         switch(event.data.event){
           case ScoringEvent.RetrievedContestantsTempScores:
             this.parseTempScoresResponse(event.data.response) 
+
+            this.sendEvent(ScoringEvent.RetrievedContestantsTempScores);
+            break;
+          case ScoringEvent.RetrievedCanCalculate:
+              this.canCalculateScore = event.data.response;
+            break;
+          case ScoringEvent.RetrievedScore:
+            this.score = event.data.response;
+            if(this.score?.submitted ?? false){
+              this.contestantScored = true ;
+              this.sendEvent(ScoringEvent.ScoredContestant);
+            }
+            break;
+          case ScoringEvent.RetrievedNextCurrentApparatusContestant:
+              if(!event.data.response.competingId){
+                this.rotationFinished = true;
+                break;
+              }
+              //Restarting all data for next contestant
+              this.rotationFinished = false;
+              this.currentContestant = event.data.response;
+              this.tempScoreSubmitted = false;
+              this.score = null;
+              this.contestantScored = false;
+              this.sendEvent(ScoringEvent.RetrievedNextCurrentApparatusContestant);
             break;
         }
       }
     });
   }
 
+  sendEvent = (event: ScoringEvent) => {
+    let socketMessage: WebSocketEventMessage = {
+      event: event,
+      competitionId: this.judgingInfo?.competitionId!,
+      apparatus: this.judgingInfo?.apparatus!,
+      ContestantId: this.currentContestant?.id!,
+    }
+    this.socket?.send(socketMessage)
+  }
 
   loadCurrentContestant = () =>{
     this.scService.getCurrentApparatusContestant(this.judgingInfo?.competitionId!, this.judgingInfo?.apparatus ?? 0).subscribe({
       next: (response: ContestantScoring) => {
+        if(!response.competingId){
+          this.rotationFinished = true;
+          return;
+        }
+        this.rotationFinished = false;
         this.currentContestant = response
         this.getSCore();
         this.loadTempScores();
@@ -150,12 +191,6 @@ public ngOnDestroy() {
     }
     this.scService.getContestantsTempScores(this.judgingInfo?.competitionId!, scoreRequest).subscribe({
       next: (response: TempScore[]) => {
-        if(response === null){
-          this.dScoreTable.dataSource = []
-          this.eScoreTable.dataSource = []
-          return
-        }
-
         this.parseTempScoresResponse(response)
       },
       error: (err: HttpErrorResponse) => {
@@ -164,32 +199,26 @@ public ngOnDestroy() {
     })
   }
 
-parseTempScoresResponse = (tempScores: TempScore[]) =>{
-        if(tempScores.map(tmpScore => tmpScore.judge.id).includes(this.judgingInfo?.judge.id!)){
-          this.scoreSubmitted = true;
-        }
-        
-        this.dScoreTable.dataSource = tempScores.filter(tmpScore => tmpScore.type === undefined || tmpScore.type === ScoreType.D)
-        this.eScoreTable.dataSource = tempScores
-            .filter(tmpScore => tmpScore.type === ScoreType.E)
-            .sort((a,b) => a.value - b.value)
-}
 
 
-  checkCanCalculate = () => {
-    let scoreRequest: ScoreRequest = {
-        apparatus: this.judgingInfo?.apparatus ?? 0,
-        contestantId: this.currentContestant?.id!
-    }
-    this.scService.canCalculateScore(this.judgingInfo?.competitionId!, scoreRequest).subscribe({
-      next: (response: boolean) => {
-        this.canCalculateScore = response;
-      },
-      error: (err: HttpErrorResponse) => {
-        alert(err.error);
-      }
-    })
- }
+  parseTempScoresResponse = (tempScores: TempScore[]) =>{
+          if(tempScores === null){
+            this.dScoreTable.dataSource = []
+            this.eScoreTable.dataSource = []
+            return
+          }
+
+          if(tempScores.map(tmpScore => tmpScore.judge.id).includes(this.judgingInfo?.judge.id!)){
+            this.tempScoreSubmitted = true;
+          }
+          
+          this.dScoreTable.dataSource = tempScores.filter(tmpScore => tmpScore.type === undefined || tmpScore.type === ScoreType.D)
+          this.eScoreTable.dataSource = tempScores
+              .filter(tmpScore => tmpScore.type === ScoreType.E)
+              .sort((a,b) => a.value - b.value)
+  }
+
+
 
 
   submitEScore = () => {
@@ -203,15 +232,9 @@ parseTempScoresResponse = (tempScores: TempScore[]) =>{
     }
     this.scService.submitTempScore(this.judgingInfo?.competitionId!, tempScore).subscribe({
     next: (response: string) => {
-      this.scoreSubmitted = true;
+      this.tempScoreSubmitted = true;
 
-      let socketMessage : WebSocketEventMessage = {
-          event: ScoringEvent.TempScoreSubmitted,
-          competitionId: this.judgingInfo?.competitionId!,
-          apparatus: this.judgingInfo?.apparatus!,
-          ContestantId: this.currentContestant?.id!,
-      }
-      this.socket?.send(socketMessage) 
+      this.sendEvent(ScoringEvent.TempScoreSubmitted);
     },
     error: (err: HttpErrorResponse) => {
       alert(err.error);
@@ -231,13 +254,33 @@ parseTempScoresResponse = (tempScores: TempScore[]) =>{
     }
     this.scService.submitTempScore(this.judgingInfo?.competitionId!, tempScore).subscribe({
     next: (response: string) => {
-      this.scoreSubmitted = true;
+      this.tempScoreSubmitted = true;
+
+      this.sendEvent(ScoringEvent.TempScoreSubmitted);
     },
     error: (err: HttpErrorResponse) => {
       alert(err.error);
     }
   }); 
   }
+
+
+  checkCanCalculate = () => {
+    let scoreRequest: ScoreRequest = {
+        apparatus: this.judgingInfo?.apparatus ?? 0,
+        contestantId: this.currentContestant?.id!
+    }
+    this.scService.canCalculateScore(this.judgingInfo?.competitionId!, scoreRequest).subscribe({
+      next: (response: boolean) => {
+        this.canCalculateScore = response;
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.error);
+      }
+    })
+ }
+
+
 
 calculateScore = () =>{
     let scoreRequest: ScoreRequest = {
@@ -247,6 +290,8 @@ calculateScore = () =>{
     this.scService.calculateScore(this.judgingInfo?.competitionId!, scoreRequest).subscribe({
       next: (response: Score) => {
         this.score = response;
+        
+        this.sendEvent(ScoringEvent.CalculatedScore)
       },
       error: (err: HttpErrorResponse) => {
         alert(err.error);
@@ -258,7 +303,7 @@ calculateScore = () =>{
 submitScore = () =>{
     this.scService.submitScore(this.judgingInfo?.competitionId!, this.score!).subscribe({
       next: (response: string) => {
-          this.contestantScored = true;
+        this.sendEvent(ScoringEvent.SubmittedScore);
       },
       error: (err: HttpErrorResponse) => {
         alert(err.error);
@@ -276,7 +321,7 @@ getSCore = () =>{
       next: (response: Score) => {
         if(response !== null){
           this.score = response;
-          this.contestantScored = true;
+          this.contestantScored = this.score.submitted;
         }
       },
       error: (err: HttpErrorResponse) => {
@@ -284,10 +329,11 @@ getSCore = () =>{
     })
 }
 
+
+
 isFirstOrLastNScore(scoreIndex: number, dataSourceLength: number): boolean {
   return scoreIndex < this.judgingInfo?.calculationMethod.scoreDeductionNum! || scoreIndex >= dataSourceLength - this.judgingInfo?.calculationMethod.scoreDeductionNum!;
 }
-
 
 
 }

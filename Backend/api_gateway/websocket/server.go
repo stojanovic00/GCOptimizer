@@ -63,6 +63,14 @@ func (server *Server) PrepareResponse(message *EventMessage) *EventResponse {
 	switch message.Event {
 	case TempScoreSubmitted:
 		return server.eventHandler.GetContestantsTempScores(message)
+	case RetrievedContestantsTempScores:
+		return server.eventHandler.CanCalculateScore(message)
+	case CalculatedScore, SubmittedScore:
+		return server.eventHandler.GetScore(message)
+	case ScoredContestant:
+		return server.eventHandler.GetNextCurrentApparatusContestant(message)
+	case RetrievedNextCurrentApparatusContestant:
+		return server.eventHandler.GetContestantsTempScores(message)
 	default:
 		return &EventResponse{
 			Event:         Error,

@@ -1,6 +1,11 @@
 export enum ScoringEvent{
 	Error = 0,
 	TempScoreSubmitted,
-	RetrievedContestantsTempScores
-
+	RetrievedContestantsTempScores,
+	RetrievedCanCalculate,
+	CalculatedScore,
+	RetrievedScore,
+	SubmittedScore,
+	ScoredContestant,
+	RetrievedNextCurrentApparatusContestant
 }
