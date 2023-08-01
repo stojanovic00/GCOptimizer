@@ -217,6 +217,12 @@ func (h *HandlerRpc) FinishSession(ctx context.Context, request *scoring_pb.IdMe
 	return &scoring_pb.EmptyMessage{}, nil
 }
 func (h *HandlerRpc) FinishCompetition(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.EmptyMessage, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	err := h.jpService.DeleteAllJudgeAccounts(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
 	return &scoring_pb.EmptyMessage{}, nil
 }
 func (h *HandlerRpc) IsRotationFinished(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.BoolMessage, error) {
@@ -245,4 +251,13 @@ func (h *HandlerRpc) IsCompetitionFinished(ctx context.Context, request *scoring
 	}
 
 	return &scoring_pb.BoolMessage{IsTrue: finished}, nil
+}
+func (h *HandlerRpc) GetCurrentSessionInfo(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.CurrentSessionInfo, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+	info, err := h.scService.GetCurrentSessionInfo(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.CurrentSessionInfoDomToPb(info), nil
 }

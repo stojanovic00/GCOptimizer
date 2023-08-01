@@ -372,3 +372,13 @@ func ScoreDomToPb(s *domain.Score) *scoring_pb.Score {
 		Submitted:     s.Submitted,
 	}
 }
+
+func CurrentSessionInfoDomToPb(info *dto.CurrentSessionInfo) *scoring_pb.CurrentSessionInfo {
+	return &scoring_pb.CurrentSessionInfo{
+		CurrentRotation:     info.CurrentRotation,
+		CurrentSession:      info.CurrentSession,
+		RotationFinished:    info.RotationFinished,
+		SessionFinished:     info.SessionFinished,
+		CompetitionFinished: info.CompetitionFinished,
+	}
+}

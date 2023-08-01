@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"scoring_service/core/domain"
 )
@@ -20,4 +21,21 @@ func (r *ScheduleRepoPg) Save(schedule *domain.Schedule) error {
 	}
 
 	return nil
+}
+
+func (r *ScheduleRepoPg) CompetitionExists(compId uuid.UUID) (bool, error) {
+	var count int64
+	result := r.dbClient.
+		Model(domain.Competition{}).
+		Where("id = ?", compId).
+		Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	if count > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

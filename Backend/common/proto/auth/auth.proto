@@ -8,6 +8,7 @@ service AuthService{
   rpc Create(Account) returns(IdResponse) {}
   rpc Login(Account) returns(AccessToken) {}
   rpc HasPermission(HasPermissionRequest) returns(BoolMessage) {}
+  rpc DeleteAccounts(EmailList) returns(EmptyMessage) {}
 }
 
 message EmptyMessage{}
@@ -41,4 +42,8 @@ message UserInfo{
 
 message HasPermissionRequest{
   string permission = 1;
+}
+
+message EmailList{
+  repeated string emails = 1;
 }

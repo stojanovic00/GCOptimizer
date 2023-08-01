@@ -9,13 +9,14 @@ import { ContestantScoring } from '../model/core/contestant-scoring';
 import { TempScore } from '../model/core/temp-score';
 import { Score } from '../model/core/score';
 import { ScoreRequest } from '../model/dto/score-request';
+import { CurrentSessionInfo } from '../model/dto/current-session-info';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScoringService {
 
-  path: string = environment.scoringPath
+  path: string = environment.scoringPath;
 
   constructor(
     private readonly http: HttpClient
@@ -66,8 +67,42 @@ export class ScoringService {
 
   getScore = (compId: string, scoreRequest: ScoreRequest): Observable<Score> => {
     let path = this.path + "/competition/" + compId + "/score?contestantId=" + scoreRequest.contestantId + "&apparatus=" + scoreRequest.apparatus;
-
-
     return this.http.get<Score>(path);
   }
+
+  getCurrentSessionInfo = (compId: string): Observable<CurrentSessionInfo> => {
+    let path = this.path + "/competition/" + compId + "/info";
+    return this.http.get<CurrentSessionInfo>(path);
+  }
+
+  rotationFinishedCheck = (compId: string): Observable<boolean> => {
+    let path = this.path + "/competition/" + compId + "/rotation/finish-check";
+    return this.http.get<boolean>(path);
+  }
+
+  finishRotation = (compId: string): Observable<string> => {
+    let path = this.path + "/competition/" + compId + "/rotation/finish";
+    return this.http.post<string>(path, null);
+  }
+
+  sessionFinishedCheck = (compId: string): Observable<boolean> => {
+    let path = this.path + "/competition/" + compId + "/session/finish-check";
+    return this.http.get<boolean>(path);
+  }
+
+  finishSession = (compId: string): Observable<string> => {
+    let path = this.path + "/competition/" + compId + "/session/finish";
+    return this.http.post<string>(path, null);
+  }
+
+  competitionFinishedCheck = (compId: string): Observable<boolean> => {
+    let path = this.path + "/competition/" + compId + "/finish-check";
+    return this.http.get<boolean>(path);
+  }
+
+  finishCompetition = (compId: string): Observable<string> => {
+    let path = this.path + "/competition/" + compId + "/finish";
+    return this.http.post<string>(path, null);
+  }
+
 }

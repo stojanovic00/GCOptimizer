@@ -101,6 +101,7 @@ func (r *ScoringRepoPg) GetCurrentSessionWithSlots(competitionId uuid.UUID) (*do
 		Where("schedule_id = ? and finished = false", schedule.ID).
 		Order("number asc").
 		Preload("ScheduleSlots.Session").
+		Preload("ScheduleSlots.Contestant").
 		First(&session)
 	if result.Error != nil {
 		return nil, err
@@ -340,12 +341,7 @@ func (r *ScoringRepoPg) IsRotationFinished(competitionId uuid.UUID) (bool, error
 }
 
 func (r *ScoringRepoPg) IsSessionFinished(competitionId uuid.UUID) (bool, error) {
-	schedule, err := r.GetScheduleByCompetitionId(competitionId)
-	if err != nil {
-		return false, err
-	}
-
-	session, err := r.GetCurrentSession(competitionId)
+	session, err := r.GetCurrentSessionWithSlots(competitionId)
 	if err != nil {
 		return false, err
 	}
@@ -353,17 +349,35 @@ func (r *ScoringRepoPg) IsSessionFinished(competitionId uuid.UUID) (bool, error)
 		return false, errors.New("no more active sessions")
 	}
 
-	//Because at last rotation finish it rotation number overflows
-	return int(session.CurrentRotation) == len(schedule.ApparatusOrder), nil
+	allCompeted := true
+	for _, slot := range session.ScheduleSlots {
+
+		if len(slot.ScoredApparatuses) != len(slot.Contestant.CompetingApparatuses) {
+			allCompeted = false
+			break
+		}
+	}
+
+	return allCompeted, nil
 }
 func (r *ScoringRepoPg) IsCompetitionFinished(competitionId uuid.UUID) (bool, error) {
-	session, err := r.GetCurrentSession(competitionId)
+	schedule, err := r.GetScheduleByCompetitionId(competitionId)
 	if err != nil {
 		return false, err
 	}
-	if session == nil { //No more unfinished sessions
-		return true, nil
-	} else {
+
+	var count int64
+	result := r.dbClient.
+		Model(domain.Session{}).
+		Where("schedule_id = ? and finished = false", schedule.ID).
+		Count(&count)
+
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	if count > 0 {
 		return false, nil
 	}
+	return true, nil
 }

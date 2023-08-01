@@ -47,7 +47,8 @@ func (server *Server) Start() {
 func (server *Server) sendToAll(response *EventResponse) {
 	// Send only to clients with same competitionId and same apparatus
 	for client := range server.clients {
-		if client.CompetitionId == response.CompetitionId && client.Apparatus == response.Apparatus {
+		//If admin sends message everyone gets it, also admin always gets every message
+		if (client.CompetitionId == response.CompetitionId && (client.Apparatus == response.Apparatus || client.Apparatus == CompetitionAdmin)) || response.Apparatus == CompetitionAdmin {
 			select {
 			case client.send <- *response:
 			default:
@@ -71,6 +72,15 @@ func (server *Server) PrepareResponse(message *EventMessage) *EventResponse {
 		return server.eventHandler.GetNextCurrentApparatusContestant(message)
 	case RetrievedNextCurrentApparatusContestant:
 		return server.eventHandler.GetContestantsTempScores(message)
+	case FinishedRotationOrSession:
+		return server.eventHandler.GetCurrentSessionInfo(message)
+	case FinishedCompetition:
+		return &EventResponse{
+			Event:         FinishedCompetition,
+			Apparatus:     message.Apparatus,
+			CompetitionId: message.CompetitionId,
+			Response:      nil,
+		}
 	default:
 		return &EventResponse{
 			Event:         Error,

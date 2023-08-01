@@ -213,3 +213,48 @@ func (s *ScoringService) IsSessionFinished(competitionId uuid.UUID) (bool, error
 func (s *ScoringService) IsCompetitionFinished(competitionId uuid.UUID) (bool, error) {
 	return s.scRepo.IsCompetitionFinished(competitionId)
 }
+func (s *ScoringService) GetCurrentSessionInfo(competitionId uuid.UUID) (*dto.CurrentSessionInfo, error) {
+	session, err := s.scRepo.GetCurrentSession(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	//If there is no more active session, competition is finished
+	if session == nil {
+		return &dto.CurrentSessionInfo{
+			CurrentRotation:     0,
+			CurrentSession:      0,
+			RotationFinished:    false,
+			SessionFinished:     false,
+			CompetitionFinished: true,
+		}, nil
+	}
+
+	isRotationFinished, err := s.IsRotationFinished(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	isSessionFinished, err := s.IsSessionFinished(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	isCompetitionFinished, err := s.IsCompetitionFinished(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	//For frontend purposes (so user can't increment rotations no more)
+	if isSessionFinished {
+		isRotationFinished = false
+	}
+	return &dto.CurrentSessionInfo{
+		CurrentRotation:     session.CurrentRotation,
+		CurrentSession:      session.Number,
+		RotationFinished:    isRotationFinished,
+		SessionFinished:     isSessionFinished,
+		CompetitionFinished: isCompetitionFinished,
+	}, nil
+
+}

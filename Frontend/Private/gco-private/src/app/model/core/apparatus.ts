@@ -7,6 +7,7 @@ export enum Apparatus{
     HorizontalBar = 5,
     BalanceBeam = 6,
     UnevenBars = 7,
+    CompetitionAdmin = 8 //For live scoring web socket purposes
 }
 
 export interface ApparatusTable {

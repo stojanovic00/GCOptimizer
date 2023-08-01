@@ -32,6 +32,8 @@ service ScoringService{
   rpc IsSessionFinished(IdMessage) returns(BoolMessage){}
   rpc IsCompetitionFinished(IdMessage) returns(BoolMessage){}
 
+  rpc GetCurrentSessionInfo(IdMessage) returns(CurrentSessionInfo){}
+
 }
 
 message EmptyMessage{ }
@@ -196,4 +198,12 @@ message ScoreRequest{
   string competitionId = 1;
   string contestantId = 2;
   Apparatus apparatus = 3;
+}
+
+message CurrentSessionInfo{
+  int32 currentRotation = 1;
+  int32 currentSession = 2;
+  bool rotationFinished = 3;
+  bool sessionFinished = 4;
+  bool competitionFinished = 5;
 }

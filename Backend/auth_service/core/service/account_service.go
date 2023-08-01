@@ -77,6 +77,9 @@ func (s *AccountService) HasPermission(role, permission string) (bool, error) {
 	return s.accountRepository.HasPermission(role, permission)
 }
 
+func (s *AccountService) DeleteAccounts(emails []string) error {
+	return s.accountRepository.DeleteAccounts(emails)
+}
 func hashPassword(password string) (string, error) {
 	// Generate a bcrypt hash of the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

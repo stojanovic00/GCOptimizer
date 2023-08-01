@@ -38,6 +38,10 @@ export class ChoosePanelComponent implements OnInit {
   loadTables = (competitionId : string) => {
     this.jpService.getAppsWithoutPanel(competitionId).subscribe({
       next: (response: Apparatus[]) => {
+        if(!response){
+          this.router.navigate(['sports-org/competition/'  + this.competitionId + '/monitoring']);
+          return;
+        }
         this.unassignedApps.dataSource = response
       },
       error: (err: HttpErrorResponse) => {
@@ -57,9 +61,5 @@ selectRow(row: Apparatus) {
   createPanels = () => {
     let apparatusName = getApparatusName(this.unassignedApps.selectedRow!)
     this.router.navigate(['sports-org/competition/'  + this.competitionId + '/judging-panel/form/' + apparatusName]);
-  }
-
-  finishAssignments = () => {
-    this.router.navigate(['sports-org/competition/'  + this.competitionId + '/monitoring']);
   }
 }

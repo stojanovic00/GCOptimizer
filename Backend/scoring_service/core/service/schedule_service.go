@@ -26,6 +26,17 @@ func (s *ScheduleService) StartCompetition(competitionId uuid.UUID) error {
 		return err
 	}
 
+	//Check if already exists
+	compId, _ := uuid.Parse(competitionPb.Id)
+	exists, err := s.schRepo.CompetitionExists(compId)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return nil
+	}
+
 	schedulePb, err := s.schClient.GetByCompetitionId(context.Background(), &scheduling_pb.IdMessage{Id: competitionId.String()})
 	if err != nil {
 		return err

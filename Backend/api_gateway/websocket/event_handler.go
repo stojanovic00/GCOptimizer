@@ -107,3 +107,21 @@ func (h *EventHandler) GetNextCurrentApparatusContestant(message *EventMessage) 
 		Response:      contestant,
 	}
 }
+func (h *EventHandler) GetCurrentSessionInfo(message *EventMessage) *EventResponse {
+	info, err := h.client.GetCurrentSessionInfo(context.Background(), &scoring_pb.IdMessage{Id: message.CompetitionId})
+	if err != nil {
+		return &EventResponse{
+			Event:         Error,
+			Apparatus:     message.Apparatus,
+			CompetitionId: message.CompetitionId,
+			Response:      &ErrorResponse{Message: err.Error()},
+		}
+	}
+
+	return &EventResponse{
+		Event:         FinishedRotationOrSession,
+		Apparatus:     message.Apparatus,
+		CompetitionId: message.CompetitionId,
+		Response:      info,
+	}
+}

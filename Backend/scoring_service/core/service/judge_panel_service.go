@@ -55,3 +55,22 @@ func (s *JudgePanelService) GetAssignedJudges(competitionId uuid.UUID) ([]domain
 func (s *JudgePanelService) AssignScoreCalculationMethod(scoreCalcMethod *domain.ScoreCalculationMethod, panelId uuid.UUID) error {
 	return s.judgePanelRepo.AssignScoreCalculationMethod(scoreCalcMethod, panelId)
 }
+
+func (s *JudgePanelService) DeleteAllJudgeAccounts(competitionId uuid.UUID) error {
+	judges, err := s.GetAssignedJudges(competitionId)
+	if err != nil {
+		return err
+	}
+
+	var emails []string
+	for _, judge := range judges {
+		emails = append(emails, judge.Email)
+	}
+
+	_, err = s.authClient.DeleteAccounts(context.Background(), &auth_pb.EmailList{Emails: emails})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

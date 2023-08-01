@@ -11,4 +11,5 @@ const (
 	HorizontalBar
 	BalanceBeam
 	UnevenBars
+	CompetitionAdmin
 )

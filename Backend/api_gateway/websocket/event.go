@@ -12,4 +12,6 @@ const (
 	SubmittedScore
 	ScoredContestant
 	RetrievedNextCurrentApparatusContestant
+	FinishedRotationOrSession
+	FinishedCompetition
 )

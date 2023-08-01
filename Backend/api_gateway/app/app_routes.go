@@ -105,6 +105,7 @@ func (a *App) CreateRoutersAndSetRoutes() error {
 	scoGroup.Use(middleware.ValidateAndExtractToken())
 	scoGroup.GET("web-socket", middleware.Authorize("WebSocket"), webSocketServer.OpenConnection)
 	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cru"), scoringHandler.StartCompetition)
+	scoGroup.GET("competition/:id/info", middleware.Authorize("LiveSchedule_cru"), scoringHandler.GetCurrentSessionInfo)
 
 	scoGroup.GET("judge", middleware.Authorize("LiveJudge_r"), scoringHandler.GetLoggedJudgeInfo)
 	scoGroup.GET("competition/:id/contestant", middleware.Authorize("LiveContestant_r"), scoringHandler.GetCurrentApparatusContestants)

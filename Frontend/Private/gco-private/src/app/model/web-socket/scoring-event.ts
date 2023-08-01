@@ -7,5 +7,7 @@ export enum ScoringEvent{
 	RetrievedScore,
 	SubmittedScore,
 	ScoredContestant,
-	RetrievedNextCurrentApparatusContestant
+	RetrievedNextCurrentApparatusContestant,
+	FinishedRotationOrSession,
+	FinishedCompetition
 }

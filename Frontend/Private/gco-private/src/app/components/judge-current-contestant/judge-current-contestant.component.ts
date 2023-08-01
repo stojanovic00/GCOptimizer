@@ -1,8 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Apparatus } from 'src/app/model/core/apparatus';
 import { ContestantScoring } from 'src/app/model/core/contestant-scoring';
 import { JudgingPanelType } from 'src/app/model/core/judging-panel-type';
 import { Score } from 'src/app/model/core/score';
@@ -14,6 +12,7 @@ import { ScoringService } from 'src/app/services/scoring.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { WebSocketEventMessage } from '../../model/web-socket/web-socket-event-message';
 import { ScoringEvent } from 'src/app/model/web-socket/scoring-event';
+import { LoginService } from 'src/app/auth/services/login.service';
 
 @Component({
   selector: 'app-judge-current-contestant',
@@ -86,9 +85,8 @@ dScoreTable :TempScoreTable = {
 
   private  socket : WebSocketService | null= null;
   constructor(
-    private readonly route : ActivatedRoute,
-    private readonly router : Router,
     private readonly scService : ScoringService,
+    private readonly loginService : LoginService,
   ){}
 
 
@@ -149,6 +147,21 @@ public ngOnDestroy() {
               this.score = null;
               this.contestantScored = false;
               this.sendEvent(ScoringEvent.RetrievedNextCurrentApparatusContestant);
+            break;
+          case ScoringEvent.FinishedRotationOrSession:
+            if(!event.data.response.CompetitionFinished){
+              this.loadCurrentContestant();
+              //Restarting all data for next contestant
+              this.rotationFinished = false;
+              this.currentContestant = event.data.response;
+              this.tempScoreSubmitted = false;
+              this.score = null;
+              this.contestantScored = false;
+              this.sendEvent(ScoringEvent.RetrievedNextCurrentApparatusContestant);
+            }
+            break;
+          case ScoringEvent.FinishedCompetition:
+            this.loginService.logout();
             break;
         }
       }

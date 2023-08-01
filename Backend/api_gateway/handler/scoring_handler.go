@@ -384,9 +384,7 @@ func (h *ScoringHandler) FinishCompetition(ctx *gin.Context) {
 		return
 	}
 
-	//TODO REVERT TO STATUS ONLY
-	//ctx.Status(http.StatusOK)
-	ctx.JSON(http.StatusOK, "SRBIJA DO TOKIJA, KUPI TELEFON KOD ZOKIJA")
+	ctx.Status(http.StatusOK)
 }
 
 func (h *ScoringHandler) IsRotationFinished(ctx *gin.Context) {
@@ -423,4 +421,16 @@ func (h *ScoringHandler) IsCompetitionFinished(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, finished.IsTrue)
+}
+
+func (h *ScoringHandler) GetCurrentSessionInfo(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	info, err := h.client.GetCurrentSessionInfo(context.Background(), &scoring_pb.IdMessage{Id: compId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, info)
 }
