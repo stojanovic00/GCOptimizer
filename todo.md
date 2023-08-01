@@ -87,9 +87,8 @@ Endpoints:
         + Check competition finish
 
     - Scoreboards
-        - Finish competition:
-          - Generate scoreboard
-          - Generate team scoreboard
+      - Generate scoreboard
+      - Generate team scoreboard
 
-        - Get scoreboard
-        - Get team scoreboard
+      - Get scoreboard
+      - Get team scoreboard

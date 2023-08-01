@@ -65,7 +65,10 @@ func (r *ScoringRepoPg) GetJudgeJudgingInfo(email string) (*dto.JudgeJudgingInfo
 func (r *ScoringRepoPg) GetScheduleByCompetitionId(competitionId uuid.UUID) (*domain.Schedule, error) {
 	var schedule domain.Schedule
 
-	result := r.dbClient.Where("competition_id = ?", competitionId).First(&schedule)
+	result := r.dbClient.
+		Where("competition_id = ?", competitionId).
+		Preload("Competition").
+		First(&schedule)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -380,4 +383,81 @@ func (r *ScoringRepoPg) IsCompetitionFinished(competitionId uuid.UUID) (bool, er
 		return false, nil
 	}
 	return true, nil
+}
+
+func (r *ScoringRepoPg) GetCompetition(competitionId uuid.UUID) (*domain.Competition, error) {
+	var competition domain.Competition
+	result := r.dbClient.
+		Where("id = ?", competitionId).
+		Preload("TeamComposition").
+		First(&competition)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &competition, nil
+}
+
+func (r *ScoringRepoPg) GetScores(competitionId uuid.UUID) ([]domain.Score, error) {
+	var scores []domain.Score
+	result := r.dbClient.
+		Where("competition_id = ?", competitionId).
+		Preload("Contestant").
+		Find(&scores)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return scores, nil
+}
+
+func (r *ScoringRepoPg) GetScoresByContestantId(contestantId uuid.UUID) ([]domain.Score, error) {
+	var scores []domain.Score
+	result := r.dbClient.
+		Where("contestant_id = ?", contestantId).
+		Find(&scores)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return scores, nil
+}
+
+func (r *ScoringRepoPg) SaveAllAroundScoreBoard(scoreBoard *domain.AllAroundScoreboard) error {
+	result := r.dbClient.Create(scoreBoard)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+func (r *ScoringRepoPg) GetAllAroundScoreBoards(competitionId uuid.UUID) ([]domain.AllAroundScoreboard, error) {
+	var scoreBoards []domain.AllAroundScoreboard
+	result := r.dbClient.
+		Where("competition_id = ?", competitionId).
+		Preload("Slots.Contestant.SportsOrganization.Address").
+		Find(&scoreBoards)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	//Calculate info that is not stored
+	for _, scoreBoard := range scoreBoards {
+		for idx, slot := range scoreBoard.Slots {
+			scores, err := r.GetScoresByContestantId(slot.ContestantID)
+			if err != nil {
+				return nil, err
+			}
+			var totalE float32 = 0
+			var totalD float32 = 0
+			for _, score := range scores {
+				totalE += score.EScore
+				totalD += score.DScore
+			}
+
+			scoreBoard.Slots[idx].Scores = scores
+			scoreBoard.Slots[idx].TotalEScore = totalE
+			scoreBoard.Slots[idx].TotalDScore = totalD
+			scoreBoard.Slots[idx].TotalScore = totalE + totalD
+		}
+	}
+
+	return scoreBoards, nil
 }

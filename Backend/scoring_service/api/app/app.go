@@ -26,6 +26,8 @@ func (a *App) Run() error {
 	pgClient := a.initPGClient()
 	err := pgClient.AutoMigrate(
 		&domain.Address{},
+		&domain.AllAroundScoreboard{},
+		&domain.AllAroundScoreboardSlot{},
 		&domain.Competition{},
 		&domain.Contestant{},
 		&domain.Judge{},

@@ -434,3 +434,15 @@ func (h *ScoringHandler) GetCurrentSessionInfo(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, info)
 }
+
+func (h *ScoringHandler) GetScoreboards(ctx *gin.Context) {
+	compId := ctx.Param("id")
+
+	scoreBoards, err := h.client.GetScoreboards(context.Background(), &scoring_pb.IdMessage{Id: compId})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, scoreBoards)
+}

@@ -33,7 +33,8 @@ service ScoringService{
   rpc IsCompetitionFinished(IdMessage) returns(BoolMessage){}
 
   rpc GetCurrentSessionInfo(IdMessage) returns(CurrentSessionInfo){}
-
+  //Scoreboard
+  rpc GetScoreboards(IdMessage) returns(ScoreBoardBundle){}
 }
 
 message EmptyMessage{ }
@@ -159,6 +160,21 @@ message Score{
 }
 
 
+message AllAroundScoreboardSlot{
+  string id = 1;
+  int32 place = 2;
+  Contestant contestant = 3;
+  repeated Score scores = 4;
+  float totalScore = 5;
+}
+message AllAroundScoreboard{
+  string id = 1;
+  string competitionId = 2;
+  string ageCategory = 3;
+  bool tieBrake = 4;
+  repeated Apparatus apparatuses = 5;
+  repeated AllAroundScoreboardSlot slots = 6;
+}
 
 // DTOS
 message CreateJudgingPanelsForApparatusRequest{
@@ -206,4 +222,8 @@ message CurrentSessionInfo{
   bool rotationFinished = 3;
   bool sessionFinished = 4;
   bool competitionFinished = 5;
+}
+
+message ScoreBoardBundle{
+  repeated AllAroundScoreboard allAroundScoreboards = 1;
 }

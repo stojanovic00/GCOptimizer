@@ -49,6 +49,8 @@ type ScoringServiceClient interface {
 	IsSessionFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error)
 	IsCompetitionFinished(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*BoolMessage, error)
 	GetCurrentSessionInfo(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*CurrentSessionInfo, error)
+	// Scoreboard
+	GetScoreboards(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*ScoreBoardBundle, error)
 }
 
 type scoringServiceClient struct {
@@ -257,6 +259,15 @@ func (c *scoringServiceClient) GetCurrentSessionInfo(ctx context.Context, in *Id
 	return out, nil
 }
 
+func (c *scoringServiceClient) GetScoreboards(ctx context.Context, in *IdMessage, opts ...grpc.CallOption) (*ScoreBoardBundle, error) {
+	out := new(ScoreBoardBundle)
+	err := c.cc.Invoke(ctx, "/scoring_pb.ScoringService/GetScoreboards", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScoringServiceServer is the server API for ScoringService service.
 // All implementations must embed UnimplementedScoringServiceServer
 // for forward compatibility
@@ -288,6 +299,8 @@ type ScoringServiceServer interface {
 	IsSessionFinished(context.Context, *IdMessage) (*BoolMessage, error)
 	IsCompetitionFinished(context.Context, *IdMessage) (*BoolMessage, error)
 	GetCurrentSessionInfo(context.Context, *IdMessage) (*CurrentSessionInfo, error)
+	// Scoreboard
+	GetScoreboards(context.Context, *IdMessage) (*ScoreBoardBundle, error)
 	mustEmbedUnimplementedScoringServiceServer()
 }
 
@@ -360,6 +373,9 @@ func (UnimplementedScoringServiceServer) IsCompetitionFinished(context.Context, 
 }
 func (UnimplementedScoringServiceServer) GetCurrentSessionInfo(context.Context, *IdMessage) (*CurrentSessionInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCurrentSessionInfo not implemented")
+}
+func (UnimplementedScoringServiceServer) GetScoreboards(context.Context, *IdMessage) (*ScoreBoardBundle, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetScoreboards not implemented")
 }
 func (UnimplementedScoringServiceServer) mustEmbedUnimplementedScoringServiceServer() {}
 
@@ -770,6 +786,24 @@ func _ScoringService_GetCurrentSessionInfo_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScoringService_GetScoreboards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScoringServiceServer).GetScoreboards(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scoring_pb.ScoringService/GetScoreboards",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScoringServiceServer).GetScoreboards(ctx, req.(*IdMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScoringService_ServiceDesc is the grpc.ServiceDesc for ScoringService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -864,6 +898,10 @@ var ScoringService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCurrentSessionInfo",
 			Handler:    _ScoringService_GetCurrentSessionInfo_Handler,
+		},
+		{
+			MethodName: "GetScoreboards",
+			Handler:    _ScoringService_GetScoreboards_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

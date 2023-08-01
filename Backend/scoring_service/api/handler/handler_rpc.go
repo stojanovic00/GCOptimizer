@@ -222,6 +222,11 @@ func (h *HandlerRpc) FinishCompetition(ctx context.Context, request *scoring_pb.
 	if err != nil {
 		return nil, err
 	}
+	//Generate scoreboards
+	err = h.scService.GenerateScoreboards(competitionId)
+	if err != nil {
+		return nil, err
+	}
 
 	return &scoring_pb.EmptyMessage{}, nil
 }
@@ -260,4 +265,14 @@ func (h *HandlerRpc) GetCurrentSessionInfo(ctx context.Context, request *scoring
 	}
 
 	return mapper.CurrentSessionInfoDomToPb(info), nil
+}
+func (h *HandlerRpc) GetScoreboards(ctx context.Context, request *scoring_pb.IdMessage) (*scoring_pb.ScoreBoardBundle, error) {
+	competitionId, _ := uuid.Parse(request.Id)
+
+	allAround, err := h.scService.GetAllAroundScoreBoards(competitionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &scoring_pb.ScoreBoardBundle{AllAroundScoreboards: mapper.AllAroundScoreBoardListDomToPb(allAround)}, nil
 }

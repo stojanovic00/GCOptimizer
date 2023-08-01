@@ -21,4 +21,8 @@ type ScoringRepo interface {
 	IsSessionFinished(competitionId uuid.UUID) (bool, error)
 	IsCompetitionFinished(competitionId uuid.UUID) (bool, error)
 	GetScore(competitionId, contestantId uuid.UUID, apparatus domain.Apparatus) (*domain.Score, error)
+	GetCompetition(competitionId uuid.UUID) (*domain.Competition, error)
+	GetScores(competitionId uuid.UUID) ([]domain.Score, error)
+	SaveAllAroundScoreBoard(scoreBoard *domain.AllAroundScoreboard) error
+	GetAllAroundScoreBoards(competitionId uuid.UUID) ([]domain.AllAroundScoreboard, error)
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"scoring_service/core/domain"
 	"scoring_service/core/domain/dto"
@@ -257,4 +258,131 @@ func (s *ScoringService) GetCurrentSessionInfo(competitionId uuid.UUID) (*dto.Cu
 		CompetitionFinished: isCompetitionFinished,
 	}, nil
 
+}
+
+func (s *ScoringService) GenerateScoreboards(compId uuid.UUID) error {
+	schedule, err := s.scRepo.GetScheduleByCompetitionId(compId)
+	if err != nil {
+		return err
+	}
+
+	switch schedule.Competition.Type {
+	case domain.Qualifications:
+		err := s.GenerateAllAroundScoreboards(schedule)
+		if err != nil {
+			return err
+		}
+		err = s.GenerateTeamScoreboards(schedule)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("no such competition type")
+	}
+
+	return nil
+}
+
+type AllAroundScoreboardSlots []domain.AllAroundScoreboardSlot
+
+func (slots AllAroundScoreboardSlots) CompareWithEPrivilege(i, j int) bool {
+	if slots[i].TotalScore != slots[j].TotalScore {
+		// Sort by TotalScore in descending order
+		return slots[i].TotalScore > slots[j].TotalScore
+	} else if slots[i].TotalEScore != slots[j].TotalEScore {
+		// If TotalScore is the same, sort by TotalEScore in descending order
+		return slots[i].TotalEScore > slots[j].TotalEScore
+	} else {
+		// If both TotalScore and EScore are the same, sort by DScore in descending order
+		return slots[i].TotalDScore > slots[j].TotalDScore
+	}
+}
+
+func (s *ScoringService) GenerateAllAroundScoreboards(schedule *domain.Schedule) error {
+	scores, err := s.scRepo.GetScores(schedule.Competition.ID)
+	if err != nil {
+		return err
+	}
+
+	//Group by contestant (ID)
+	scoresByContestant := make(map[uuid.UUID][]domain.Score)
+	for _, score := range scores {
+		scoresByContestant[score.ContestantID] = append(scoresByContestant[score.ContestantID], score)
+	}
+
+	//Create scoreboard slots
+	var slots AllAroundScoreboardSlots
+	for _, contestantsScores := range scoresByContestant {
+
+		var totalE float32 = 0
+		var totalD float32 = 0
+		var scores []domain.Score
+		for _, score := range contestantsScores {
+			totalE += score.EScore
+			totalD += score.DScore
+			scores = append(scores, score)
+		}
+
+		slot := domain.AllAroundScoreboardSlot{
+			ID:           uuid.New(),
+			ContestantID: scores[0].ContestantID,
+			Contestant:   scores[0].Contestant,
+			Scores:       scores,
+			TotalEScore:  totalE,
+			TotalDScore:  totalD,
+			TotalScore:   totalE + totalD,
+		}
+		slots = append(slots, slot)
+	}
+
+	//Group by age category
+	slotsByAgeCat := make(map[string]AllAroundScoreboardSlots)
+	for _, slot := range slots {
+		slotsByAgeCat[slot.Contestant.AgeCategory] = append(slotsByAgeCat[slot.Contestant.AgeCategory], slot)
+	}
+
+	//Assign places
+	for _, slotsByACat := range slotsByAgeCat {
+		//Sort
+		sort.Slice(slotsByACat, slotsByACat.CompareWithEPrivilege)
+
+		//Assign places depending on having same score or not
+		//First one is always on first place
+		placeCounter := 1
+		slotsByACat[0].Place = placeCounter
+		//Starting from second member
+		for idx := 1; idx < len(slotsByACat); idx++ {
+			if slotsByACat[idx].TotalScore != slotsByACat[idx-1].TotalScore {
+				placeCounter++
+			} else if schedule.Competition.Tiebreak && (slotsByACat[idx].TotalDScore != slotsByACat[idx-1].TotalDScore) {
+				placeCounter++
+			}
+			slotsByACat[idx].Place = placeCounter
+		}
+	}
+
+	//Create and save scoreboards
+	for _, slotsByACat := range slotsByAgeCat {
+		scoreBoard := &domain.AllAroundScoreboard{
+			ID:            uuid.New(),
+			CompetitionID: schedule.CompetitionID,
+			AgeCategory:   slotsByACat[0].Contestant.AgeCategory,
+			TieBrake:      schedule.Competition.Tiebreak,
+			Apparatuses:   schedule.ApparatusOrder,
+			Slots:         slotsByACat,
+		}
+		err = s.scRepo.SaveAllAroundScoreBoard(scoreBoard)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+func (s *ScoringService) GenerateTeamScoreboards(schedule *domain.Schedule) error {
+	return nil
+}
+
+func (s *ScoringService) GetAllAroundScoreBoards(competitionId uuid.UUID) ([]domain.AllAroundScoreboard, error) {
+	return s.scRepo.GetAllAroundScoreBoards(competitionId)
 }

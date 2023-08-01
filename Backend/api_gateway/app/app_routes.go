@@ -106,6 +106,7 @@ func (a *App) CreateRoutersAndSetRoutes() error {
 	scoGroup.GET("web-socket", middleware.Authorize("WebSocket"), webSocketServer.OpenConnection)
 	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cru"), scoringHandler.StartCompetition)
 	scoGroup.GET("competition/:id/info", middleware.Authorize("LiveSchedule_cru"), scoringHandler.GetCurrentSessionInfo)
+	scoGroup.GET("competition/:id/score-board", middleware.Authorize("ScoreBoard_r"), scoringHandler.GetScoreboards)
 
 	scoGroup.GET("judge", middleware.Authorize("LiveJudge_r"), scoringHandler.GetLoggedJudgeInfo)
 	scoGroup.GET("competition/:id/contestant", middleware.Authorize("LiveContestant_r"), scoringHandler.GetCurrentApparatusContestants)
@@ -120,7 +121,7 @@ func (a *App) CreateRoutersAndSetRoutes() error {
 
 	scoGroup.POST("competition/:id/rotation/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishRotation)
 	scoGroup.POST("competition/:id/session/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishSession)
-	scoGroup.POST("competition/:id/finish", middleware.Authorize("Scoreboard_c"), scoringHandler.FinishCompetition)
+	scoGroup.POST("competition/:id/finish", middleware.Authorize("ScoreBoard_c"), scoringHandler.FinishCompetition)
 
 	scoGroup.GET("competition/:id/rotation/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsRotationFinished)
 	scoGroup.GET("competition/:id/session/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsSessionFinished)

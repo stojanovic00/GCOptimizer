@@ -382,3 +382,47 @@ func CurrentSessionInfoDomToPb(info *dto.CurrentSessionInfo) *scoring_pb.Current
 		CompetitionFinished: info.CompetitionFinished,
 	}
 }
+
+func ScoreListDomToPb(scores []domain.Score) []*scoring_pb.Score {
+	var scoreListPb []*scoring_pb.Score
+	for _, score := range scores {
+		scoreListPb = append(scoreListPb, ScoreDomToPb(&score))
+	}
+	return scoreListPb
+}
+
+func AllAroundScoreBoardSlotDomToPb(slot *domain.AllAroundScoreboardSlot) *scoring_pb.AllAroundScoreboardSlot {
+	return &scoring_pb.AllAroundScoreboardSlot{
+		Id:         slot.ID.String(),
+		Place:      int32(slot.Place),
+		Contestant: ContestantDomToPb(&slot.Contestant),
+		Scores:     ScoreListDomToPb(slot.Scores),
+		TotalScore: slot.TotalScore,
+	}
+}
+
+func AllAroundScoreBoardSlotListDomToPb(slots []domain.AllAroundScoreboardSlot) []*scoring_pb.AllAroundScoreboardSlot {
+	var slotListPb []*scoring_pb.AllAroundScoreboardSlot
+	for _, slot := range slots {
+		slotListPb = append(slotListPb, AllAroundScoreBoardSlotDomToPb(&slot))
+	}
+	return slotListPb
+}
+
+func AllAroundScoreBoardDomToPb(scb *domain.AllAroundScoreboard) *scoring_pb.AllAroundScoreboard {
+	return &scoring_pb.AllAroundScoreboard{
+		Id:            scb.ID.String(),
+		CompetitionId: scb.CompetitionID.String(),
+		AgeCategory:   scb.AgeCategory,
+		TieBrake:      scb.TieBrake,
+		Apparatuses:   ApparatusListDomToPb(scb.Apparatuses),
+		Slots:         AllAroundScoreBoardSlotListDomToPb(scb.Slots),
+	}
+}
+func AllAroundScoreBoardListDomToPb(scoreBoards []domain.AllAroundScoreboard) []*scoring_pb.AllAroundScoreboard {
+	var scbListPb []*scoring_pb.AllAroundScoreboard
+	for _, slot := range scoreBoards {
+		scbListPb = append(scbListPb, AllAroundScoreBoardDomToPb(&slot))
+	}
+	return scbListPb
+}
