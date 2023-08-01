@@ -12,6 +12,7 @@ import { ApplicationViewComponent } from 'src/app/components/application-view/ap
 import { ChoosePanelComponent } from 'src/app/components/choose-panel/choose-panel.component';
 import { FormPanelComponent } from 'src/app/components/form-panel/form-panel.component';
 import { CompetitionMonitoringComponent } from 'src/app/components/competition-monitoring/competition-monitoring.component';
+import { ScoreboardsComponent } from 'src/app/components/scoreboards/scoreboards.component';
 
 
 
@@ -25,8 +26,8 @@ import { CompetitionMonitoringComponent } from 'src/app/components/competition-m
     ApplicationViewComponent,
     ChoosePanelComponent,
     FormPanelComponent,
-    CompetitionMonitoringComponent
-
+    CompetitionMonitoringComponent,
+    ScoreboardsComponent
   ],
   imports: [
     CommonModule,

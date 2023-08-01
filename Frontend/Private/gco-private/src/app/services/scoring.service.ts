@@ -10,6 +10,7 @@ import { TempScore } from '../model/core/temp-score';
 import { Score } from '../model/core/score';
 import { ScoreRequest } from '../model/dto/score-request';
 import { CurrentSessionInfo } from '../model/dto/current-session-info';
+import { ScoreboardBundle } from '../model/dto/scoreboard-bundle';
 
 @Injectable({
   providedIn: 'root'
@@ -103,6 +104,11 @@ export class ScoringService {
   finishCompetition = (compId: string): Observable<string> => {
     let path = this.path + "/competition/" + compId + "/finish";
     return this.http.post<string>(path, null);
+  }
+
+  getScoreboards = (compId: string): Observable<ScoreboardBundle> => {
+    let path = this.path + "/competition/" + compId + "/score-board";
+    return this.http.get<ScoreboardBundle>(path);
   }
 
 }

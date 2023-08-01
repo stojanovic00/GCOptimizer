@@ -5,7 +5,9 @@ import { formatAddress } from 'src/app/model/core/address';
 import { Competition, CompetitionTable } from 'src/app/model/core/competition';
 import { getCompetitionTypeName } from 'src/app/model/core/competition-type';
 import { getGenderName } from 'src/app/model/core/gender';
+import { ScoreboardBundle } from 'src/app/model/dto/scoreboard-bundle';
 import { CompetitionService } from 'src/app/services/competition.service';
+import { ScoringService } from 'src/app/services/scoring.service';
 import { unixDateToString } from 'src/app/utils/date-utils';
 
 @Component({
@@ -29,11 +31,13 @@ export class CompetitionViewComponent implements OnInit {
 
   //Details
   selectedCompetition : Competition | null = null
+  selectedCompetitionFinished : boolean = false;
   detailsDialogOpened : boolean = false
 
   constructor(
+    private readonly router : Router,
     private readonly compService : CompetitionService,
-    private readonly router : Router
+    private readonly scService : ScoringService,
   ) { }
 
   ngOnInit(): void {
@@ -76,7 +80,22 @@ export class CompetitionViewComponent implements OnInit {
     this.compService.getById(this.table.selectedRow?.id!).subscribe({
       next: (response: Competition) => {
         this.selectedCompetition = response;
-        this.detailsDialogOpened = true;
+
+        //Check if competition finished
+        this.scService.getScoreboards(this.selectedCompetition.id!).subscribe({
+          next: (response: ScoreboardBundle) => {
+            if(response.allAroundScoreboards && response.teamScoreboards){
+              this.selectedCompetitionFinished = true;
+            }
+            else{
+              this.selectedCompetitionFinished = false;
+            }
+            this.detailsDialogOpened = true;
+          },
+          error: (err: HttpErrorResponse) => {
+            alert(err.error);
+          }
+        });
       },
       error: (err: HttpErrorResponse) => {
         alert(err.error);
@@ -102,5 +121,8 @@ export class CompetitionViewComponent implements OnInit {
   viewApplications = () => {
     let compId = this.table.selectedRow?.id;
     this.router.navigate(['sports-org/competition/' + compId + '/application/view']);
+  }
+  goToScoreBoards = () =>{
+      this.router.navigate(['sports-org/competition/' + this.selectedCompetition?.id + '/scoreboards']); 
   }
 }

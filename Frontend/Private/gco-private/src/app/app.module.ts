@@ -10,6 +10,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 import { SportsOrgPageModule } from './pages/sports-org-page/sports-org-page.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { JudgePageModule } from './pages/judge-page/judge-page.module';
+import { ScoreboardsComponent } from './components/scoreboards/scoreboards.component';
 
 @NgModule({
   declarations: [

@@ -138,6 +138,6 @@ export class CompetitionMonitoringComponent implements OnInit {
   }
 
   goToScoreboards = () =>{
-    alert("TODO")
+      this.router.navigate(['sports-org/competition/' + this.competitionId + '/scoreboards']); 
   }
 }

@@ -8,6 +8,7 @@ import { ApplicationViewComponent } from '../components/application-view/applica
 import { ChoosePanelComponent } from '../components/choose-panel/choose-panel.component';
 import { FormPanelComponent } from '../components/form-panel/form-panel.component';
 import { CompetitionMonitoringComponent } from '../components/competition-monitoring/competition-monitoring.component';
+import { ScoreboardsComponent } from '../components/scoreboards/scoreboards.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,10 @@ const routes: Routes = [
   {
     path: 'competition/:id/monitoring',
     component: CompetitionMonitoringComponent
+  },
+  {
+    path: 'competition/:id/scoreboards',
+    component: ScoreboardsComponent
   },
   {
     path: '',
