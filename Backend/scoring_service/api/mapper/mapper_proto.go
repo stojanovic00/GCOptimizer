@@ -426,3 +426,47 @@ func AllAroundScoreBoardListDomToPb(scoreBoards []domain.AllAroundScoreboard) []
 	}
 	return scbListPb
 }
+
+func ApparatusTotalScoresDomToPb(appScores map[domain.Apparatus]float32) map[string]float32 {
+	appScoresPb := make(map[string]float32)
+	for apparatus, score := range appScores {
+		appScoresPb[apparatus.String()] = score
+	}
+	return appScoresPb
+}
+
+func TeamScoreBoardSlotDomToPb(slot *domain.TeamScoreboardSlot) *scoring_pb.TeamScoreboardSlot {
+	return &scoring_pb.TeamScoreboardSlot{
+		Id:                   slot.ID.String(),
+		Place:                int32(slot.Place),
+		SportsOrganization:   sportsOrganizationDomToPb(&slot.SportsOrganization),
+		TeamNumber:           int32(slot.TeamNumber),
+		ApparatusTotalScores: ApparatusTotalScoresDomToPb(slot.ApparatusTotalScores),
+		TotalScore:           slot.TotalScore,
+	}
+}
+
+func TeamScoreBoardSlotListDomToPb(slots []domain.TeamScoreboardSlot) []*scoring_pb.TeamScoreboardSlot {
+	var slotListPb []*scoring_pb.TeamScoreboardSlot
+	for _, slot := range slots {
+		slotListPb = append(slotListPb, TeamScoreBoardSlotDomToPb(&slot))
+	}
+	return slotListPb
+}
+
+func TeamScoreBoardDomToPb(scb *domain.TeamScoreboard) *scoring_pb.TeamScoreboard {
+	return &scoring_pb.TeamScoreboard{
+		Id:            scb.ID.String(),
+		CompetitionId: scb.CompetitionID.String(),
+		AgeCategory:   scb.AgeCategory,
+		Apparatuses:   ApparatusListDomToPb(scb.Apparatuses),
+		Slots:         TeamScoreBoardSlotListDomToPb(scb.Slots),
+	}
+}
+func TeamScoreBoardListDomToPb(scoreBoards []domain.TeamScoreboard) []*scoring_pb.TeamScoreboard {
+	var scbListPb []*scoring_pb.TeamScoreboard
+	for _, slot := range scoreBoards {
+		scbListPb = append(scbListPb, TeamScoreBoardDomToPb(&slot))
+	}
+	return scbListPb
+}

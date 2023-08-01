@@ -25,4 +25,6 @@ type ScoringRepo interface {
 	GetScores(competitionId uuid.UUID) ([]domain.Score, error)
 	SaveAllAroundScoreBoard(scoreBoard *domain.AllAroundScoreboard) error
 	GetAllAroundScoreBoards(competitionId uuid.UUID) ([]domain.AllAroundScoreboard, error)
+	SaveTeamScoreBoard(scoreBoard *domain.TeamScoreboard) error
+	GetTeamScoreBoards(competitionId uuid.UUID) ([]domain.TeamScoreboard, error)
 }

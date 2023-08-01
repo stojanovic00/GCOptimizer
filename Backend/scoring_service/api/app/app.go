@@ -28,6 +28,8 @@ func (a *App) Run() error {
 		&domain.Address{},
 		&domain.AllAroundScoreboard{},
 		&domain.AllAroundScoreboardSlot{},
+		&domain.TeamScoreboard{},
+		&domain.TeamScoreboardSlot{},
 		&domain.Competition{},
 		&domain.Contestant{},
 		&domain.Judge{},

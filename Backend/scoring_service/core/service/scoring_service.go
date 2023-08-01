@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"scoring_service/core/domain"
 	"scoring_service/core/domain/dto"
@@ -379,10 +380,107 @@ func (s *ScoringService) GenerateAllAroundScoreboards(schedule *domain.Schedule)
 
 	return nil
 }
+
 func (s *ScoringService) GenerateTeamScoreboards(schedule *domain.Schedule) error {
+	allAroundScoreboards, err := s.GetAllAroundScoreBoards(schedule.CompetitionID)
+	if err != nil {
+		return err
+	}
+
+	//Because I am using all around scoreboard, slots are already grouped by age category
+	for _, scoreBoard := range allAroundScoreboards {
+
+		slotsByOrgTeam := make(map[string]AllAroundScoreboardSlots)
+		for _, slot := range scoreBoard.Slots {
+			key := fmt.Sprintf("%s-%d", slot.Contestant.SportsOrganizationID, slot.Contestant.TeamNumber)
+			slotsByOrgTeam[key] = append(slotsByOrgTeam[key], slot)
+		}
+
+		//Create teams slots
+		var teamScoreboardSlots []domain.TeamScoreboardSlot
+		for _, teamSlots := range slotsByOrgTeam {
+			teamBaseNum := schedule.Competition.TeamComposition.BaseContestantNumber
+
+			//Calculate best scores for each apparatus and sum them to get total E and D
+			scoresByApparatus := make(map[domain.Apparatus][]domain.Score)
+			for _, slot := range teamSlots {
+				for _, score := range slot.Scores {
+					scoresByApparatus[score.Apparatus] = append(scoresByApparatus[score.Apparatus], score)
+				}
+			}
+			//Sum best n scores on each apparatus and add it to total score
+			var totalScore float32 = 0
+			apparatusTotalScores := make(map[domain.Apparatus]float32)
+			var allScores []domain.Score
+			for apparatus, scores := range scoresByApparatus {
+				sort.Slice(scores, func(i, j int) bool {
+					return scores[i].TotalScore > scores[j].TotalScore
+				})
+
+				//For possible out of bounds error
+				var limit int
+				if teamBaseNum <= len(scores) {
+					limit = teamBaseNum
+				} else {
+					limit = len(scores)
+				}
+
+				best := scores[:limit]
+				var bestSum float32 = 0
+				for _, score := range best {
+					bestSum += score.TotalScore
+				}
+				totalScore += bestSum
+				apparatusTotalScores[apparatus] = bestSum
+				allScores = append(allScores, scores...)
+			}
+
+			teamSlot := domain.TeamScoreboardSlot{
+				ID:                   uuid.New(),
+				SportsOrganizationID: teamSlots[0].Contestant.SportsOrganizationID,
+				TeamNumber:           int(teamSlots[0].Contestant.TeamNumber),
+				Scores:               allScores,
+				ApparatusTotalScores: apparatusTotalScores,
+				TotalScore:           totalScore,
+			}
+			teamScoreboardSlots = append(teamScoreboardSlots, teamSlot)
+		}
+
+		//Assign positions
+		sort.Slice(teamScoreboardSlots, func(i, j int) bool {
+			return teamScoreboardSlots[i].TotalScore > teamScoreboardSlots[j].TotalScore
+		})
+
+		placeCounter := 1
+		teamScoreboardSlots[0].Place = placeCounter
+		for idx := 1; idx < len(teamScoreboardSlots); idx++ {
+			if teamScoreboardSlots[idx].TotalScore != teamScoreboardSlots[idx-1].TotalScore {
+				placeCounter++
+			}
+			teamScoreboardSlots[idx].Place = placeCounter
+		}
+
+		//Save scoreboard
+		teamScoreBoard := &domain.TeamScoreboard{
+			ID:            uuid.New(),
+			CompetitionID: schedule.CompetitionID,
+			AgeCategory:   scoreBoard.AgeCategory,
+			Apparatuses:   scoreBoard.Apparatuses,
+			Slots:         teamScoreboardSlots,
+		}
+
+		err = s.scRepo.SaveTeamScoreBoard(teamScoreBoard)
+		if err != nil {
+			return err
+		}
+
+	}
 	return nil
 }
 
 func (s *ScoringService) GetAllAroundScoreBoards(competitionId uuid.UUID) ([]domain.AllAroundScoreboard, error) {
 	return s.scRepo.GetAllAroundScoreBoards(competitionId)
+}
+func (s *ScoringService) GetTeamScoreBoards(competitionId uuid.UUID) ([]domain.TeamScoreboard, error) {
+	return s.scRepo.GetTeamScoreBoards(competitionId)
 }

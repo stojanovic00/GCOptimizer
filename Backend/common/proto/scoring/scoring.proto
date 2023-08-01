@@ -176,6 +176,24 @@ message AllAroundScoreboard{
   repeated AllAroundScoreboardSlot slots = 6;
 }
 
+message TeamScoreboardSlot{
+  string id = 1;
+  int32 place = 2;
+  SportsOrganization sportsOrganization = 3;
+  int32 teamNumber = 4;
+  //  repeated Score scores = 6;
+  map<string, float> apparatusTotalScores = 5;
+  float totalScore = 6;
+}
+
+message TeamScoreboard{
+  string id = 1;
+  string competitionId = 2;
+  string ageCategory = 3;
+  repeated Apparatus apparatuses = 4;
+  repeated TeamScoreboardSlot slots = 5;
+}
+
 // DTOS
 message CreateJudgingPanelsForApparatusRequest{
   Apparatus apparatus = 1;
@@ -226,4 +244,7 @@ message CurrentSessionInfo{
 
 message ScoreBoardBundle{
   repeated AllAroundScoreboard allAroundScoreboards = 1;
+  repeated TeamScoreboard teamScoreboards = 2;
 }
+
+

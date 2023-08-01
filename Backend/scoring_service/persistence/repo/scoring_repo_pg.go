@@ -67,7 +67,7 @@ func (r *ScoringRepoPg) GetScheduleByCompetitionId(competitionId uuid.UUID) (*do
 
 	result := r.dbClient.
 		Where("competition_id = ?", competitionId).
-		Preload("Competition").
+		Preload("Competition.TeamComposition").
 		First(&schedule)
 	if result.Error != nil {
 		return nil, result.Error
@@ -459,5 +459,27 @@ func (r *ScoringRepoPg) GetAllAroundScoreBoards(competitionId uuid.UUID) ([]doma
 		}
 	}
 
+	return scoreBoards, nil
+}
+
+func (r *ScoringRepoPg) SaveTeamScoreBoard(scoreBoard *domain.TeamScoreboard) error {
+	result := r.dbClient.Create(scoreBoard)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *ScoringRepoPg) GetTeamScoreBoards(competitionId uuid.UUID) ([]domain.TeamScoreboard, error) {
+	var scoreBoards []domain.TeamScoreboard
+	result := r.dbClient.
+		Where("competition_id = ?", competitionId).
+		Preload("Slots.SportsOrganization.Address").
+		Find(&scoreBoards)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	//Calculate info that is not stored
+	//Not needed for now :)
 	return scoreBoards, nil
 }

@@ -273,6 +273,13 @@ func (h *HandlerRpc) GetScoreboards(ctx context.Context, request *scoring_pb.IdM
 	if err != nil {
 		return nil, err
 	}
+	team, err := h.scService.GetTeamScoreBoards(competitionId)
+	if err != nil {
+		return nil, err
+	}
 
-	return &scoring_pb.ScoreBoardBundle{AllAroundScoreboards: mapper.AllAroundScoreBoardListDomToPb(allAround)}, nil
+	return &scoring_pb.ScoreBoardBundle{
+		AllAroundScoreboards: mapper.AllAroundScoreBoardListDomToPb(allAround),
+		TeamScoreboards:      mapper.TeamScoreBoardListDomToPb(team),
+	}, nil
 }
