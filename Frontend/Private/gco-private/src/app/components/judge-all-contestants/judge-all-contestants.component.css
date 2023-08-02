@@ -1,0 +1,47 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+.table-wrap{
+    width: 70%;
+    margin: 100px auto 0px auto ;
+    text-align: right;
+}
+
+/* Everything with !important overrides tables.css */
+
+
+.mat-row:hover{
+    cursor: default!important;
+    background-color: inherit!important;
+    transition:none!important;
+}
+
+.mat-mdc-row:hover{
+    cursor: default!important;
+    background-color: inherit!important;
+    transition:none!important;
+}
+
+
+
+
+.not-competing{
+    background-color: #f0f1f3;
+}
+
+.not-competing:hover{
+    cursor: default!important;
+    background-color: #f0f1f3!important;
+    transition:none!important;
+}
+
+
+
+.current{
+    background-color: #39eca2;
+}
+.current:hover{
+    cursor: default!important;
+    background-color: #39eca2!important;
+    transition:none!important;
+}

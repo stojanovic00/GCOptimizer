@@ -2,6 +2,16 @@
 
 <p *ngIf="sessionViews.length !== 0" class="heading-main">Schedule</p>
 
+<div *ngIf="sessionViews.length" class="button-wrap">
+        <button
+         *ngIf="sessionViews.length !== 0" 
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         (click)="startCompetition()"
+         >Start competition</button>
+</div>
+
 <div class="schedule" *ngFor="let sessionView of sessionViews">
    <p class="heading-hier-1">Session {{sessionView.session}}</p>
    <p class="heading-hier-2">Starting time: {{sessionView.startTime}}</p>

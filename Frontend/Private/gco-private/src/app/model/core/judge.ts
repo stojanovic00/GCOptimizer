@@ -4,7 +4,6 @@ import { LicenceType } from "./licence-type"
 
 export interface Judge{
     delegationMember : DelegationMember;
-    sportsOrganisation? : SportsOrg;
     licenceType : LicenceType;
     licenceName : string;
 }

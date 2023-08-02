@@ -14,6 +14,8 @@ type Config struct {
 	ApplicationServicePort string `long:"application_service_port" env:"APPLICATION_SERVICE_PORT"`
 	SchedulingServiceHost  string `long:"scheduling_service_host" env:"SCHEDULING_SERVICE_HOST"`
 	SchedulingServicePort  string `long:"scheduling_service_port" env:"SCHEDULING_SERVICE_PORT"`
+	ScoringServiceHost     string `long:"scoring_service_host" env:"SCORING_SERVICE_HOST"`
+	ScoringServicePort     string `long:"scoring_service_port" env:"SCORING_SERVICE_PORT"`
 }
 
 func LoadConfig() (Config, error) {

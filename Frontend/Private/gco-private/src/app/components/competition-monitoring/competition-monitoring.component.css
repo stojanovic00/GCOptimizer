@@ -1,0 +1,21 @@
+@import '../../styles/forms-and-headings.css';
+
+
+.wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+  }
+  
+  .wrap h2 {
+    margin-bottom: 45px; 
+    text-align: center; 
+    font-size: 35px;
+  }
+
+button{
+    margin: 0px 20px;
+}
+  

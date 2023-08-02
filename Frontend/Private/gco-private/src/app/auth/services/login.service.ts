@@ -20,6 +20,8 @@ export class LoginService {
   private redirectToMainPage = () => {
     var roleLandingPages = new Map<string, string>([
       ['SPORTS_ORG', 'sports-org/view'],
+      ['E_JUDGE', 'judge/info'],
+      ['D_JUDGE', 'judge/info'],
     ]);
 
     const token = localStorage.getItem('jwt');

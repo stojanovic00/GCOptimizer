@@ -71,8 +71,9 @@
             </li>
         </ul>
         <button mat-raised-button color="primary" (click)="viewApplications()">View applications</button>
-        <button mat-raised-button color="primary" (click)="goToMakeSchedule()">Make schedule</button>
-        <button mat-raised-button color="primary" (click)="goToViewSchedule()">View schedule</button>
+        <button *ngIf="!selectedCompetitionFinished" mat-raised-button color="primary" (click)="goToMakeSchedule()">Make schedule</button>
+        <button  *ngIf="!selectedCompetitionFinished" mat-raised-button color="primary" (click)="goToViewSchedule()">View schedule</button>
+        <button  *ngIf="selectedCompetitionFinished" mat-raised-button color="primary" (click)="goToScoreBoards()">View scoreboards</button>
         <button mat-raised-button color="primary" (click)="closeDetailsDialog()">Close</button>
     </div>
 </div>

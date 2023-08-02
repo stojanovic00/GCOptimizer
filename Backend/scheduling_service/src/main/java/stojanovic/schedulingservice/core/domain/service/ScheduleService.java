@@ -64,6 +64,7 @@ public class ScheduleService {
         //Save
         solution.setSlots(processedSlots);
         solution.setStartingTimes(startingTimes);
+        solution.setApparatusOrder(parameters.getApparatusOrder().stream().map(Apparatus::getType).collect(Collectors.toList()));
         solution.setId(UUID.randomUUID());
         solution.setCompetitionId(parameters.getCompetitionId());
 

@@ -25,6 +25,9 @@ services:
       SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
       SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
 
+      SCORING_SERVICE_HOST: ${SCORING_SERVICE_HOST}
+      SCORING_SERVICE_PORT: ${SCORING_SERVICE_PORT}
+
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     networks:
       - network
@@ -46,7 +49,10 @@ services:
       AUTH_DB_PORT: ${AUTH_DB_PORT}
       AUTH_DB_USER: ${AUTH_DB_USER}
       AUTH_DB_PASS  : ${AUTH_DB_PASS}
+
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      MAIL_CLIENT_MAIL: ${MAIL_CLIENT_MAIL}
+      MAIL_CLIENT_PASSWORD: ${MAIL_CLIENT_PASSWORD}
     networks:
       - network
     depends_on:
@@ -172,12 +178,75 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${SCHEDULING_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${SCHEDULING_DB_PASS}
 
+
+
+
+  scoring-service:
+    image: scoring-service
+    container_name: scoring-service
+    build:
+      context: .
+      dockerfile: ./scoring_service/Dockerfile
+    restart: on-failure
+    ports:
+      - 8004:${SCORING_SERVICE_PORT}
+    environment:
+      SCORING_SERVICE_HOST: ${SCORING_SERVICE_HOST}
+      SCORING_SERVICE_PORT: ${SCORING_SERVICE_PORT}
+      SCORING_DB_NAME: ${SCORING_DB_NAME}
+      SCORING_DB_HOST: ${SCORING_DB_HOST}
+      SCORING_DB_PORT: ${SCORING_DB_PORT}
+      SCORING_DB_USER: ${SCORING_DB_USER}
+      SCORING_DB_PASS: ${SCORING_DB_PASS}
+
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+
+      SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
+      SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
+    networks:
+      - network
+    depends_on:
+      - scoring-db
+
+
+  scoring-db:
+    image: scoring-db
+    container_name: scoring-db
+    restart: on-failure
+    build:
+      context: ../Database/Scoring
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${SCORING_DB_USER}
+      POSTGRES_PASSWORD: ${SCORING_DB_PASS}
+      POSTGRES_DB: ${SCORING_DB_NAME}
+    volumes: 
+      - scoring_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5004:5432
+
+
+
 volumes:
   auth_db:
     driver: local
   application_db:
     driver: local
   scheduling-db:
+    driver: local
+  scoring_db:
     driver: local
 
 networks:

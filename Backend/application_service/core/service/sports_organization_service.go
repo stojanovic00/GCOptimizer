@@ -20,3 +20,6 @@ func (s *SportsOrganisationService) Create(organisation *domain.SportsOrganizati
 func (s *SportsOrganisationService) GetByEmail(email string) (*domain.SportsOrganization, error) {
 	return s.soRepo.GetByEmail(email)
 }
+func (s *SportsOrganisationService) GetByName(name string) (*domain.SportsOrganization, error) {
+	return s.soRepo.GetByName(name)
+}

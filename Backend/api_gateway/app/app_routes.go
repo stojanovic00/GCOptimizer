@@ -3,13 +3,14 @@ package app
 import (
 	grpc_client "api_gateway/client"
 	handler "api_gateway/handler"
+	"api_gateway/websocket"
 	"auth_service/api/middleware"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
+func (a *App) CreateRoutersAndSetRoutes() error {
 	//DEPENDENCIES
 	authServiceAddress := fmt.Sprintf("%s:%s", a.Config.AuthServiceHost, a.Config.AuthServicePort)
 	authClient := grpc_client.NewAuthClient(authServiceAddress)
@@ -22,6 +23,15 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 	schedulingServiceAddress := fmt.Sprintf("%s:%s", a.Config.SchedulingServiceHost, a.Config.SchedulingServicePort)
 	schedulingClient := grpc_client.NewSchedulingClient(schedulingServiceAddress)
 	schedulingHandler := handler.NewSchedulingHandler(schedulingClient)
+
+	scoringServiceAddress := fmt.Sprintf("%s:%s", a.Config.ScoringServiceHost, a.Config.ScoringServicePort)
+	scoringClient := grpc_client.NewScoringClient(scoringServiceAddress)
+	scoringHandler := handler.NewScoringHandler(scoringClient)
+
+	//Web sockets
+	wsEventHandler := websocket.NewEventHandler(scoringClient)
+	webSocketServer := websocket.NewServer(wsEventHandler)
+	go webSocketServer.Start()
 
 	// MIDDLEWARE
 	corsMiddleware := cors.New(cors.Config{
@@ -83,10 +93,50 @@ func (a *App) CreateRoutersAndSetRoutes() (*gin.Engine, *gin.Engine, error) {
 		c.JSON(404, gin.H{"message": "Endpoint doesn't exist"})
 	})
 
+	//Schedule
 	schGroup := privateRouter.Group("scheduling")
 	schGroup.Use(middleware.ValidateAndExtractToken())
 	schGroup.POST("schedule", middleware.Authorize("Schedule_crud"), schedulingHandler.GenerateSchedule)
 	schGroup.GET("schedule/:id", middleware.Authorize("Schedule_crud"), schedulingHandler.GetByCompetitionId)
 
-	return publicRouter, privateRouter, nil
+	//Live scoring
+	scoGroup := privateRouter.Group("scoring")
+	//auth
+	scoGroup.Use(middleware.ValidateAndExtractToken())
+	scoGroup.GET("web-socket", middleware.Authorize("WebSocket"), webSocketServer.OpenConnection)
+	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cru"), scoringHandler.StartCompetition)
+	scoGroup.GET("competition/:id/info", middleware.Authorize("LiveSchedule_cru"), scoringHandler.GetCurrentSessionInfo)
+	scoGroup.GET("competition/:id/score-board", middleware.Authorize("ScoreBoard_r"), scoringHandler.GetScoreboards)
+
+	scoGroup.GET("judge", middleware.Authorize("LiveJudge_r"), scoringHandler.GetLoggedJudgeInfo)
+	scoGroup.GET("competition/:id/contestant", middleware.Authorize("LiveContestant_r"), scoringHandler.GetCurrentApparatusContestants)
+	scoGroup.GET("competition/:id/contestant/current", middleware.Authorize("LiveContestant_r"), scoringHandler.GetNextCurrentApparatusContestant)
+
+	scoGroup.POST("competition/:id/temp-score", middleware.Authorize("Score_c"), scoringHandler.SubmitTempScore)
+	scoGroup.GET("competition/:id/temp-score", middleware.Authorize("Score_r"), scoringHandler.GetContestantsTempScores)
+	scoGroup.GET("competition/:id/score/can-calculate", middleware.Authorize("Score_r"), scoringHandler.CanCalculateScore)
+	scoGroup.GET("competition/:id/score/calculate", middleware.Authorize("Score_r"), scoringHandler.CalculateScore)
+	scoGroup.POST("competition/:id/score", middleware.Authorize("Score_c"), scoringHandler.SubmitScore)
+	scoGroup.GET("competition/:id/score", middleware.Authorize("Score_c"), scoringHandler.GetScore)
+
+	scoGroup.POST("competition/:id/rotation/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishRotation)
+	scoGroup.POST("competition/:id/session/finish", middleware.Authorize("LiveSchedule_cru"), scoringHandler.FinishSession)
+	scoGroup.POST("competition/:id/finish", middleware.Authorize("ScoreBoard_c"), scoringHandler.FinishCompetition)
+
+	scoGroup.GET("competition/:id/rotation/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsRotationFinished)
+	scoGroup.GET("competition/:id/session/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsSessionFinished)
+	scoGroup.GET("competition/:id/finish-check", middleware.Authorize("LiveSchedule_cru"), scoringHandler.IsCompetitionFinished)
+
+	//Judging panel
+	jpGroup := scoGroup.Group("judging-panel")
+	jpGroup.GET("competition/:id/unassigned", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetApparatusesWithoutPanel)
+	jpGroup.POST("", middleware.Authorize("JudgingPanel_crud"), scoringHandler.CreateJudgingPanelsForApparatus)
+	jpGroup.POST("/:id/judge", middleware.Authorize("JudgingPanel_crud"), scoringHandler.AssignJudge)
+	jpGroup.GET("judge/competition/:id", middleware.Authorize("JudgingPanel_crud"), scoringHandler.GetAssignedJudges)
+	jpGroup.POST("/:id/score-calc-method", middleware.Authorize("JudgingPanel_crud"), scoringHandler.AssignScoreCalculationMethod)
+
+	a.PublicRouter = publicRouter
+	a.PrivateRouter = privateRouter
+
+	return nil
 }

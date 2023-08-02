@@ -75,3 +75,11 @@ func (h *AccountHandler) HasPermission(ctx context.Context, request *auth_pb.Has
 
 	return &auth_pb.BoolMessage{Value: hasPermission}, nil
 }
+
+func (h *AccountHandler) DeleteAccounts(ctx context.Context, request *auth_pb.EmailList) (*auth_pb.EmptyMessage, error) {
+	err := h.accountService.DeleteAccounts(request.Emails)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.EmptyMessage{}, nil
+}

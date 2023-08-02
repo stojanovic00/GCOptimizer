@@ -76,3 +76,14 @@ func (r *AccountRepoPg) HasPermission(roleName, permissionName string) (bool, er
 		return false, nil
 	}
 }
+
+func (r *AccountRepoPg) DeleteAccounts(emails []string) error {
+	result := r.dbClient.
+		Where("email IN ?", emails).
+		Delete(&domain.Account{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

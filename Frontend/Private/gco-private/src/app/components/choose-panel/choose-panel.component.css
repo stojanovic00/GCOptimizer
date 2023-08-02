@@ -1,0 +1,21 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+
+
+.wrap {
+    width: 50%;
+    margin: auto;
+}
+
+.wrap p{
+    margin: 70px auto 25px auto;
+}
+
+.button-wrap{
+    text-align: center;
+}
+
+.button-wrap button{
+    width: 30%;
+}

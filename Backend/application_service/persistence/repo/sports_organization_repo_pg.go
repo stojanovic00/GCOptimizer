@@ -50,3 +50,17 @@ func (r *SportsOrganisationRepoPg) GetByEmail(email string) (*domain.SportsOrgan
 	}
 	return &spOrg, nil
 }
+
+func (r *SportsOrganisationRepoPg) GetByName(name string) (*domain.SportsOrganization, error) {
+	var spOrg domain.SportsOrganization
+
+	result := r.dbClient.Where("name = ?", name).Preload("Address").First(&spOrg)
+	if result.Error != nil {
+		return &domain.SportsOrganization{}, result.Error
+	}
+
+	if &spOrg == nil {
+		return &domain.SportsOrganization{}, errors.ErrNotFound{Message: "Sports organisation with given name not found"}
+	}
+	return &spOrg, nil
+}

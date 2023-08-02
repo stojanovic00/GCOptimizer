@@ -1,0 +1,34 @@
+<p class="heading-main">Contestants</p>
+<div class="table-wrap">
+    <table mat-table [dataSource]="contestantsTable.dataSource" class="mat-elevation-z8 tablee">
+
+        <ng-container matColumnDef="compId">
+            <th mat-header-cell *matHeaderCellDef>Num.</th>
+            <td mat-cell *matCellDef="let info">{{info.contestant.competingId}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let info">{{info.contestant.fullName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="team">
+            <th mat-header-cell *matHeaderCellDef>Team</th>
+            <td mat-cell *matCellDef="let info">{{info.contestant.teamNumber}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="ageCat">
+            <th mat-header-cell *matHeaderCellDef>Category</th>
+            <td mat-cell *matCellDef="let info">{{info.contestant.ageCategory}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="organization">
+            <th mat-header-cell *matHeaderCellDef>Organization</th>
+            <td mat-cell *matCellDef="let info"> {{info.contestant.sportsOrganization.name}} </td>
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="contestantsTable.displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: contestantsTable.displayedColumns;" [class.not-competing]="!row.competes" [class.current]="row.contestant?.id! === currentContestant?.id!" ></tr>
+    </table>
+</div>

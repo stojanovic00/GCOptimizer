@@ -12,6 +12,7 @@ import { JudgeApplication } from '../model/core/judge-application';
 export class CompetitionService {
 
   path: string = environment.applicationPath + "/competition";
+  scoringPath: string = environment.scoringPath + "/competition";
 
   constructor(
     private readonly http: HttpClient
@@ -37,5 +38,10 @@ export class CompetitionService {
   getJudgeApplications = (competitionId: string): Observable<JudgeApplication[]> => {
     let path = this.path + "/"+  competitionId + "/app/judge";
     return this.http.get<JudgeApplication[]>(path);
+  }
+
+  startCompetition = (competitionId : string): Observable<string> =>{
+    let path = this.scoringPath + "/" + competitionId;
+    return this.http.post<string>(path, null);
   }
 }

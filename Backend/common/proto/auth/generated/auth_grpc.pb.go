@@ -25,6 +25,7 @@ type AuthServiceClient interface {
 	Create(ctx context.Context, in *Account, opts ...grpc.CallOption) (*IdResponse, error)
 	Login(ctx context.Context, in *Account, opts ...grpc.CallOption) (*AccessToken, error)
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*BoolMessage, error)
+	DeleteAccounts(ctx context.Context, in *EmailList, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
 type authServiceClient struct {
@@ -62,6 +63,15 @@ func (c *authServiceClient) HasPermission(ctx context.Context, in *HasPermission
 	return out, nil
 }
 
+func (c *authServiceClient) DeleteAccounts(ctx context.Context, in *EmailList, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, "/auth_pb.AuthService/DeleteAccounts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type AuthServiceServer interface {
 	Create(context.Context, *Account) (*IdResponse, error)
 	Login(context.Context, *Account) (*AccessToken, error)
 	HasPermission(context.Context, *HasPermissionRequest) (*BoolMessage, error)
+	DeleteAccounts(context.Context, *EmailList) (*EmptyMessage, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedAuthServiceServer) Login(context.Context, *Account) (*AccessT
 }
 func (UnimplementedAuthServiceServer) HasPermission(context.Context, *HasPermissionRequest) (*BoolMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
+}
+func (UnimplementedAuthServiceServer) DeleteAccounts(context.Context, *EmailList) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccounts not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -152,6 +166,24 @@ func _AuthService_HasPermission_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_DeleteAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailList)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).DeleteAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_pb.AuthService/DeleteAccounts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).DeleteAccounts(ctx, req.(*EmailList))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HasPermission",
 			Handler:    _AuthService_HasPermission_Handler,
+		},
+		{
+			MethodName: "DeleteAccounts",
+			Handler:    _AuthService_DeleteAccounts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

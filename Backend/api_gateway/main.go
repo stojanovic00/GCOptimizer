@@ -2,7 +2,6 @@ package main
 
 import (
 	"api_gateway/app"
-	"api_gateway/config"
 	"context"
 	"fmt"
 	"log"
@@ -14,18 +13,9 @@ import (
 )
 
 func main() {
-	app := &app.App{}
-
-	var err error
-	app.Config, err = config.LoadConfig()
+	app, err := app.NewApp()
 	if err != nil {
-		log.Fatal(err.Error())
-		return
-	}
-
-	app.PublicRouter, app.PrivateRouter, err = app.CreateRoutersAndSetRoutes()
-	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatalf(err.Error())
 		return
 	}
 

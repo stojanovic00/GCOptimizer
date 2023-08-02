@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Schedule } from 'src/app/model/core/schedule';
 import { ScheduleSessionView } from 'src/app/model/dto/schedule-session-view';
 import { ScheduleDtoToScheduleView } from 'src/app/model/mappers/schedule-mapper';
@@ -18,13 +18,17 @@ export class ScheduleViewComponent implements OnInit {
 
   constructor(
     private readonly route : ActivatedRoute,
+    private readonly router : Router,
     private readonly schService : ScheduleService,
+    private readonly compService : CompetitionService,
   ){}
+
+  competitionId : string = ""
 
   ngOnInit(): void {
       this.route.paramMap.subscribe((params) => {
-      let compId = params.get('id') || "";
-      this.loadData(compId)
+      this.competitionId = params.get('id') || "";
+      this.loadData(this.competitionId)
     });
   }
 
@@ -35,6 +39,17 @@ export class ScheduleViewComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
           this.sessionViews = [];
+      }
+    }); 
+  }
+
+  startCompetition = () =>{
+      this.compService.startCompetition(this.competitionId).subscribe({
+      next: (response: string) => {
+        this.router.navigate(['sports-org/competition/'  + this.competitionId + '/judging-panel/unassigned']);
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.error)
       }
     }); 
   }
