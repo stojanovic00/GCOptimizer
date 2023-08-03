@@ -35,10 +35,17 @@ public class ScheduleService {
 
         //Prepare data for optaplanner
         List<Contestant> contestants = generateContestants(applications);
-        List<ScheduleSlot> slots = generateScheduleSlots(parameters, contestants.size(), apparatusOrder);
+        List<ScheduleSlot> slots = generateScheduleSlots(parameters, contestants, apparatusOrder);
+
+        List<Integer> sessions = new ArrayList<Integer>();
+        int maxSessionNumber = calculateMaxSessionNum(parameters);
+
+        for(int i = 1; i <= maxSessionNumber;i++){
+           sessions.add(i);
+        }
 
         //Initialize planning solution
-        Schedule schedule = new Schedule(contestants, slots);
+        Schedule schedule = new Schedule(sessions, apparatusOrder, slots);
 
 
         UUID problemId = UUID.randomUUID();
@@ -95,22 +102,15 @@ public class ScheduleService {
         return contestants;
     }
 
-    private List<ScheduleSlot> generateScheduleSlots(SchedulingParameters parameters, int allContestantsNum, List<ApparatusType> apparatusOrder){
-       double maxSessionNum = calculateMaxSessionNum(parameters);
+    private List<ScheduleSlot> generateScheduleSlots(SchedulingParameters parameters,List<Contestant> contestants, List<ApparatusType> apparatusOrder){
 
        List<ScheduleSlot> slots = new ArrayList<ScheduleSlot>();
        long slotCounter = 0;
-
-       //Each session has table for each apparatus with row number equal to contestants per apparatus
-       for(int sessionNum = 1; sessionNum <= maxSessionNum;sessionNum++){
-          for(Apparatus apparatus : parameters.getApparatusOrder()){
-              for(int i = 0; i < parameters.getContestantNumPerApparatus(); i++){
-                  slotCounter ++;
-                  ScheduleSlot slot = new ScheduleSlot(slotCounter, sessionNum, apparatus.getType(), allContestantsNum, apparatusOrder);
-                  slots.add(slot);
-              }
-          }
-       }
+       //Make n Slots where n is number of contestants
+        for(int i = 0; i < contestants.size();i++){
+           slotCounter++;
+           slots.add(new ScheduleSlot(slotCounter, parameters.getContestantNumPerApparatus(), apparatusOrder, contestants.get(i)));
+        }
 
         return slots;
     }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver xmlns="https://www.optaplanner.org/xsd/solver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.optaplanner.org/xsd/solver https://www.optaplanner.org/xsd/solver/solver.xsd">
+
+    <solutionClass>stojanovic.schedulingservice.core.domain.model.Schedule</solutionClass>
+    <entityClass>stojanovic.schedulingservice.core.domain.model.ScheduleSlot</entityClass>
+
+    <scoreDirectorFactory>
+        <constraintProviderClass>stojanovic.schedulingservice.core.domain.constraints.ScheduleConstraintProvider</constraintProviderClass>
+    </scoreDirectorFactory>
+
+    <termination>
+        <bestScoreLimit>[0/0]hard/[0/0/0]soft</bestScoreLimit>
+    </termination>
+
+    <constructionHeuristic>
+        <constructionHeuristicType>FIRST_FIT</constructionHeuristicType>
+    </constructionHeuristic>
+
+    <localSearch>
+        <acceptor>
+            <entityTabuRatio>0.05</entityTabuRatio>
+        </acceptor>
+        <forager>
+            <acceptedCountLimit>1000</acceptedCountLimit>
+        </forager>
+    </localSearch></solver>

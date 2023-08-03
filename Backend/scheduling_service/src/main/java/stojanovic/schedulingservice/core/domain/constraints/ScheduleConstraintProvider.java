@@ -2,7 +2,6 @@ package stojanovic.schedulingservice.core.domain.constraints;
 
 import org.optaplanner.core.api.score.buildin.bendable.BendableScore;
 import org.optaplanner.core.api.score.stream.Constraint;
-import org.optaplanner.core.api.score.stream.ConstraintCollectors;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
 import org.optaplanner.core.api.score.stream.ConstraintProvider;
 import stojanovic.schedulingservice.core.domain.model.Apparatus;
@@ -13,7 +12,9 @@ import stojanovic.schedulingservice.core.domain.model.ScheduleSlot;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.optaplanner.core.api.score.stream.ConstraintCollectors.*;
 import static org.optaplanner.core.api.score.stream.Joiners.equal;
+import static org.optaplanner.core.api.score.stream.Joiners.lessThan;
 
 public class ScheduleConstraintProvider implements ConstraintProvider {
     private static final int BENDABLE_SCORE_HARD_LEVELS_SIZE = 2;
@@ -21,12 +22,12 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
     @Override
     public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
         return new Constraint[ ]{
-                contestantNotAssigned(constraintFactory),
-                contestantAssignedMultipleTimes(constraintFactory),
+                apparatusNumGreaterThanGiven(constraintFactory),
                 sameSportOrgContestantsWithSameSessionOnDifferentApparatuses(constraintFactory),
                 contestantWithLesserAgeCategoryInGreaterSession(constraintFactory),
                 greaterSessionHasMoreFilledSlots(constraintFactory),
-                contestantsWithSameAgeCategoryInSameSession(constraintFactory),
+                contestantsWithSameAgeCategoryInDiffSession(constraintFactory),
+                contestantsWithDiffAgeCategoryInSameSession(constraintFactory),
                 contestantsWithSameCountryInSameSessionOnSameApparatus(constraintFactory),
                 contestantsWithSameCityInSameSessionOnSameApparatus(constraintFactory),
                 contestantPenalizeWait(constraintFactory)
@@ -37,37 +38,22 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
 //    HARD 1
 //******************************
 
-    //    There can't be contestant that isn't assigned to any slot
-    private Constraint contestantNotAssigned(ConstraintFactory factory) {
-        return factory.forEachIncludingNullVars(ScheduleSlot.class)
-                .filter(slot -> {
-                    return slot.getContestant() == null;
-                })
-                .penalize(BendableScore.ofHard(
-                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
-                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
-                        0,
-                        2
-                ))
-                .asConstraint("Contestant not assigned");
-    }
-
-
-//    //    Contestant must be assigned to only one slot
-    private Constraint contestantAssignedMultipleTimes(ConstraintFactory factory) {
-        return factory.forEach(ScheduleSlot.class)
-                .join(ScheduleSlot.class,
-                        equal(ScheduleSlot::getContestant, ScheduleSlot::getContestant)
-                )
-                .penalize(BendableScore.ofHard(
-                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
-                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
-                        0,
-                        1
-                ))
-                .asConstraint("Contestant assigned multiple times");
-    }
-
+// Contestants per apparatus must be lower or equal to give number of contestants per apparatus
+private Constraint apparatusNumGreaterThanGiven(ConstraintFactory factory) {
+    // Group by the number of contestants per apparatus
+    return factory.forEach(ScheduleSlot.class)
+            .groupBy( slot -> new CustomKey(slot.getSession(), slot.getStartingApparatus(), slot.getContestantsPerApparatus()), count())
+            .filter((key, count) ->{
+                return count > key.getContestantsNum();
+            })
+            .penalize(BendableScore.ofHard(
+                    BENDABLE_SCORE_HARD_LEVELS_SIZE,
+                    BENDABLE_SCORE_SOFT_LEVELS_SIZE,
+                    0,
+                    1
+            ))
+            .asConstraint("Apparatus number greater than given");
+}
 
 //******************************
 //    HARD 2
@@ -101,7 +87,45 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
 //******************************
 //    SOFT 1
 //******************************
+//    Contestants with same age category should be in same session
+    private Constraint contestantsWithSameAgeCategoryInDiffSession(ConstraintFactory factory) {
+        return factory.forEach(ScheduleSlot.class)
+                .join(ScheduleSlot.class,
+                       equal(
+                               slot -> slot.getContestant().getAgeCategory(),
+                               slot -> slot.getContestant().getAgeCategory()
+                       ),
+                        lessThan(ScheduleSlot::getPlanningId, ScheduleSlot::getPlanningId)
+                    )
+                .filter( (slot1, slot2) -> {
+                    return slot1.getSession() != slot2.getSession();
+                })
+                .penalize(BendableScore.ofSoft(
+                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
+                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
+                        0,
+                        1
+                ))
+                .asConstraint("Contestants with same age category in different session");
+    }
 
+    private Constraint contestantsWithDiffAgeCategoryInSameSession(ConstraintFactory factory) {
+        return factory.forEach(ScheduleSlot.class)
+                .join(ScheduleSlot.class,
+                       equal(ScheduleSlot::getSession, ScheduleSlot::getSession),
+                        lessThan(ScheduleSlot::getPlanningId, ScheduleSlot::getPlanningId)
+                )
+                .filter((slot1, slot2) -> {
+                    return  !slot1.getContestant().getAgeCategory().getName().equals(slot2.getContestant().getAgeCategory().getName());
+                })
+                .penalize(BendableScore.ofSoft(
+                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
+                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
+                        0,
+                        1
+                ))
+                .asConstraint("Contestants different  age category in same session");
+    }
 //    Contestants with lesser age category shouldn't be in greater session
 //    In layman's terms : schedule should be sorted by age category ascending
 
@@ -119,44 +143,11 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
                         BENDABLE_SCORE_HARD_LEVELS_SIZE,
                         BENDABLE_SCORE_SOFT_LEVELS_SIZE,
                         0,
-                        3
+                        1
                 ))
                 .asConstraint("Contestants with lesser age category in greater session");
     }
 
-    // First fully fill lower sessions
-    private Constraint greaterSessionHasMoreFilledSlots(ConstraintFactory factory) {
-        return factory.forEach(ScheduleSlot.class)
-                .groupBy(ScheduleSlot::getSession, ConstraintCollectors.count())
-                .penalize(BendableScore.ofSoft(
-                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
-                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
-                        0,
-                                1
-                        //This is penalty function (it was sufficient to state it for previous constraints(default value is 1)).
-                        //Final penalty is weight(in this case 1) * penalty function result
-                        //This function penalizes more, greater sessions with higher count
-                        ), (session, count) -> session * count )
-                .asConstraint("Greater session has more filled slots than lesser session");
-    }
-
-//    Contestants with same age category should be in same session
-    private Constraint contestantsWithSameAgeCategoryInSameSession(ConstraintFactory factory) {
-        return factory.forEach(ScheduleSlot.class)
-                .join(ScheduleSlot.class,
-                        equal(ScheduleSlot::getSession, ScheduleSlot::getSession)
-                )
-                .filter(
-                        (slot1, slot2) -> slot1.getContestant().getAgeCategory().getName().equals(slot2.getContestant().getAgeCategory().getName())
-                )
-                .reward(BendableScore.ofSoft(
-                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
-                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
-                        0,
-                        1
-                ))
-                .asConstraint("Contestants with same age category in same session");
-    }
 
 
 //******************************
@@ -164,6 +155,20 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
 //******************************
 
 
+    private Constraint greaterSessionHasMoreFilledSlots(ConstraintFactory factory) {
+        return factory.forEach(ScheduleSlot.class)
+                .groupBy(ScheduleSlot::getSession, count())
+                .penalize(BendableScore.ofSoft(
+                        BENDABLE_SCORE_HARD_LEVELS_SIZE,
+                        BENDABLE_SCORE_SOFT_LEVELS_SIZE,
+                        0,
+                        2
+                        //This is penalty function (it was sufficient to state it for previous constraints(default value is 1)).
+                        //Final penalty is weight(in this case 1) * penalty function result
+                        //This function penalizes more, greater sessions with higher count
+                ), (session, count) -> session* count )
+                .asConstraint("Greater session has more filled slots than lesser session");
+    }
 
 //    Contestants should have same starting apparatus if:
 //          2: They are from same city
@@ -254,39 +259,4 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
                         )
                 .asConstraint("Contestants non competing apparatus wait");
     }
-
-
-
-
-
-
-
-//    Constraints summed up:
-
-//    HARD 1: (Each contestant is included in schedule once and only once)
-//    Contestant can be assigned to only one slot
-//    There can't be contestant that isn't assigned to any slot
-
-//    HARD 2
-//    Contestants from same organisation must have same starting apparatus in one session
-
-//    SOFT 1 (sort and compress but keep together same age category)
-//    Contestants with lower age category should be in lower session
-//    There should be minimal number of sessions(first fill lower sessions)
-//    All contestants with same age category should be in same session
-
-
-//    SOFT 2
-//     Contestants should have same starting apparatus if:
-//          1: They are from same sports organization! (Defined as HARD 2)
-//          2: They are from same city
-//          3: They are from same country
-
-//    SOFT 3
-//    For contestants that don't compete on all apparatuses:
-//        Give them starting apparatus, so they finish as fast as possible:
-//            Minimal waiting between apparatuses
-//
-//            If competition apparatus order is 0 1 2 3 4 5
-//            Best solution for contestant that competes only apparatuses 0 3 5 is to start on apparatus 3
 }

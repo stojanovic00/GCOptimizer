@@ -408,6 +408,12 @@ func (s *ScoringService) GenerateTeamScoreboards(schedule *domain.Schedule) erro
 					scoresByApparatus[score.Apparatus] = append(scoresByApparatus[score.Apparatus], score)
 				}
 			}
+
+			//Check if there is enough contestants to make a team
+			if len(scoresByApparatus[schedule.ApparatusOrder[0]]) < teamBaseNum {
+				continue
+			}
+
 			//Sum best n scores on each apparatus and add it to total score
 			var totalScore float32 = 0
 			apparatusTotalScores := make(map[domain.Apparatus]float32)

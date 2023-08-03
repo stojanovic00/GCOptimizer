@@ -39,7 +39,7 @@ func main() {
 	privateServer := &http.Server{
 		Handler:           app.PrivateRouter,
 		Addr:              privateAddress,
-		WriteTimeout:      100 * time.Second, // because optaplanner takes time
+		WriteTimeout:      1000 * time.Second, // because optaplanner takes time
 		ReadTimeout:       15 * time.Second,
 		ReadHeaderTimeout: 100 * time.Millisecond,
 		MaxHeaderBytes:    2048,
