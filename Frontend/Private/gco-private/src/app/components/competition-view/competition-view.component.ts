@@ -84,7 +84,7 @@ export class CompetitionViewComponent implements OnInit {
         //Check if competition finished
         this.scService.getScoreboards(this.selectedCompetition.id!).subscribe({
           next: (response: ScoreboardBundle) => {
-            if(response.allAroundScoreboards && response.teamScoreboards){
+            if(response.allAroundScoreboards){
               this.selectedCompetitionFinished = true;
             }
             else{

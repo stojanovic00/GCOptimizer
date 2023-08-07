@@ -82,7 +82,7 @@
         </div>
 </div>
 
-<p *ngIf="scoreBoardBundle?.teamScoreboards!.length !== 0" class="heading-hier-1">Team</p>
+<p *ngIf="scoreBoardBundle?.teamScoreboards" class="heading-hier-1">Team</p>
 <div *ngFor="let scoreboard of scoreBoardBundle?.teamScoreboards!" class="scoreboard">
     <p class="heading-hier-2">{{scoreboard.ageCategory}}</p>
     <div class="table-wrap">

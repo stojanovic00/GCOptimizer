@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter} from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Apparatus } from '../model/core/apparatus';
 import { WebSocketEventMessage } from '../model/web-socket/web-socket-event-message';
@@ -13,11 +13,12 @@ export class WebSocketService {
     public constructor(apparatus: Apparatus, compId: string) {
 
 
-        // Second parameter puts value in header "Sec-Websocket-Protocol"
-        // I put there my bearer and I modified auth middleware to read from that header if it doesn't find "Authorization" header
+        // There is no authentication for web sockets right now, because it doesn't support auth headers
+        // There should be made some challenge response authentication like first sending pre ws request that returns some code for response
+        // and then sending that code when establishing ws
         const requestPath: string = this.webSocketPath+"?apparatus=" + apparatus + "&competitionId=" + compId;
-        const jwt: string = localStorage.getItem("jwt")!; 
-        this.socket = new WebSocket(requestPath, [jwt]);
+        this.socket = new WebSocket(requestPath);
+        
         this.socket.onopen = event => {
             this.listener.emit({"type": "open", "data": event});
         }

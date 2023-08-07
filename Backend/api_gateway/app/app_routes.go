@@ -101,9 +101,10 @@ func (a *App) CreateRoutersAndSetRoutes() error {
 
 	//Live scoring
 	scoGroup := privateRouter.Group("scoring")
+	scoGroup.GET("web-socket", webSocketServer.OpenConnection)
 	//auth
 	scoGroup.Use(middleware.ValidateAndExtractToken())
-	scoGroup.GET("web-socket", middleware.Authorize("WebSocket"), webSocketServer.OpenConnection)
+	//scoGroup.GET("web-socket", middleware.Authorize("WebSocket"), webSocketServer.OpenConnection)
 	scoGroup.POST("competition/:id", middleware.Authorize("LiveSchedule_cru"), scoringHandler.StartCompetition)
 	scoGroup.GET("competition/:id/info", middleware.Authorize("LiveSchedule_cru"), scoringHandler.GetCurrentSessionInfo)
 	scoGroup.GET("competition/:id/score-board", middleware.Authorize("ScoreBoard_r"), scoringHandler.GetScoreboards)

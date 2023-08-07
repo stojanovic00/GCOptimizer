@@ -2,13 +2,18 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+  const host: string =  "localhost"
+  //For this to work you need to start with:  ng serve --host 0.0.0.0 --port 4202
+  //This way, it will be accesible from devices in local network
+  //const host: string = "192.168.43.111"  
+
 export const environment = {
   production: false,
-  applicationPath: "http://localhost:8081/application",
-  authPath: "http://localhost:8081/auth",
-  schedulingPath: "http://localhost:8082/scheduling",
-  scoringPath: "http://localhost:8082/scoring",
-  webSocketPath: "ws://localhost:8082/scoring/web-socket",
+  applicationPath: "http://" + host + ":8081/application",
+  authPath: "http://" + host + ":8081/auth",
+  schedulingPath: "http://" + host + ":8082/scheduling",
+  scoringPath: "http://" + host + ":8082/scoring",
+  webSocketPath: "ws://" + host + ":8082/scoring/web-socket",
 };
 
 /*

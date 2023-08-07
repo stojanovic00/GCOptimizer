@@ -26,16 +26,19 @@ import java.util.UUID;
 public class Schedule {
     @Id
     UUID id;
-    @ValueRangeProvider
+    //Things that change inside schedule: slot (session, apparatus)
     // States that contestant is readonly.
-    // Only thing that changes in this optimization problem is contestant field inside ScheduleSlot
     // ProblemFactCollectionProperties are available to constraint streams
+    @ValueRangeProvider
     @ProblemFactCollectionProperty
     @Transient
-    private List<Contestant> contestants;
+    private List<Integer> sessions;
+    @ValueRangeProvider
 
-    @PlanningEntityCollectionProperty
-    private List<ScheduleSlot> slots;
+    @ProblemFactCollectionProperty
+    @Transient
+    private List<ApparatusType> startingApparatuses;
+@PlanningEntityCollectionProperty private List<ScheduleSlot> slots;
 
     @PlanningScore(bendableHardLevelsSize = 2, bendableSoftLevelsSize = 3)
     @Transient
@@ -48,9 +51,9 @@ public class Schedule {
     @Indexed
     private UUID competitionId;
 
-
-   public Schedule(List<Contestant> contestants, List<ScheduleSlot> slots){
-       this.contestants = contestants;
-       this.slots = slots;
-   }
+    public Schedule(List<Integer> sessions, List<ApparatusType> startingApparatuses, List<ScheduleSlot> slots) {
+        this.sessions = sessions;
+        this.startingApparatuses = startingApparatuses;
+        this.slots = slots;
+    }
 }

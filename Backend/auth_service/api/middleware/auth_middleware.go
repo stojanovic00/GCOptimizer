@@ -25,22 +25,14 @@ var (
 
 func ValidateAndExtractToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var tokenString string
 		bearerToken := ctx.Request.Header.Get("Authorization")
 		if bearerToken == "" {
-			// Maybe it is web socket opening request(it can't have Authorize header) so check its dedicated auth header
-			bearerToken = ctx.Request.Header.Get("Sec-Websocket-Protocol")
-			if bearerToken == "" {
-				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"errors": "No authentication header provided"})
-				ctx.Abort()
-				return
-			}
-			//It doesn't have "Bearer " part so no need for parsing
-			tokenString = bearerToken
-		} else {
-			//Removes "Bearer "
-			tokenString = strings.Split(bearerToken, " ")[1]
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"errors": "No authentication header provided"})
+			ctx.Abort()
+			return
 		}
+
+		tokenString := strings.Split(bearerToken, " ")[1]
 
 		claims, err := service.VerifyToken(tokenString)
 		if err != nil {
