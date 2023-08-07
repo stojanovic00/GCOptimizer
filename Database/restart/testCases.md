@@ -17,8 +17,9 @@
 
 # Primeri
 
-- DKMT: (4 na spravi)
+- DKMT: (4 na spravi, sve 4 sprave)
     - hard1, hard2, soft1
-- Country/city example (2 na spravi)
+- Country/city example (2 na spravi, sve 4 sprave)
     - soft2
-- Min waiting example (1 na spravi)
+- Min waiting example (1 na spravi, svih 6 sprava)
+- Live scoring(2 na spravi, 2 greda, parter)

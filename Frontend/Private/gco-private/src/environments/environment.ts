@@ -5,7 +5,7 @@
   const host: string =  "localhost"
   //For this to work you need to start with:  ng serve --host 0.0.0.0 --port 4202
   //This way, it will be accesible from devices in local network
-  // const host: string = "192.168.43.111"  
+  //const host: string = "192.168.43.111"  
 
 export const environment = {
   production: false,

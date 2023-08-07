@@ -457,6 +457,9 @@ func (s *ScoringService) GenerateTeamScoreboards(schedule *domain.Schedule) erro
 			return teamScoreboardSlots[i].TotalScore > teamScoreboardSlots[j].TotalScore
 		})
 
+		if len(teamScoreboardSlots) == 0 {
+			return nil
+		}
 		placeCounter := 1
 		teamScoreboardSlots[0].Place = placeCounter
 		for idx := 1; idx < len(teamScoreboardSlots); idx++ {

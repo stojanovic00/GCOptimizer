@@ -113,8 +113,8 @@ func (server *Server) OpenConnection(ctx *gin.Context) {
 
 	//Upgrade connection to web socket duplex
 	//Check origin function is used for CORS (this one allows everything)
-	connection, error := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}).Upgrade(ctx.Writer, ctx.Request, nil)
-	if error != nil {
+	connection, err := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}).Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
