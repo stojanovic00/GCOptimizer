@@ -1,0 +1,16 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+.heading-hier-2{
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.scoreboard .table-wrap{
+    width: 90%;
+    margin: 20px auto 20px auto;
+}
+
+.important{
+    background-color:#f6f0ff;
+}

@@ -1,0 +1,250 @@
+syntax = "proto3";
+
+option go_package = "common/scoring_pb";
+package scoring_pb;
+
+service ScoringService{
+  rpc StartCompetition(IdMessage) returns(EmptyMessage) {}
+  //Judging panel
+  rpc GetApparatusesWithoutPanel(IdMessage) returns(ApparatusList) {}
+  rpc CreateJudgingPanelsForApparatus(CreateJudgingPanelsForApparatusRequest) returns(CreateJudgingPanelsForApparatusResponse) {}
+  rpc AssignJudge(AssignJudgeRequest) returns(EmptyMessage){}
+  rpc GetAssignedJudges(IdMessage) returns(JudgeList){}
+  rpc AssignScoreCalculation(AssignScoreCalculationRequest) returns(EmptyMessage){}
+  //Live scoring
+    //Judge and contestant info
+  rpc GetLoggedJudgeInfo(EmptyMessage) returns(JudgeJudgingInfo){}
+  rpc GetCurrentApparatusContestants(GetByApparatusRequest) returns(ContestantList){}
+  rpc GetNextCurrentApparatusContestant(GetByApparatusRequest) returns(Contestant){}
+    //Scores
+  rpc SubmitTempScore(TempScore) returns(EmptyMessage){}
+  rpc GetContestantsTempScores(ScoreRequest) returns(TempScoreList){}
+  rpc CanCalculateScore(ScoreRequest) returns(BoolMessage){}
+  rpc CalculateScore(ScoreRequest) returns(Score){}
+  rpc SubmitScore(Score) returns(EmptyMessage){}
+  rpc GetScore(ScoreRequest) returns(Score){}
+    //Events
+  rpc FinishRotation(IdMessage) returns(EmptyMessage){}
+  rpc FinishSession(IdMessage) returns(EmptyMessage){}
+  rpc FinishCompetition(IdMessage) returns(EmptyMessage){}
+
+  rpc IsRotationFinished(IdMessage) returns(BoolMessage){}
+  rpc IsSessionFinished(IdMessage) returns(BoolMessage){}
+  rpc IsCompetitionFinished(IdMessage) returns(BoolMessage){}
+
+  rpc GetCurrentSessionInfo(IdMessage) returns(CurrentSessionInfo){}
+  //Scoreboard
+  rpc GetScoreboards(IdMessage) returns(ScoreBoardBundle){}
+}
+
+message EmptyMessage{ }
+
+message IdMessage{
+  string id = 1;
+}
+
+message BoolMessage{
+  bool isTrue = 1;
+}
+
+enum Apparatus{
+  Floor = 0;
+  PommelHorse = 1;
+  StillRings = 2;
+  Vault = 3;
+  ParallelBars = 4;
+  HorizontalBar = 5;
+  BalanceBeam = 6;
+  UnevenBars = 7;
+}
+
+enum JudgingPanelType{
+  EPanel = 0;
+  DPanel = 1;
+}
+
+message ApparatusList {
+  repeated Apparatus apparatuses = 1;
+}
+enum LicenceType{
+  National  = 0;
+  International = 1;
+}
+message Address{
+  string id = 1;
+  string country = 2;
+  string city = 3;
+  string street = 4;
+  string streetNumber =5;
+}
+message SportsOrganization{
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string contactPersonFullName = 5;
+  bool competitionOrganisingPrivilege = 6;
+  Address address = 7;
+}
+
+
+message Judge{
+  string id = 1;
+  string fullName = 2;
+  string email = 3;
+  LicenceType licenceType = 4;
+  string licenceName = 5;
+
+  SportsOrganization sportsOrganization = 6;
+//  string panel = 6;
+}
+
+message JudgeList{
+  repeated Judge judges = 1;
+}
+
+
+message ScoreCalculationMethod{
+  string id = 1;
+  int32 scoreDeductionNum = 2;
+}
+
+message Contestant{
+  string id = 1;
+  int32 competingId = 2;
+  string fullName = 3;
+  SportsOrganization sportsOrganization = 4;
+  repeated Apparatus competingApparatuses = 5;
+  int32 teamNumber = 6;
+  string ageCategory = 7;
+}
+
+message ContestantCompeting{
+  Contestant contestant = 1;
+  bool competes = 2;
+}
+
+message ContestantList{
+  repeated ContestantCompeting contestants = 1;
+}
+
+enum ScoreType{
+  D = 0;
+  E = 1;
+}
+
+message TempScore{
+    string id = 1;
+    ScoreType type = 2;
+    Apparatus apparatus = 3;
+    float value = 4;
+    Contestant contestant = 5;
+    string competitionId = 6; //Too large to put whole message
+    Judge judge = 7;
+}
+
+message TempScoreList{
+  repeated TempScore tempScores = 1;
+}
+
+
+message Score{
+  string id = 1;
+  Apparatus apparatus = 2;
+  float dScore = 3;
+  float eScore = 4;
+  float totalScore = 5;
+  string competitionId = 6;
+  Contestant contestant = 7;
+  bool submitted = 8;
+}
+
+
+message AllAroundScoreboardSlot{
+  string id = 1;
+  int32 place = 2;
+  Contestant contestant = 3;
+  repeated Score scores = 4;
+  float totalScore = 5;
+}
+message AllAroundScoreboard{
+  string id = 1;
+  string competitionId = 2;
+  string ageCategory = 3;
+  bool tieBrake = 4;
+  repeated Apparatus apparatuses = 5;
+  repeated AllAroundScoreboardSlot slots = 6;
+}
+
+message TeamScoreboardSlot{
+  string id = 1;
+  int32 place = 2;
+  SportsOrganization sportsOrganization = 3;
+  int32 teamNumber = 4;
+  //  repeated Score scores = 6;
+  map<string, float> apparatusTotalScores = 5;
+  float totalScore = 6;
+}
+
+message TeamScoreboard{
+  string id = 1;
+  string competitionId = 2;
+  string ageCategory = 3;
+  repeated Apparatus apparatuses = 4;
+  repeated TeamScoreboardSlot slots = 5;
+}
+
+// DTOS
+message CreateJudgingPanelsForApparatusRequest{
+  Apparatus apparatus = 1;
+  string competitionId = 2;
+}
+
+message CreateJudgingPanelsForApparatusResponse{
+  string dPanelId = 1;
+  string ePanelId = 2;
+}
+
+message AssignJudgeRequest{
+  Judge judge = 1;
+  string panelId = 2;
+}
+
+message AssignScoreCalculationRequest{
+  ScoreCalculationMethod method = 1;
+  string panelId = 2;
+}
+
+message JudgeJudgingInfo{
+  Judge judge = 1;
+  string competitionId = 2;
+  Apparatus apparatus = 3;
+  JudgingPanelType judgingPanelType = 4;
+  ScoreCalculationMethod calculationMethod = 5;
+}
+
+message GetByApparatusRequest{
+  string competitionId = 1;
+  Apparatus apparatus = 2;
+}
+
+message ScoreRequest{
+  string competitionId = 1;
+  string contestantId = 2;
+  Apparatus apparatus = 3;
+}
+
+message CurrentSessionInfo{
+  int32 currentRotation = 1;
+  int32 currentSession = 2;
+  bool rotationFinished = 3;
+  bool sessionFinished = 4;
+  bool competitionFinished = 5;
+}
+
+message ScoreBoardBundle{
+  repeated AllAroundScoreboard allAroundScoreboards = 1;
+  repeated TeamScoreboard teamScoreboards = 2;
+}
+
+

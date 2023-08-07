@@ -1,0 +1,8 @@
+<p class="heading-main">{{JudgeType}} Judge {{getApparatusName(judgingInfo?.apparatus!)}}</p>
+<div *ngIf="judgingInfo" class="info">
+    <h2>{{judgingInfo.judge.fullName}}</h2>
+    <h3>Email: {{judgingInfo.judge.email}}</h3>
+    <h3>Licence type: {{getLicenceTypeName(judgingInfo.judge.licenceType)}}</h3>
+    <h3>Licence name: {{judgingInfo.judge.licenceName}}</h3>
+    <h3>Sports organization: {{judgingInfo.judge.sportsOrganization.name}}</h3>
+</div>

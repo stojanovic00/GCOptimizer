@@ -1,0 +1,10 @@
+<p class="heading-main">Sports organisation info</p>
+<div *ngIf="sportsOrg" class="info">
+    <h2>{{sportsOrg.name}}</h2>
+    <h3>Email: {{sportsOrg.email}}</h3>
+    <h3>Contact: {{sportsOrg.phoneNumber}}</h3>
+    <h3>Contact person: {{sportsOrg.contactPersonFullName}}</h3>
+    <h3>Address: {{address}}</h3>
+    <h3 *ngIf="sportsOrg.competitionOrganisingPrivilege">This organization can organize competitions</h3>
+    <h3 *ngIf="!sportsOrg.competitionOrganisingPrivilege">This organization cannot organize competitions</h3>
+</div>

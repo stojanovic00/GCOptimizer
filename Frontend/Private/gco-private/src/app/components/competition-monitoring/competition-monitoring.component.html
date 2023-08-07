@@ -1,0 +1,29 @@
+<p class="heading-main">Competition monitoring</p>
+
+<div  *ngIf="currentSessionInfo && !currentSessionInfo.competitionFinished" class="wrap">
+    <!-- Rotation increased for human readability -->
+    <h2 *ngIf="currentSessionInfo" >Current session: {{currentSessionInfo.currentSession}}, Current rotation: {{currentSessionInfo.currentRotation + 1}}</h2>
+    <div class="buttons">
+        <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!currentSessionInfo.rotationFinished"
+        (click)="finishRotation()"
+        >Finish rotation</button>
+
+        <button
+        mat-raised-button
+        [disabled]="!currentSessionInfo.sessionFinished"
+        color="primary"
+        (click)="finishSession()"
+        >Finish session</button>
+    </div>
+</div>
+<div  *ngIf="currentSessionInfo && currentSessionInfo.competitionFinished" class="wrap">
+    <h2>Competition finished</h2>
+    <button
+    mat-raised-button
+    color="primary"
+    (click)="goToScoreboards()"
+    >See scoreboards</button>
+</div>

@@ -1,0 +1,19 @@
+.tablee {
+    width: 100%;
+    text-align: left;
+}
+
+.mat-row:hover{
+    cursor: pointer;
+    background: #efebf7;
+    transition:0.5s;
+}
+
+.mat-mdc-row:hover{
+    cursor: pointer;
+    background: #efebf7!important;
+    transition:0.5s;
+}
+.selected-row{
+    background: #efebf7;
+}

@@ -1,0 +1,33 @@
+.heading-main{
+    margin: 50px auto 0px auto;
+    width: 100%;
+    text-align: center;
+    font-size: 45px;
+}
+
+.heading-hier-1{
+    margin: 70px auto 0px auto;
+    width: 100%;
+    text-align: center;
+    font-size: 35px;
+}
+
+.heading-hier-2{
+    margin: 70px auto 0px auto;
+    width: 100%;
+    text-align: center;
+    font-size: 25px;
+}
+.custom-form{
+    width: 600px;
+    margin: 100px auto 0px auto;
+    text-align: center;
+}
+
+.form-item{
+    width: 80%;
+}
+
+.separator{
+    height: 10px;
+}

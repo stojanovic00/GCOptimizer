@@ -1,0 +1,197 @@
+<p class="heading-main">Create competition</p>
+<mat-stepper [linear]="true" #stepper>
+    <mat-step>
+        <form [formGroup]="competitionForm" class="custom-form">
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Name</mat-label>
+                <input matInput placeholder="name" formControlName="name">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Start date</mat-label>
+                <input matInput [matDatepicker]="pickerstart" formControlName="startDate">
+                <mat-datepicker-toggle [for]="pickerstart"></mat-datepicker-toggle>
+                <mat-datepicker #pickerstart></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>End date</mat-label>
+                <input matInput [matDatepicker]="pickerend" formControlName="endDate">
+                <mat-datepicker-toggle [for]="pickerend"></mat-datepicker-toggle>
+                <mat-datepicker #pickerend></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender">
+                  <mat-option *ngFor="let option of genderOptions" [value]="option.value">
+                    {{option.label}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type">
+                  <mat-option *ngFor="let option of competitionTypeOptions" [value]="option.value">
+                    {{option.label}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-checkbox formControlName="tiebreak" class="form-item">Tiebreak</mat-checkbox>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Country</mat-label>
+                <input matInput placeholder="country" formControlName="country">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>City</mat-label>
+                <input matInput placeholder="city" formControlName="city">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Street</mat-label>
+                <input matInput placeholder="street" formControlName="street">
+            </mat-form-field>
+
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Street number</mat-label>
+                <input matInput placeholder="streetNumber" formControlName="streetNumber">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Base contestant number</mat-label>
+                <input type="number" matInput placeholder="base contestant number" formControlName="baseContestantNumber">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Bonus contestant number</mat-label>
+                <input type="number"  matInput placeholder="bonus contestant number" formControlName="bonusContestantNumber">
+            </mat-form-field>
+
+            <mat-checkbox formControlName="multiCategoryTeam" class="form-item">Multi category team</mat-checkbox>
+
+               
+            <button
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="competitionForm.invalid || createdCompetitionId !== ''"
+             (click)="createCompetition()"
+             >Create competition</button>
+
+            <div class="separator"></div>
+
+            <button
+             matStepperNext
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="createdCompetitionId === ''"
+             >Add delegation member propositions</button>
+        </form>
+    </mat-step>
+    <mat-step label="Add delegation member propositions">
+        <form [formGroup]="delMemPropForm" class="custom-form">
+    
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Position</mat-label>
+                <mat-select formControlName="positionName">
+                    <mat-option *ngFor="let option of positionOptions" [value]="option.value">
+                        {{option.label}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+    
+    
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Minimal number</mat-label>
+                <input type="number" matInput placeholder="minimal number" formControlName="minNumber">
+            </mat-form-field>
+    
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Maximal number</mat-label>
+                <input type="number" matInput placeholder="maximal number" formControlName="maxNumber">
+            </mat-form-field>
+    
+            <button
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="delMemPropForm.invalid"
+             (click)="addDelMemProp()"
+             >Add</button>
+
+            <div class="separator"></div>
+
+            <button
+             matStepperNext
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="!(addedPropositions.length > 0)"
+             >Add age categories</button>
+        </form>
+        <div class="added-wrapper">
+            <h3>Added propositions:</h3>
+            <ul>
+                <li *ngFor="let proposition of addedPropositions">
+                    {{ proposition.position.name }} : min number: {{ proposition.minNumber }}, max number: {{ proposition.maxNumber }}
+                </li>
+            </ul>
+        </div>
+    </mat-step>
+    <mat-step label="Add age categories">
+        <form [formGroup]="ageCatForm" class="custom-form">
+    
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Name</mat-label>
+                <input matInput placeholder="name" formControlName="name">
+            </mat-form-field>
+    
+    
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Minimal age</mat-label>
+                <input type="number" matInput placeholder="minimal age" formControlName="minAge">
+            </mat-form-field>
+    
+            <mat-form-field appearance="fill" class="form-item">
+                <mat-label>Maximal age</mat-label>
+                <input type="number" matInput placeholder="maximal number" formControlName="maxAge">
+            </mat-form-field>
+    
+    
+            <button
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="ageCatForm.invalid"
+             (click)="addAgeCat()"
+             >Add</button>
+
+            <div class="separator"></div>
+
+            <button
+             matStepperNext
+             mat-raised-button
+             color="primary"
+             class="form-item"
+             [disabled]="!(addedAgeCategories.length > 0)"
+             (click)="finishCompCreation()"
+             >Finish competition creation</button>
+        </form>
+        <div class="added-wrapper">
+            <h3>Added age categories:</h3>
+            <ul>
+                <li *ngFor="let cat of addedAgeCategories">
+                    {{ cat.name }} : min age: {{ cat.minAge }}, max age: {{
+                    cat.maxAge }}
+                </li>
+            </ul>
+        </div>
+    
+    </mat-step>
+  </mat-stepper>

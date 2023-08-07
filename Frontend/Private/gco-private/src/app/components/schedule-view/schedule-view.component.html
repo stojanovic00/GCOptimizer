@@ -1,0 +1,61 @@
+<p *ngIf="sessionViews.length === 0" class="heading-main">Schedule not generated yet</p>
+
+<p *ngIf="sessionViews.length !== 0" class="heading-main">Schedule</p>
+
+<div *ngIf="sessionViews.length" class="button-wrap">
+        <button
+         *ngIf="sessionViews.length !== 0" 
+         mat-raised-button
+         color="primary"
+         class="form-item"
+         (click)="startCompetition()"
+         >Start competition</button>
+</div>
+
+<div class="schedule" *ngFor="let sessionView of sessionViews">
+   <p class="heading-hier-1">Session {{sessionView.session}}</p>
+   <p class="heading-hier-2">Starting time: {{sessionView.startTime}}</p>
+
+    <div class="session" *ngFor="let apparatusList of sessionView.apparatusLists">
+        <p class="heading-hier-3">{{apparatusList.apparatusName}}</p>
+
+        <div class="table-wrap">
+            <table mat-table [dataSource]="apparatusList.slots" class="mat-elevation-z8 tablee">
+
+                <ng-container matColumnDef="compId">
+                    <th mat-header-cell *matHeaderCellDef>Num.</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.contestantCompId || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.name || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="team">
+                    <th mat-header-cell *matHeaderCellDef>Team</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.teamNumber || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="ageCat">
+                    <th mat-header-cell *matHeaderCellDef>Category</th>
+                    <td mat-cell *matCellDef="let slot">{{slot.contestantInfo?.ageCategory || ''}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="organization">
+                    <th mat-header-cell *matHeaderCellDef>Organization</th>
+                    <td mat-cell *matCellDef="let slot">
+                        {{ slot.contestantInfo?.organization || '' }}
+                        <span *ngIf="slot.contestantInfo?.location"> ({{ slot.contestantInfo?.location }})</span>
+                      </td>
+                      
+                </ng-container>
+
+        
+                <tr mat-header-row *matHeaderRowDef="['compId', 'name', 'team', 'ageCat', 'organization']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['compId', 'name', 'team', 'ageCat', 'organization'];"></tr>
+            </table>
+        </div>
+
+    </div>
+</div>

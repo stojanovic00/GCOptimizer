@@ -1,0 +1,10 @@
+@import '../../styles/forms-and-headings.css';
+
+mat-toolbar {
+    display: flex;
+    justify-content: flex-end;
+  }
+button {
+  font-size: 25px;
+  letter-spacing: 0px;
+}

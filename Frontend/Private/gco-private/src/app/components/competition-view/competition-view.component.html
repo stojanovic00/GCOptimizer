@@ -1,0 +1,80 @@
+<p class="heading-main">Competitions</p>
+<div class="table-wrap">
+    <table mat-table [dataSource]="table.dataSource" class="mat-elevation-z8 tablee">
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let competition">{{competition.name}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let competition">{{getGenderName(competition.gender)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="startDate">
+            <th mat-header-cell *matHeaderCellDef>Start date</th>
+            <td mat-cell *matCellDef="let competition">{{unixDateToString(competition.startDate)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef>End date</th>
+            <td mat-cell *matCellDef="let competition">{{unixDateToString(competition.endDate)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="address">
+            <th mat-header-cell *matHeaderCellDef>Address</th>
+            <td mat-cell *matCellDef="let competition">{{formatAddress(competition.address)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let competition">{{getCompetitionTypeName(competition.type)}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="organizer">
+            <th mat-header-cell *matHeaderCellDef>Organizer</th>
+            <td mat-cell *matCellDef="let competition">{{competition.organizer.name}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: table.displayedColumns;" (click)="selectRow(row)" [class.selected-row]="row === table.selectedRow"></tr>
+    </table>
+</div>
+<div *ngIf="detailsDialogOpened" class="dialog" [class.hidden]="!detailsDialogOpened">
+    <div class="details-wrapper">
+        <h3>Name: {{selectedCompetition?.name!}}</h3>
+        <h3>Organizer: {{selectedCompetition?.organizer!.name!}}</h3>
+        <h3>Address: {{formatAddress(selectedCompetition?.address!)}}</h3>
+        <h3>Start date: {{unixDateToString(selectedCompetition?.startDate!)}}</h3>
+        <h3>End date: {{unixDateToString(selectedCompetition?.endDate!)}}</h3>
+        <h3>Gender: {{getGenderName(selectedCompetition?.gender!)}}</h3>
+        <h3>Type: {{getCompetitionTypeName(selectedCompetition?.type!)}}</h3>
+        <h3 *ngIf="selectedCompetition?.tiebreak!">Applying tiebreak</h3>
+        <h3 *ngIf="!selectedCompetition?.tiebreak!">Not applying tiebreak</h3>
+        <h3 class="list-heading" >Team composition:</h3>
+        <ul>
+            <li>Base contestant number: {{selectedCompetition?.teamComposition!.baseContestantNumber!}}</li>
+            <li>Bonus contestant number: {{selectedCompetition?.teamComposition!.bonusContestantNumber!}}</li>
+            <li *ngIf="selectedCompetition?.teamComposition!.multiCategoryTeam!">Multicategory teams</li>
+        </ul>
+        <h3 class="list-heading" >Age categories</h3>
+        <ul>
+            <li *ngFor="let cat of selectedCompetition?.ageCategories!">
+                {{ cat.name }} : min age: {{ cat.minAge || 0 }}, max age: {{ cat.maxAge || 0 }}
+            </li>
+        </ul>
+        <h3 class="list-heading" >Delegation member propositions</h3>
+        <ul>
+            <li *ngFor="let proposition of selectedCompetition?.delegationMemberPropositions!">
+                {{ proposition.position.name }} : min number: {{ proposition.minNumber }}, max number: {{ proposition.maxNumber }}
+            </li>
+        </ul>
+        <button mat-raised-button color="primary" (click)="viewApplications()">View applications</button>
+        <button *ngIf="!selectedCompetitionFinished" mat-raised-button color="primary" (click)="goToMakeSchedule()">Make schedule</button>
+        <button  *ngIf="!selectedCompetitionFinished" mat-raised-button color="primary" (click)="goToViewSchedule()">View schedule</button>
+        <button  *ngIf="selectedCompetitionFinished" mat-raised-button color="primary" (click)="goToScoreBoards()">View scoreboards</button>
+        <button mat-raised-button color="primary" (click)="closeDetailsDialog()">Close</button>
+    </div>
+</div>
+

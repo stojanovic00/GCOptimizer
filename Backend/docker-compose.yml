@@ -1,0 +1,254 @@
+version: "3.8"
+
+services:
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
+    restart: on-failure
+    ports:
+      - ${API_GATEWAY_PUBLIC_PORT}:${API_GATEWAY_PUBLIC_PORT}
+      - ${API_GATEWAY_PRIVATE_PORT}:${API_GATEWAY_PRIVATE_PORT}
+    environment:
+      API_GATEWAY_HOST: ${API_GATEWAY_HOST}
+      API_GATEWAY_PUBLIC_PORT: ${API_GATEWAY_PUBLIC_PORT}
+      API_GATEWAY_PRIVATE_PORT: ${API_GATEWAY_PRIVATE_PORT}
+      
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+
+      SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
+      SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
+
+      SCORING_SERVICE_HOST: ${SCORING_SERVICE_HOST}
+      SCORING_SERVICE_PORT: ${SCORING_SERVICE_PORT}
+
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    networks:
+      - network
+
+  auth-service:
+    image: auth-service
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./auth_service/Dockerfile
+    restart: on-failure
+    ports:
+      - 8001:${AUTH_SERVICE_PORT}
+    environment:
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      AUTH_DB_NAME: ${AUTH_DB_NAME}
+      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_USER: ${AUTH_DB_USER}
+      AUTH_DB_PASS  : ${AUTH_DB_PASS}
+
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      MAIL_CLIENT_MAIL: ${MAIL_CLIENT_MAIL}
+      MAIL_CLIENT_PASSWORD: ${MAIL_CLIENT_PASSWORD}
+    networks:
+      - network
+    depends_on:
+      - auth-db
+
+  auth-db:
+    image: auth-db
+    container_name: auth-db
+    restart: on-failure
+    build:
+      context: ../Database/Auth
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+    volumes: 
+      - auth_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5001:5432
+
+
+  application-service:
+    image: application-service
+    container_name: application-service
+    build:
+      context: .
+      dockerfile: ./application_service/Dockerfile
+    restart: on-failure
+    ports:
+      - 8002:${APPLICATION_SERVICE_PORT}
+    environment:
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+      APPLICATION_DB_NAME: ${APPLICATION_DB_NAME}
+      APPLICATION_DB_HOST: ${APPLICATION_DB_HOST}
+      APPLICATION_DB_PORT: ${APPLICATION_DB_PORT}
+      APPLICATION_DB_USER: ${APPLICATION_DB_USER}
+      APPLICATION_DB_PASS: ${APPLICATION_DB_PASS}
+    networks:
+      - network
+    depends_on:
+      - application-db
+
+
+  application-db:
+    image: application-db
+    container_name: application-db
+    restart: on-failure
+    build:
+      context: ../Database/Application
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${APPLICATION_DB_USER}
+      POSTGRES_PASSWORD: ${APPLICATION_DB_PASS}
+      POSTGRES_DB: ${APPLICATION_DB_NAME}
+    volumes: 
+      - application_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5002:5432
+
+  scheduling-service:
+    image: scheduling-service
+    container_name: scheduling-service
+    build:
+      context: ./scheduling_service
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - 8003:${SCHEDULING_SERVICE_PORT}
+    environment:
+      SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
+      SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
+      SCHEDULING_DB_NAME: ${SCHEDULING_DB_NAME}
+      SCHEDULING_DB_HOST: ${SCHEDULING_DB_HOST}
+      SCHEDULING_DB_PORT: ${SCHEDULING_DB_PORT}
+      SCHEDULING_DB_USER: ${SCHEDULING_DB_USER}
+      SCHEDULING_DB_PASS: ${SCHEDULING_DB_PASS}
+
+
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+    networks:
+      - network
+    depends_on:
+      - scheduling-db
+
+
+  scheduling-db:
+    image: mongo
+    container_name: scheduling-db
+    restart: on-failure
+    volumes: 
+      - scheduling-db:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 20s
+      timeout: 10s
+      retries: 20
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5003:27017
+    environment:
+      MONGO_INITDB_DATABASE: ${SCHEDULING_DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${SCHEDULING_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${SCHEDULING_DB_PASS}
+
+
+
+
+  scoring-service:
+    image: scoring-service
+    container_name: scoring-service
+    build:
+      context: .
+      dockerfile: ./scoring_service/Dockerfile
+    restart: on-failure
+    ports:
+      - 8004:${SCORING_SERVICE_PORT}
+    environment:
+      SCORING_SERVICE_HOST: ${SCORING_SERVICE_HOST}
+      SCORING_SERVICE_PORT: ${SCORING_SERVICE_PORT}
+      SCORING_DB_NAME: ${SCORING_DB_NAME}
+      SCORING_DB_HOST: ${SCORING_DB_HOST}
+      SCORING_DB_PORT: ${SCORING_DB_PORT}
+      SCORING_DB_USER: ${SCORING_DB_USER}
+      SCORING_DB_PASS: ${SCORING_DB_PASS}
+
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+
+      APPLICATION_SERVICE_HOST: ${APPLICATION_SERVICE_HOST}
+      APPLICATION_SERVICE_PORT: ${APPLICATION_SERVICE_PORT}
+
+      SCHEDULING_SERVICE_HOST: ${SCHEDULING_SERVICE_HOST}
+      SCHEDULING_SERVICE_PORT: ${SCHEDULING_SERVICE_PORT}
+    networks:
+      - network
+    depends_on:
+      - scoring-db
+
+
+  scoring-db:
+    image: scoring-db
+    container_name: scoring-db
+    restart: on-failure
+    build:
+      context: ../Database/Scoring
+      dockerfile: Dockerfile
+    environment:
+      PGUSER: ${SCORING_DB_USER}
+      POSTGRES_PASSWORD: ${SCORING_DB_PASS}
+      POSTGRES_DB: ${SCORING_DB_NAME}
+    volumes: 
+      - scoring_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s 
+    networks:
+      - network
+    ports:
+      - 5004:5432
+
+
+
+volumes:
+  auth_db:
+    driver: local
+  application_db:
+    driver: local
+  scheduling-db:
+    driver: local
+  scoring_db:
+    driver: local
+
+networks:
+  network:
+    driver: bridge

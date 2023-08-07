@@ -1,0 +1,57 @@
+@import '../../styles/forms-and-headings.css';
+@import '../../styles/tables.css';
+
+.info{
+    width: 70%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+h2{
+    font-size: 40px;
+}
+
+h3{
+    font-size: 30px;
+}
+
+.table-wrap{
+    width: 50%;
+    margin: auto;
+}
+
+.table-wrap p{
+    margin-bottom: 20px;
+}
+
+.heading-hier-3{
+    margin: 15px auto 0px auto;
+    text-align: left;
+}
+
+.button-wrap{
+    width: 60%;
+    margin: 40px auto 40px auto;
+    display: flex;
+    text-align: center;
+}
+
+.button-wrap button{
+    flex: 1;
+    margin:0px 20px;
+}
+  
+.deducted{
+    background-color: rgb(245, 199, 199);
+}
+
+.rotation-finished {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+  }
+  
+  .rotation-finished h2 {
+    text-align: center; /* Center the text horizontally */
+  }

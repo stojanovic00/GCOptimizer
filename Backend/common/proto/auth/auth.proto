@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option go_package = "common/auth_pb";
+package auth_pb;
+
+
+service AuthService{
+  rpc Create(Account) returns(IdResponse) {}
+  rpc Login(Account) returns(AccessToken) {}
+  rpc HasPermission(HasPermissionRequest) returns(BoolMessage) {}
+  rpc DeleteAccounts(EmailList) returns(EmptyMessage) {}
+}
+
+message EmptyMessage{}
+message BoolMessage{
+    bool value = 1;
+}
+
+message Account{
+  string id = 1;
+  string email=2;
+  string password=3;
+  Role role=4;
+}
+
+message Role{
+  string id = 1;
+  string name = 2;
+}
+
+message IdResponse{
+  string id = 1;
+}
+message AccessToken{
+  string token = 1;
+}
+
+message UserInfo{
+  string email= 1;
+  string role= 2;
+}
+
+message HasPermissionRequest{
+  string permission = 1;
+}
+
+message EmailList{
+  repeated string emails = 1;
+}
