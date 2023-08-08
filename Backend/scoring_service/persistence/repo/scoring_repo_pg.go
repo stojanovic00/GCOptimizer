@@ -17,6 +17,22 @@ func NewScoringRepoPg(dbClient *gorm.DB) *ScoringRepoPg {
 	return &ScoringRepoPg{dbClient: dbClient}
 }
 
+// This function is made just to patch things up before presentation, logic of geting judge info should be changed
+// This function will also work on long run (one judge can't physicaly be on 2 active competitions)
+// but i don't think it is good approach
+func (r *ScoringRepoPg) GetPanelWithActiveCompetition(panels []domain.Panel) (*domain.Panel, error) {
+	for _, panel := range panels {
+		finished, err := r.IsCompetitionFinished(panel.CompetitionID)
+		if err != nil {
+			return nil, err
+		}
+		if !finished {
+			return &panel, nil
+		}
+	}
+	return nil, errors.New("no panel with active competition found")
+}
+
 func (r *ScoringRepoPg) GetJudgeJudgingInfo(email string) (*dto.JudgeJudgingInfo, error) {
 	var judge domain.Judge
 
@@ -25,14 +41,18 @@ func (r *ScoringRepoPg) GetJudgeJudgingInfo(email string) (*dto.JudgeJudgingInfo
 		return nil, result.Error
 	}
 
-	var panel domain.Panel
+	var panels []domain.Panel
 	result = r.dbClient.Model(domain.Panel{}).
 		Joins("left join panel_judges pj on id = pj.panel_id").
 		Where("judge_id = ?", judge.ID).
 		Preload("ScoreCalculationMethod").
-		Find(&panel)
+		Find(&panels)
 	if result.Error != nil {
 		return nil, result.Error
+	}
+	panel, err := r.GetPanelWithActiveCompetition(panels)
+	if err != nil {
+		return nil, err
 	}
 
 	//If it is D panel it must retrieve E score calculation method so frontend can show deductions on D panel GUI
@@ -187,10 +207,15 @@ func (r *ScoringRepoPg) SubmitScore(score *domain.Score) error {
 		return result.Error
 	}
 
+	session, err := r.GetCurrentSession(score.CompetitionID)
+	if err != nil {
+		return err
+	}
+
 	//Update schedule slots scoredApparatuses
 	var slot domain.ScheduleSlot
 	result = r.dbClient.
-		Where("contestant_id = ?", score.ContestantID).
+		Where("contestant_id = ? and session_id = ?", score.ContestantID, session.ID).
 		First(&slot)
 	if result.Error != nil {
 		return result.Error
@@ -321,7 +346,7 @@ func (r *ScoringRepoPg) IsRotationFinished(competitionId uuid.UUID) (bool, error
 		}
 
 		for _, slot := range slots {
-			if slot.Contestant.CompetesApparatus(currentApparatus) {
+			if slot.CompetesApparatus(currentApparatus) {
 				//Check if he scored on this apparatus
 				scored := false
 				for _, app := range slot.ScoredApparatuses {
@@ -355,7 +380,7 @@ func (r *ScoringRepoPg) IsSessionFinished(competitionId uuid.UUID) (bool, error)
 	allCompeted := true
 	for _, slot := range session.ScheduleSlots {
 
-		if len(slot.ScoredApparatuses) != len(slot.Contestant.CompetingApparatuses) {
+		if len(slot.ScoredApparatuses) != len(slot.CompetingApparatuses) {
 			allCompeted = false
 			break
 		}

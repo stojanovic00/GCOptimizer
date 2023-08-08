@@ -6,7 +6,6 @@ export interface ContestantScoring{
     competingId : number;
     fullName : string;
     sportsOrganization : SportsOrg;
-    competingApparatuses : Apparatus[];
     teamNumber : number;
     ageCategory : string;
 }

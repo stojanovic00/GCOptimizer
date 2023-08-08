@@ -84,7 +84,7 @@ func (s *ScoringService) GetNextCurrentApparatusContestant(competitionId uuid.UU
 				break
 			}
 		}
-		if !competed && slot.Contestant.CompetesApparatus(apparatus) {
+		if !competed && slot.CompetesApparatus(apparatus) {
 			contestant = slot.Contestant
 			break
 		}
@@ -423,7 +423,7 @@ func (s *ScoringService) GenerateTeamScoreboards(schedule *domain.Schedule) erro
 					return scores[i].TotalScore > scores[j].TotalScore
 				})
 
-				//For possible out of bounds error
+				//For possible out-of-bounds error
 				var limit int
 				if teamBaseNum <= len(scores) {
 					limit = teamBaseNum

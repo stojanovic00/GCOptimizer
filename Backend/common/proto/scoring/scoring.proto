@@ -114,7 +114,6 @@ message Contestant{
   int32 competingId = 2;
   string fullName = 3;
   SportsOrganization sportsOrganization = 4;
-  repeated Apparatus competingApparatuses = 5;
   int32 teamNumber = 6;
   string ageCategory = 7;
 }

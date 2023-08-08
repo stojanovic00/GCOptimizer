@@ -108,7 +108,7 @@ func (h *HandlerRpc) GetCurrentApparatusContestants(ctx context.Context, request
 	compId, _ := uuid.Parse(request.CompetitionId)
 	apparatus := domain.Apparatus(request.Apparatus)
 
-	contestants, err := h.scService.GetCurrentApparatusContestants(compId, apparatus)
+	contestants, err := h.scService.GetCurrentApparatusSlots(compId, apparatus)
 	if err != nil {
 		return nil, err
 	}

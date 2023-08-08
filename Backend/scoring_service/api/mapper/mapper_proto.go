@@ -123,9 +123,8 @@ func contestantPbToDom(contestant *scheduling_pb.ContestantInfo) *domain.Contest
 		SportsOrganization: domain.SportsOrganization{ //Fill it later in code!!!
 			Name: contestant.Organization,
 		},
-		CompetingApparatuses: ApparatusListPbToDom(contestant.CompetingApparatuses),
-		TeamNumber:           contestant.TeamNumber,
-		AgeCategory:          contestant.AgeCategory,
+		TeamNumber:  contestant.TeamNumber,
+		AgeCategory: contestant.AgeCategory,
 	}
 }
 
@@ -142,10 +141,11 @@ func slotPbToDom(slot *scheduling_pb.ScheduleSlot) *domain.ScheduleSlot {
 		Session: domain.Session{
 			Number: slot.Session,
 		}, //Will be assigned later
-		StartingApparatus: domain.Apparatus(slot.StartingApparatus.Number()),
-		ScoredApparatuses: []domain.Apparatus{},
-		ContestantID:      uuid.UUID{},
-		Contestant:        contestant,
+		CompetingApparatuses: ApparatusListPbToDom(slot.ContestantInfo.CompetingApparatuses),
+		StartingApparatus:    domain.Apparatus(slot.StartingApparatus.Number()),
+		ScoredApparatuses:    []domain.Apparatus{},
+		ContestantID:         uuid.UUID{},
+		Contestant:           contestant,
 	}
 }
 func SlotListPbToDom(slots []*scheduling_pb.ScheduleSlot) []domain.ScheduleSlot {
@@ -252,13 +252,12 @@ func JudgeJudgingInfoDomToPb(info *dto.JudgeJudgingInfo) *scoring_pb.JudgeJudgin
 
 func ContestantDomToPb(contestant *domain.Contestant) *scoring_pb.Contestant {
 	return &scoring_pb.Contestant{
-		Id:                   contestant.ID.String(),
-		CompetingId:          contestant.CompetingId,
-		FullName:             contestant.FullName,
-		SportsOrganization:   sportsOrganizationDomToPb(&contestant.SportsOrganization),
-		CompetingApparatuses: ApparatusListDomToPb(contestant.CompetingApparatuses),
-		TeamNumber:           contestant.TeamNumber,
-		AgeCategory:          contestant.AgeCategory,
+		Id:                 contestant.ID.String(),
+		CompetingId:        contestant.CompetingId,
+		FullName:           contestant.FullName,
+		SportsOrganization: sportsOrganizationDomToPb(&contestant.SportsOrganization),
+		TeamNumber:         contestant.TeamNumber,
+		AgeCategory:        contestant.AgeCategory,
 	}
 }
 func ContestantListDomToPb(contestants []domain.Contestant) []*scoring_pb.Contestant {
@@ -270,17 +269,17 @@ func ContestantListDomToPb(contestants []domain.Contestant) []*scoring_pb.Contes
 	return contListPb
 }
 
-func ContestantCompetingDomToPb(contestant *domain.Contestant, apparatus domain.Apparatus) *scoring_pb.ContestantCompeting {
+func ContestantCompetingDomToPb(slot *domain.ScheduleSlot, apparatus domain.Apparatus) *scoring_pb.ContestantCompeting {
 	return &scoring_pb.ContestantCompeting{
-		Contestant: ContestantDomToPb(contestant),
-		Competes:   contestant.CompetesApparatus(apparatus),
+		Contestant: ContestantDomToPb(&slot.Contestant),
+		Competes:   slot.CompetesApparatus(apparatus),
 	}
 }
 
-func ContestantCompetingListDomToPbSorted(contestants []domain.Contestant, apparatus domain.Apparatus) []*scoring_pb.ContestantCompeting {
+func ContestantCompetingListDomToPbSorted(slots []domain.ScheduleSlot, apparatus domain.Apparatus) []*scoring_pb.ContestantCompeting {
 	var contListPb []*scoring_pb.ContestantCompeting
-	for _, contestant := range contestants {
-		contListPb = append(contListPb, ContestantCompetingDomToPb(&contestant, apparatus))
+	for _, slot := range slots {
+		contListPb = append(contListPb, ContestantCompetingDomToPb(&slot, apparatus))
 	}
 
 	//Filter those who compete on this apparatus and those who don't
