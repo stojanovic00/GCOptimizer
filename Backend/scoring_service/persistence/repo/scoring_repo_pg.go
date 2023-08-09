@@ -435,10 +435,10 @@ func (r *ScoringRepoPg) GetScores(competitionId uuid.UUID) ([]domain.Score, erro
 	return scores, nil
 }
 
-func (r *ScoringRepoPg) GetScoresByContestantId(contestantId uuid.UUID) ([]domain.Score, error) {
+func (r *ScoringRepoPg) GetScoresByContestantId(contestantId, competitionId uuid.UUID) ([]domain.Score, error) {
 	var scores []domain.Score
 	result := r.dbClient.
-		Where("contestant_id = ?", contestantId).
+		Where("contestant_id = ? and competition_id = ?", contestantId, competitionId).
 		Find(&scores)
 	if result.Error != nil {
 		return nil, result.Error
@@ -466,7 +466,7 @@ func (r *ScoringRepoPg) GetAllAroundScoreBoards(competitionId uuid.UUID) ([]doma
 	//Calculate info that is not stored
 	for _, scoreBoard := range scoreBoards {
 		for idx, slot := range scoreBoard.Slots {
-			scores, err := r.GetScoresByContestantId(slot.ContestantID)
+			scores, err := r.GetScoresByContestantId(slot.ContestantID, competitionId)
 			if err != nil {
 				return nil, err
 			}
