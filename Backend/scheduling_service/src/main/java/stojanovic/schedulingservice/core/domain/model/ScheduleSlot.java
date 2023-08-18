@@ -32,7 +32,6 @@ public class ScheduleSlot {
     ApparatusType startingApparatus;
 
 
-
     public ScheduleSlot(long planningId, int contestantsPerApparatus, List<ApparatusType> apparatusOrder, Contestant contestant){
         this.planningId = planningId;
         this.contestantsPerApparatus = contestantsPerApparatus;

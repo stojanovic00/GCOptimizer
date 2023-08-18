@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 @PlanningSolution
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,19 +32,21 @@ public class Schedule {
     @ProblemFactCollectionProperty
     @Transient
     private List<Integer> sessions;
-    @ValueRangeProvider
 
+    @ValueRangeProvider
     @ProblemFactCollectionProperty
     @Transient
     private List<ApparatusType> startingApparatuses;
-@PlanningEntityCollectionProperty private List<ScheduleSlot> slots;
+
+    @PlanningEntityCollectionProperty
+    private List<ScheduleSlot> slots;
 
     @PlanningScore(bendableHardLevelsSize = 2, bendableSoftLevelsSize = 3)
     @Transient
     // Solution is feasible if all hard score levels are at least 0
     private BendableScore score;
 
-    //For persisting order when reading from in database
+    //For persisting order when reading from database
     private List<Long> startingTimes;
     private List<ApparatusType> apparatusOrder;
     @Indexed
